@@ -1,0 +1,12 @@
+spring:
+  flyway:
+    enabled: false
+
+logging:
+  level:
+    org:
+      hibernate:
+        engine:
+          jdbc:
+            env:
+              internal: ERROR
