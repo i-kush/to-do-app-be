@@ -1,0 +1,18 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="Igor Kushnir"
+               id="init-schema">
+        <sqlFile path="changesets/init-schema.sql"
+                 relativeToChangelogFile="true"
+                 splitStatements="false"/>
+        <rollback>
+            <sqlFile path="changesets/rollback/init-schema-rollback.sql"
+                     relativeToChangelogFile="true"
+                     splitStatements="false"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

@@ -2,7 +2,7 @@ package com.kush.todo.service;
 
 import com.kush.todo.BaseTest;
 import com.kush.todo.exception.NotFoundException;
-import com.kush.todo.repository.TaskRepository;
+import com.kush.todo.repository.TenantRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
@@ -11,22 +11,23 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import java.util.Optional;
+import java.util.UUID;
 
-class TaskServiceTest extends BaseTest {
+class TenantServiceTest extends BaseTest {
 
     @InjectMocks
-    private TaskService taskService;
+    private TenantService tenantService;
 
     @Mock
-    private TaskRepository taskRepository;
+    private TenantRepository tenantRepository;
 
     @Test
     void findById() {
-        Mockito.when(taskRepository.findById(ArgumentMatchers.anyLong())).thenReturn(Optional.empty());
+        Mockito.when(tenantRepository.findById(ArgumentMatchers.any())).thenReturn(Optional.empty());
 
         Assertions.assertThrows(
                 NotFoundException.class,
-                () -> taskService.findTaskById(1),
+                () -> tenantService.findById(UUID.randomUUID()),
                 "When no info in DB then exception should be thrown"
         );
     }

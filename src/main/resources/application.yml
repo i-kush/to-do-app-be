@@ -1,13 +1,13 @@
 spring:
   profiles:
     active: local
-  flyway:
-    baseline-on-migrate: true # ToDo use liquibase
   jpa:
     open-in-view: false
   mvc:
     servlet:
       path: /api/v1
+  liquibase:
+    change-log: classpath:/db/changelog/changelog-master.xml
 
 management:
   endpoints:
