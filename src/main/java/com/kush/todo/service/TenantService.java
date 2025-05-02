@@ -1,6 +1,7 @@
 package com.kush.todo.service;
 
 import com.kush.todo.dto.request.TenantRequestDto;
+import com.kush.todo.dto.response.CustomPage;
 import com.kush.todo.dto.response.TenantResponseDto;
 import com.kush.todo.entity.Tenant;
 import com.kush.todo.exception.NotFoundException;
@@ -11,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,5 +60,11 @@ public class TenantService {
         return tenantRepository
                 .findById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("No tenant with id '%s'", id)));
+    }
+
+    public CustomPage<TenantResponseDto> findAll(int page, int size) {
+        Page<TenantResponseDto> pages = tenantRepository.findAll(PageRequest.of(page - 1, size))
+                                                        .map(tenantMapper::toTenantDto);
+        return tenantMapper.toCustomPage(pages);
     }
 }

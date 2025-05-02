@@ -1,9 +1,12 @@
 package com.kush.todo.controller;
 
 import com.kush.todo.dto.request.TenantRequestDto;
+import com.kush.todo.dto.response.CustomPage;
 import com.kush.todo.dto.response.TenantResponseDto;
 import com.kush.todo.service.TenantService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,6 +41,12 @@ public class TenantController {
     @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public TenantResponseDto get(@NotNull @PathVariable UUID id) {
         return tenantService.findById(id);
+    }
+
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public CustomPage<TenantResponseDto> getAll(@RequestParam @Min(1) int page,
+                                                @RequestParam @Min(1) @Max(200) int size) {
+        return tenantService.findAll(page, size);
     }
 
     @PutMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)

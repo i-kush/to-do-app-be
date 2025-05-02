@@ -1,26 +1,13 @@
 package com.kush.todo.entity;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.Data;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.time.Instant;
-import java.util.UUID;
-
+@Getter
+@Setter
 @Entity
-@Data
-public class Tenant {
+public class Tenant extends CommonEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
     private String name;
-    @CreationTimestamp
-    private Instant created;
-    @UpdateTimestamp
-    private Instant updated;
 }

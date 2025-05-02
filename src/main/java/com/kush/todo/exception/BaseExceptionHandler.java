@@ -2,6 +2,7 @@ package com.kush.todo.exception;
 
 import com.kush.todo.dto.response.ErrorDto;
 import com.kush.todo.dto.response.ErrorsDto;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.method.MethodValidationResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
@@ -22,12 +24,11 @@ public class BaseExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorsDto> handle(MethodArgumentNotValidException e) {
-        List<ErrorDto> errors = e
-                .getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .map(er -> new ErrorDto(String.format("%s -> %s", er.getField(), er.getDefaultMessage())))
-                .toList();
+        List<ErrorDto> errors = e.getBindingResult()
+                                 .getFieldErrors()
+                                 .stream()
+                                 .map(er -> new ErrorDto(String.format("%s -> %s", er.getField(), er.getDefaultMessage())))
+                                 .toList();
         log.warn("Validation failed: {} ", errors, e);
 
         return new ResponseEntity<>(new ErrorsDto(errors), HttpStatus.BAD_REQUEST);
@@ -66,14 +67,29 @@ public class BaseExceptionHandler {
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ErrorsDto> handle(MethodArgumentTypeMismatchException e) {
-        log.warn("Invalid argument", e);
+        log.warn("Invalid argument type", e);
         return new ResponseEntity<>(new ErrorsDto(new ErrorDto(String.format("Invalid type for '%s'", e.getName()))), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ErrorsDto> handle(MissingServletRequestParameterException e) {
+        log.warn("Missing request param", e);
+        return new ResponseEntity<>(new ErrorsDto(new ErrorDto(String.format("Missing request param '%s'", e.getParameterName()))), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorsDto> handle(ConstraintViolationException e) {
+        List<ErrorDto> errors = e.getConstraintViolations()
+                                 .stream()
+                                 .map(c -> new ErrorDto(String.format("%s %s", c.getPropertyPath(), c.getMessage())))
+                                 .toList();
+        log.warn("Constraint violation", e);
+        return new ResponseEntity<>(new ErrorsDto(errors), HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorsDto> handleCommon(Exception e) {
+    public ResponseEntity<ErrorsDto> handle(Exception e) {
         log.error("Unknown error", e);
         return new ResponseEntity<>(new ErrorsDto(new ErrorDto(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
 }
