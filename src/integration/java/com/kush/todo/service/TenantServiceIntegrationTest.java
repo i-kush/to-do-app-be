@@ -1,7 +1,7 @@
 package com.kush.todo.service;
 
 import com.kush.todo.BaseIntegrationTest;
-import com.kush.todo.dto.response.TenantDto;
+import com.kush.todo.dto.request.TenantRequestDto;
 import com.kush.todo.exception.NotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -26,9 +26,9 @@ class TenantServiceIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void findById() {
-        TenantDto createdTenant = tenantService.create(new TenantDto(UUID.randomUUID(), "test"));
+        TenantRequestDto createdTenant = tenantService.create(new TenantRequestDto(UUID.randomUUID(), "test"));
 
-        TenantDto foundTenant = Assertions.assertDoesNotThrow(
+        TenantRequestDto foundTenant = Assertions.assertDoesNotThrow(
                 () -> tenantService.findById(createdTenant.id()),
                 "No exceptions on finding should appear"
         );

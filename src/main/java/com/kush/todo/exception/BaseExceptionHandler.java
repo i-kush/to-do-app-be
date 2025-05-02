@@ -1,0 +1,79 @@
+package com.kush.todo.exception;
+
+import com.kush.todo.dto.response.ErrorDto;
+import com.kush.todo.dto.response.ErrorsDto;
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.method.MethodValidationResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+@ControllerAdvice
+@Slf4j
+public class BaseExceptionHandler {
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorsDto> handle(MethodArgumentNotValidException e) {
+        List<ErrorDto> errors = e
+                .getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(er -> new ErrorDto(String.format("%s -> %s", er.getField(), er.getDefaultMessage())))
+                .toList();
+        log.warn("Validation failed: {} ", errors, e);
+
+        return new ResponseEntity<>(new ErrorsDto(errors), HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * For some reason in Spring 6.1+ {@link HandlerMethodValidationException} is thrown instead of {@link MethodArgumentNotValidException}.
+     * Moreover, {@link MethodValidationResult#getAllValidationResults} is deprecated and does not have adequate alternative...waiting for a new Spring version
+     */
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<ErrorsDto> handle(HandlerMethodValidationException e) {
+        List<ErrorDto> errors = new ArrayList<>();
+        for (Object rawError : e.getDetailMessageArguments()) {
+            String[] rawErrorParts = rawError.toString().split(",");
+            for (int i = 0; i < rawErrorParts.length; i++) {
+                String errorPart = i == 0 ? rawErrorParts[i] : rawErrorParts[i].substring(5);
+                errors.add(new ErrorDto(errorPart.trim()));
+            }
+        }
+        log.warn("Validation failed: {} ", errors, e);
+
+        return new ResponseEntity<>(new ErrorsDto(errors), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ErrorsDto> handle(NotFoundException e) {
+        log.warn("Not found", e);
+        return new ResponseEntity<>(new ErrorsDto(new ErrorDto(e.getMessage())), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorsDto> handle(IllegalArgumentException e) {
+        log.warn("Invalid argument", e);
+        return new ResponseEntity<>(new ErrorsDto(new ErrorDto(e.getMessage())), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorsDto> handle(MethodArgumentTypeMismatchException e) {
+        log.warn("Invalid argument", e);
+        return new ResponseEntity<>(new ErrorsDto(new ErrorDto(String.format("Invalid type for '%s'", e.getName()))), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorsDto> handleCommon(Exception e) {
+        log.error("Unknown error", e);
+        return new ResponseEntity<>(new ErrorsDto(new ErrorDto(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+}
