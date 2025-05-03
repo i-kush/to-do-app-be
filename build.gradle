@@ -2,6 +2,7 @@ plugins {
     id "java"
     id "org.springframework.boot" version "3.4.5"
     id "io.spring.dependency-management" version "1.1.7"
+    id "jacoco"
 }
 
 group = "com.kush.todo"
@@ -49,7 +50,9 @@ dependencies {
 }
 
 tasks.named("test") {
+    jvmArgs "-javaagent:${configurations.testRuntimeClasspath.find { it.name.contains('mockito-core') }}", '-Xshare:off'
     useJUnitPlatform()
+    finalizedBy jacocoTestReport
 }
 
 sourceSets {
@@ -67,6 +70,7 @@ configurations {
 }
 
 tasks.register("integrationTest", Test) {
+    jvmArgs "-javaagent:${configurations.testRuntimeClasspath.find { it.name.contains('mockito-core') }}", '-Xshare:off'
     useJUnitPlatform()
 
     testClassesDirs = sourceSets.integration.output.classesDirs
@@ -80,4 +84,12 @@ rootProject.tasks.named("processIntegrationResources") {
 if (System.properties["test.profile"] == "integration") {
     check.dependsOn integrationTest
     integrationTest.mustRunAfter test
+
+    jacocoTestReport {
+        dependsOn integrationTest
+    }
+}
+
+jacocoTestReport {
+    dependsOn test
 }
