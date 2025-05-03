@@ -72,6 +72,7 @@ configurations {
 tasks.register("integrationTest", Test) {
     jvmArgs "-javaagent:${configurations.testRuntimeClasspath.find { it.name.contains('mockito-core') }}", '-Xshare:off'
     useJUnitPlatform()
+    finalizedBy jacocoTestReport
 
     testClassesDirs = sourceSets.integration.output.classesDirs
     classpath = sourceSets.integration.runtimeClasspath
@@ -85,11 +86,20 @@ if (System.properties["test.profile"] == "integration") {
     check.dependsOn integrationTest
     integrationTest.mustRunAfter test
 
-    jacocoTestReport {
+    tasks.named("jacocoTestReport") {
         dependsOn integrationTest
     }
 }
 
-jacocoTestReport {
+tasks.named("jacocoTestReport") {
     dependsOn test
+    executionData fileTree(project.rootDir.absolutePath).include(
+            "**/build/jacoco/test.exec",
+            "**/build/jacoco/integrationTest.exec"
+    )
+
+    reports {
+        xml.required = true
+        html.required = true
+    }
 }

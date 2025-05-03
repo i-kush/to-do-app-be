@@ -13,6 +13,21 @@ services:
     volumes:
       - to-do-app-data:/var/lib/postgresql/data
 
+  backend:
+    container_name: to-do-app-be
+    image: to-do-app:latest
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/to-do-app-db"
+    ports:
+      - "8080:8080"
+    profiles:
+      - backend
+
 volumes:
   to-do-app-data:
     driver: local
