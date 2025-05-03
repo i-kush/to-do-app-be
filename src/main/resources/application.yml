@@ -5,17 +5,12 @@ spring:
     open-in-view: false
   mvc:
     servlet:
-      path: /api/v1
+      path: /api
   liquibase:
     change-log: classpath:/db/changelog/changelog-master.xml
 
 management:
   endpoints:
     web:
-      base-path: /actuator
       exposure:
-        include: '*'
-  endpoint:
-    health:
-      show-details: always
-      show-components: always
+        include: health

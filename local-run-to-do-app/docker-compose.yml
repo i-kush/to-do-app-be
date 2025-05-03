@@ -2,7 +2,7 @@ services:
 
   postgres:
     container_name: to-do-app-postgres
-    image: postgres:13.0-alpine
+    image: postgres:17-alpine
     restart: always
     environment:
       POSTGRES_PASSWORD: password2
@@ -10,7 +10,9 @@ services:
       POSTGRES_DB: to-do-app-db
     ports:
       - "5432:5432"
+    volumes:
+      - to-do-app-data:/var/lib/postgresql/data
 
 volumes:
-  to-do-app-postgres-data:
+  to-do-app-data:
     driver: local

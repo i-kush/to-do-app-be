@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.method.MethodValidationResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -85,6 +86,14 @@ public class BaseExceptionHandler {
                                  .toList();
         log.warn("Constraint violation", e);
         return new ResponseEntity<>(new ErrorsDto(errors), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorsDto> handle(HttpMessageNotReadableException e) {
+        String[] messageParts = e.getMessage().split(":");
+        String message = messageParts.length > 1 ? messageParts[0] : e.getMessage();
+        log.error("Invalid HTTP request", e);
+        return new ResponseEntity<>(new ErrorsDto(new ErrorDto(message)), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)

@@ -2,8 +2,14 @@ package com.kush.todo.controller;
 
 import com.kush.todo.dto.request.TenantRequestDto;
 import com.kush.todo.dto.response.CustomPage;
+import com.kush.todo.dto.response.ErrorsDto;
 import com.kush.todo.dto.response.TenantResponseDto;
 import com.kush.todo.service.TenantService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -32,29 +38,53 @@ public class TenantController {
 
     private final TenantService tenantService;
 
+    @Operation(summary = "Create tenant", description = "Creates a tenant with the specific settings")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Successfully created tenant"),
+            @ApiResponse(responseCode = "4**/5**", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
+    })
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public TenantResponseDto create(@Valid @NotNull @RequestBody TenantRequestDto tenantDto) {
+    public TenantResponseDto create(@Valid @RequestBody TenantRequestDto tenantDto) {
         return tenantService.create(tenantDto);
     }
 
+    @Operation(summary = "Get tenant by ID", description = "Gets tenant details by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved tenant"),
+            @ApiResponse(responseCode = "4**/5**", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
+    })
     @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public TenantResponseDto get(@NotNull @PathVariable UUID id) {
         return tenantService.findById(id);
     }
 
+    @Operation(summary = "Get tenants", description = "Gets paginated tenants list with details")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved paginated tenants"),
+            @ApiResponse(responseCode = "4**/5**", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
+    })
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public CustomPage<TenantResponseDto> getAll(@RequestParam @Min(1) int page,
-                                                @RequestParam @Min(1) @Max(200) int size) {
+    public CustomPage<TenantResponseDto> getAll(@Min(1) @RequestParam int page, @Min(1) @Max(200) @RequestParam int size) {
         return tenantService.findAll(page, size);
     }
 
+
+    @Operation(summary = "Update tenant by ID", description = "Updates tenant details by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully updated tenant"),
+            @ApiResponse(responseCode = "4**/5**", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
+    })
     @PutMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public TenantResponseDto update(@NotNull @PathVariable UUID id,
-                                    @Valid @NotNull @RequestBody TenantRequestDto tenantDto) {
+    public TenantResponseDto update(@NotNull @PathVariable UUID id, @Valid @RequestBody TenantRequestDto tenantDto) {
         return tenantService.update(id, tenantDto);
     }
 
+    @Operation(summary = "Delete tenant by ID", description = "Deletes tenant by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully deleted tenant"),
+            @ApiResponse(responseCode = "4**/5**", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
+    })
     @DeleteMapping("{id}")
     public void delete(@NotNull @PathVariable UUID id) {
         tenantService.delete(id);
