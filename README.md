@@ -18,6 +18,7 @@ I will put everything here someday...
 - build without tests: `./gradlew build -x test`
 - build with unit tests: `./gradlew build`
 - build with both unit and integration tests: `./gradlew build -Dtest.profile=integration`
+- build test coverage report (first `test` and `integrationTest` should be executed: `./gradlew jacocoTestReport`
 - build image locally: `docker build -t to-do-app .`
 
 ## Local run
