@@ -54,6 +54,7 @@ sonarqube {
     properties {
         property "sonar.qualitygate.wait", true
         property "sonar.projectKey", "kush-to-do-app-be"
+        property "sonar.organization", System.getenv("SONAR_ORG")
         property "sonar.login", System.getenv("SONAR_TOKEN")
         property "sonar.host.url", System.getenv("SONAR_HOST_URL")
         property "sonar.sourceEncoding", "UTF-8"
