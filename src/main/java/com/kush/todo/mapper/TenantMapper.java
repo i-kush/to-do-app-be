@@ -14,11 +14,11 @@ public abstract class TenantMapper extends PageMapper {
     @Mapping(target = "updated", ignore = true)
     public abstract Tenant toTenant(TenantRequestDto tenantDto);
 
-    public abstract TenantResponseDto toTenantDto(Tenant tenant);
-
     @Mapping(target = "id", source = "tenant.id")
     @Mapping(target = "name", source = "tenantDto.name")
     @Mapping(target = "created", source = "tenant.created")
     @Mapping(target = "updated", ignore = true)
     public abstract Tenant toTenant(Tenant tenant, TenantRequestDto tenantDto);
+
+    public abstract TenantResponseDto toTenantDto(Tenant tenant);
 }

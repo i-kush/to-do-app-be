@@ -69,7 +69,6 @@ public class TenantController {
         return tenantService.findAll(page, size);
     }
 
-
     @Operation(summary = "Update tenant by ID", description = "Updates tenant details by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully updated tenant"),
