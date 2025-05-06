@@ -48,5 +48,3 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           SONAR_ORG: ${{ secrets.SONAR_ORG }}
-        with:
-          projectBaseDir: .
