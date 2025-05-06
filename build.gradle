@@ -2,7 +2,9 @@ plugins {
     id "java"
     id "org.springframework.boot" version "3.4.5"
     id "io.spring.dependency-management" version "1.1.7"
-    id "org.sonarqube" version "4.4.1.3373"
+    id "com.github.spotbugs" version "6.1.10"
+    id "checkstyle"
+    id "pmd"
     id "jacoco"
 }
 
@@ -48,19 +50,6 @@ dependencies {
     testImplementation "org.testcontainers:postgresql"
 
     testRuntimeOnly "org.junit.platform:junit-platform-launcher"
-}
-
-sonarqube {
-    properties {
-        property "sonar.qualitygate.wait", true
-        property "sonar.projectKey", "kush-to-do-app-be"
-        property "sonar.login", System.getenv("SONAR_LOGIN")
-        property "sonar.host.url", System.getenv("SONAR_HOST_URL")
-        property "sonar.sourceEncoding", "UTF-8"
-        property "sonar.coverage.jacoco.xmlReportPaths", "${project.rootDir}/build/reports/jacoco/test/jacocoTestReport.xml"
-        property "sonar.coverage.exclusions", "src/main/java/com/kush/todo/config/OpenApiConfig.java," +
-                "src/main/java/com/kush/todo/dto/**"
-    }
 }
 
 tasks.named("test") {
@@ -114,4 +103,55 @@ tasks.named("jacocoTestReport") {
         xml.required = true
         html.required = true
     }
+}
+
+checkstyle {
+    toolVersion = "10.17.0"
+    configFile = file("config/checkstyle-rules.xml")
+    ignoreFailures = false
+}
+
+pmd {
+    toolVersion = "7.0.0"
+    ruleSets = []
+    ruleSetFiles = files("config/pmd-rules.xml")
+    ignoreFailures = false
+}
+
+spotbugs {
+    toolVersion = "4.8.4"
+    effort = "max"
+    reportLevel = "low"
+    ignoreFailures = false
+    excludeFilter = file("config/spotbugs-exclusions.xml")
+}
+
+tasks.withType(Checkstyle).configureEach {
+    reports {
+        html.required = true
+        xml.required = true
+    }
+}
+
+tasks.withType(Pmd).configureEach {
+    reports {
+        html.required = true
+        xml.required = true
+    }
+}
+
+tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach {
+    reports {
+        html.required = true
+        xml.required = true
+    }
+}
+
+tasks.named("check") {
+    dependsOn tasks.named("checkstyleMain")
+    dependsOn tasks.named("checkstyleTest")
+    dependsOn tasks.named("pmdMain")
+    dependsOn tasks.named("pmdTest")
+    dependsOn tasks.named("spotbugsMain")
+    dependsOn tasks.named("spotbugsTest")
 }
