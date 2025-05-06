@@ -3,7 +3,7 @@ name: ToDo App Build
 on:
   pull_request:
   push:
-    branches: [ main ]
+    branches: [ main, feature/**, release/**, bugfix/** ]
 
 jobs:
   build:
