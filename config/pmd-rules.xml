@@ -95,7 +95,6 @@
     <rule ref="category/java/design.xml/SimplifyConditional"/>
     <rule ref="category/java/design.xml/SingularField"/>
     <rule ref="category/java/design.xml/UselessOverridingMethod"/>
-    <rule ref="category/java/design.xml/UseUtilityClass"/>
 
     <rule ref="category/java/errorprone.xml/AssignmentInOperand"/>
     <rule ref="category/java/errorprone.xml/AssignmentToNonFinalStatic"/>

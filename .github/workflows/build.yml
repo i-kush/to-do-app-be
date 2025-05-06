@@ -40,3 +40,6 @@ jobs:
 
       - name: Generate code coverage report
         run: ./gradlew jacocoTestReport --no-daemon
+
+      - name: Run checks
+        run: ./gradlew check --no-daemon
