@@ -41,14 +41,19 @@ jobs:
       - name: Generate code coverage report
         run: ./gradlew jacocoTestReport --no-daemon
 
-      - name: Report code coverage
-        uses: 5monkeys/code-coverage-action@v1
-        with:
-          coverage-file: build/reports/jacoco/test/jacocoTestReport.xml
-          minimum-coverage: 80
-          fail: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Prepare code coverage analysis tool
+        run: |
+          python -m pip install --upgrade pip
+          pip install diff-cover
+
+      - name: Validate code coverage
+        run: |
+          diff-cover build/reports/jacoco/test/jacocoTestReport.xml \
+            --compare-branch=origin/main \
+            --fail-under=80 \
+            --coverage-report-type jacoco-xml \
+            --github-token ${{ secrets.GITHUB_TOKEN }} \
+            --check --comment
 
       - name: Run checks
         run: ./gradlew check --no-daemon
