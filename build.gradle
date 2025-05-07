@@ -152,6 +152,8 @@ tasks.named("check") {
     dependsOn tasks.named("checkstyleTest")
     dependsOn tasks.named("pmdMain")
     dependsOn tasks.named("pmdTest")
+    dependsOn tasks.named("spotbugsMain")
+    dependsOn tasks.named("spotbugsTest")
 }
 
 afterEvaluate {
