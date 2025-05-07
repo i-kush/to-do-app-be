@@ -59,6 +59,12 @@ jobs:
         run: ./gradlew check --no-daemon
         continue-on-error: true
 
+      - name: Spotbugs report check
+        uses: jwgmeligmeyling/spotbugs-github-action@master
+        with:
+          path: '**/build/reports/spotbugs/*.xml'
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: PMD report check
         uses: jwgmeligmeyling/pmd-github-action@master
         with:
@@ -69,10 +75,4 @@ jobs:
         uses: jwgmeligmeyling/checkstyle-github-action@master
         with:
           path: '**/build/reports/checkstyle/*.xml'
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Spotbugs report check
-        uses: jwgmeligmeyling/spotbugs-github-action@master
-        with:
-          path: '**/build/reports/**/*.xml'
           token: ${{ secrets.GITHUB_TOKEN }}
