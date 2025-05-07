@@ -55,6 +55,7 @@ jobs:
           verbose: true
 
       - name: Run checks
+        id: run-checks-step
         run: ./gradlew check --no-daemon
         continue-on-error: true
 
@@ -75,3 +76,7 @@ jobs:
         with:
           path: '**/build/reports/spotbugs/*.xml'
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Validate checks statuses
+        if: steps.run-checks-step.outputs.exit_code != '0'
+        run: exit 1
