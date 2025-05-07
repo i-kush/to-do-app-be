@@ -147,14 +147,6 @@ tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach {
     }
 }
 
-//tasks.named("check") {
-//    dependsOn tasks.named("spotbugsMain")
-//    dependsOn tasks.named("spotbugsTest")
-//    dependsOn tasks.named("checkstyleMain")
-//    dependsOn tasks.named("checkstyleTest")
-//    dependsOn tasks.named("pmdMain")
-//    dependsOn tasks.named("pmdTest")
-//}
 afterEvaluate {
     tasks.named("check") {
         dependsOn tasks.named("spotbugsMain")
