@@ -1,8 +1,0 @@
-coverage:
-  status:
-    project: 80
-    patch: 80
-
-  comment:
-    layout: "compact"
-    threshold: 80
