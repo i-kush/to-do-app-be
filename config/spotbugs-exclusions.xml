@@ -5,7 +5,7 @@
     <Match>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
-<!--    <Match>-->
-<!--        <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"/>-->
-<!--    </Match>-->
+    <Match>
+        <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"/>
+    </Match>
 </FindBugsFilter>
