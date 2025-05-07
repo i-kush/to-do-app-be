@@ -1,12 +1,13 @@
 name: ToDo App Build
 
-permissions:
-  pull-requests: write
-
 on:
   pull_request:
   push:
     branches: [ main ]
+
+permissions:
+  pull-requests: write
+  checks: write
 
 jobs:
   build:
@@ -61,4 +62,4 @@ jobs:
         uses: jwgmeligmeyling/pmd-github-action@master
         with:
           path: '**/build/reports/pmd/*.xml'
-          token: ${{ secrets.PERSONAL_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
