@@ -57,8 +57,10 @@ jobs:
       - name: Run checks
         id: run-checks-step
         run: |
+          set +e
           ./gradlew check --no-daemon
           echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+          set -e
         continue-on-error: true
 
       - name: Spotbugs report check
