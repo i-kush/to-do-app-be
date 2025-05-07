@@ -5,6 +5,10 @@ on:
   push:
     branches: [ main ]
 
+permissions:
+  pull-requests: write
+  checks: write
+
 jobs:
   build:
     name: Build and Analysis
@@ -41,5 +45,44 @@ jobs:
       - name: Generate code coverage report
         run: ./gradlew jacocoTestReport --no-daemon
 
+      - name: Upload code coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
+          files: build/reports/jacoco/test/jacocoTestReport.xml
+          name: coverage-report
+          verbose: true
+
       - name: Run checks
-        run: ./gradlew check --no-daemon
+        id: run-checks-step
+        run: |
+          set +e
+          ./gradlew check --no-daemon
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+          set -e
+        continue-on-error: true
+
+      - name: Spotbugs report check
+        uses: jwgmeligmeyling/spotbugs-github-action@master
+        with:
+          path: '**/build/reports/spotbugs/*.xml'
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: PMD report check
+        uses: jwgmeligmeyling/pmd-github-action@master
+        with:
+          path: '**/build/reports/pmd/*.xml'
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkstyle report check
+        uses: jwgmeligmeyling/checkstyle-github-action@master
+        with:
+          path: '**/build/reports/checkstyle/*.xml'
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Validate checks report
+        if: steps.run-checks-step.outputs.exit_code != '0'
+        run: |
+          echo "See checks steps for more details"
+          exit 1
