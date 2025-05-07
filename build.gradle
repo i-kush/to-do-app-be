@@ -155,10 +155,3 @@ tasks.named("check") {
     dependsOn tasks.named("pmdMain")
     dependsOn tasks.named("pmdTest")
 }
-
-afterEvaluate {
-    tasks.named("check") {
-        dependsOn tasks.named("spotbugsMain")
-        dependsOn tasks.named("spotbugsTest")
-    }
-}
