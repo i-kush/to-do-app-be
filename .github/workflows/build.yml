@@ -45,7 +45,7 @@ jobs:
       - name: Code coverage
         run: ./gradlew jacocoTestReport --no-daemon
 
-      - name: Code coverage report check
+      - name: Code coverage report decoration
         id: jacoco
         uses: madrapps/jacoco-report@v1.7.2
         with:
@@ -53,8 +53,18 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 80
           min-coverage-changed-files: 80
-          update-comment: true
-          continue-on-error: false
+          title: 'Code Coverage'
+          update-comment: 'true'
+          pass-emoji: ':green_circle:'
+          fail-emoji: ':red_circle:'
+
+
+      - name: Code coverage report check
+        if: ${{ steps.jacoco.outputs.coverage-changed-files < 80.0 }}
+        uses: actions/github-script@v6
+        with:
+          script: |
+            core.setFailed('Changed files coverage is less than expected, see reports for details')
 
       - name: Spotbugs
         id: spotbugs-check
@@ -105,6 +115,7 @@ jobs:
         if: steps.spotbugs-check.outputs.spotbugs_exit_code != '0' ||
           steps.checkstyle-check.outputs.checkstyle_exit_code != '0' ||
           steps.pmd-check.outputs.pmd_exit_code != '0'
-        run: |
-          echo "See checks steps for more details"
-          exit 1
+        uses: actions/github-script@v6
+        with:
+          script: |
+            core.setFailed('Quality checks failed, see reports for details')
