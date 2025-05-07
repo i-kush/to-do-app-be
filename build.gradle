@@ -94,10 +94,8 @@ if (System.properties["test.profile"] == "integration") {
 
 tasks.named("jacocoTestReport") {
     dependsOn test
-    executionData fileTree(project.rootDir.absolutePath).include(
-            "**/build/jacoco/test.exec",
-            "**/build/jacoco/integrationTest.exec"
-    )
+    executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/test.exec",
+            "**/build/jacoco/integrationTest.exec")
 
     reports {
         xml.required = true
@@ -147,11 +145,13 @@ tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach {
     }
 }
 
-tasks.named("check") {
-    dependsOn tasks.named("checkstyleMain")
-    dependsOn tasks.named("checkstyleTest")
-    dependsOn tasks.named("pmdMain")
-    dependsOn tasks.named("pmdTest")
-    dependsOn tasks.named("spotbugsMain")
-    dependsOn tasks.named("spotbugsTest")
+afterEvaluate {
+    tasks.named("check") {
+        dependsOn tasks.named("spotbugsMain")
+        dependsOn tasks.named("spotbugsTest")
+        dependsOn tasks.named("checkstyleMain")
+        dependsOn tasks.named("checkstyleTest")
+        dependsOn tasks.named("pmdMain")
+        dependsOn tasks.named("pmdTest")
+    }
 }
