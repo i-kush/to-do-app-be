@@ -53,6 +53,8 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 80
           min-coverage-changed-files: 80
+          update-comment: true
+          continue-on-error: false
 
       - name: Spotbugs
         id: spotbugs-check
