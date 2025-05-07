@@ -57,5 +57,5 @@ jobs:
       - name: Annotate PR with PMD report
         uses: jwgmeligmeyling/pmd-github-action@v1
         with:
-          reportPath: '**/build/reports/pmd/*.xml'
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          path: '**/build/reports/pmd/*.xml'
+          token: ${{ secrets.GITHUB_TOKEN }}
