@@ -63,3 +63,14 @@ jobs:
         with:
           path: '**/build/reports/pmd/*.xml'
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Annotate PR with Checkstyle report
+        uses: jwgmeligmeyling/pmd-github-action@master
+        with:
+          path: '**/build/reports/checkstyle/*.xml'
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Annotate PR with Spotbugs report
+        uses: jwgmeligmeyling/pmd-github-action@master
+        with:
+          path: '**/build/reports/spotbugs/*.xml'
+          token: ${{ secrets.GITHUB_TOKEN }}
