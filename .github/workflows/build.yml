@@ -56,7 +56,7 @@ jobs:
 
       - name: Run checks
         id: run-checks-step
-        run: ./gradlew check --no-daemon
+        run: ./gradlew check --no-daemon --info | grep spotbugs
         continue-on-error: true
 
       - name: PMD report check
