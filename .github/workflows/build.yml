@@ -83,4 +83,6 @@ jobs:
 
       - name: Validate checks report
         if: steps.run-checks-step.outputs.exit_code != '0'
-        run: exit 1
+        run: |
+          echo "See checks steps for more details"
+          exit 1
