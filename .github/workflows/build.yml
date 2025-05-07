@@ -35,11 +35,6 @@ jobs:
       - name: Compile
         run: ./gradlew assemble --no-daemon
 
-      - name: Debug GitHub Token Permissions
-        run: |
-          curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            https://api.github.com/user
-
       - name: Run unit tests
         run: ./gradlew test --no-daemon
 
@@ -66,4 +61,4 @@ jobs:
         uses: jwgmeligmeyling/pmd-github-action@master
         with:
           path: '**/build/reports/pmd/*.xml'
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PERSONAL_TOKEN }}
