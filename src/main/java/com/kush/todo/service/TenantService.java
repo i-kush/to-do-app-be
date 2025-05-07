@@ -62,6 +62,7 @@ public class TenantService {
                 .orElseThrow(() -> new NotFoundException(String.format("No tenant with id '%s'", id)));
     }
 
+    @Transactional(readOnly = true)
     public CustomPage<TenantResponseDto> findAll(int page, int size) {
         Page<TenantResponseDto> pages = tenantRepository.findAll(PageRequest.of(page - 1, size))
                                                         .map(tenantMapper::toTenantDto);
