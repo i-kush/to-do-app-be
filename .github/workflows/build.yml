@@ -32,6 +32,11 @@ jobs:
       - name: Compile
         run: ./gradlew assemble --no-daemon
 
+      - name: Debug GitHub Token Permissions
+        run: |
+          curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/user
+
       - name: Run unit tests
         run: ./gradlew test --no-daemon
 
