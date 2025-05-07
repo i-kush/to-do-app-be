@@ -56,9 +56,7 @@ jobs:
 
       - name: Run checks
         id: run-checks-step
-        run: |
-          ./gradlew check --no-daemon
-          find . -name "*.xml"
+        run: ./gradlew check --no-daemon && find . -name "*.xml"
         continue-on-error: true
 
       - name: PMD report check
