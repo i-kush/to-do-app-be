@@ -41,19 +41,15 @@ jobs:
       - name: Generate code coverage report
         run: ./gradlew jacocoTestReport --no-daemon
 
-      - name: Prepare code coverage analysis tool
-        run: |
-          python -m pip install --upgrade pip
-          pip install diff-cover
-
-      - name: Validate code coverage
-        run: |
-          diff-cover build/reports/jacoco/test/jacocoTestReport.xml \
-            --compare-branch=origin/main \
-            --fail-under=80 \
-            --coverage-report-type jacoco-xml \
-            --github-token ${{ secrets.GITHUB_TOKEN }} \
-            --check --comment
+      - name: Upload code coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: build/reports/jacoco/test/jacocoTestReport.xml
+          fail_ci_if_error: true
+          flags: unittests
+          name: coverage-report
+          required: true
+          threshold: 80
 
       - name: Run checks
         run: ./gradlew check --no-daemon
