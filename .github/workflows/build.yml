@@ -42,14 +42,13 @@ jobs:
         run: ./gradlew jacocoTestReport --no-daemon
 
       - name: Upload code coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
-          file: build/reports/jacoco/test/jacocoTestReport.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
-          flags: unittests
+          files: build/reports/jacoco/test/jacocoTestReport.xml
           name: coverage-report
-          required: true
-          threshold: 80
+          verbose: true
 
       - name: Run checks
         run: ./gradlew check --no-daemon
