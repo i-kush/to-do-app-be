@@ -53,6 +53,7 @@ jobs:
           files: build/reports/jacoco/test/jacocoTestReport.xml
           name: coverage-report
           verbose: true
+          status: true
 
       - name: Run checks
         id: run-checks-step
