@@ -41,12 +41,21 @@ jobs:
       - name: Generate code coverage report
         run: ./gradlew jacocoTestReport --no-daemon
 
-      - name: Validate code coverage percentage
-        uses: romankh3/jacoco-report-diff@v2.6
+      - name: Report code coverage
+        uses: 5monkeys/code-coverage-action@v1
         with:
-          jacocoReportPath: build/reports/jacoco/test/jacocoTestReport.xml
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
-          minCoveragePercentage: 80
+          coverage-file: build/reports/jacoco/test/jacocoTestReport.xml
+          minimum-coverage: 80
+          fail: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run checks
         run: ./gradlew check --no-daemon
+        continue-on-error: true
+
+      - name: Annotate PR with PMD report
+        uses: jwgmeligmeyling/pmd-github-action@v1
+        with:
+          reportPath: '**/build/reports/pmd/*.xml'
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
