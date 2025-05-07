@@ -56,7 +56,9 @@ jobs:
 
       - name: Run checks
         id: run-checks-step
-        run: ./gradlew check --no-daemon --info | grep spotbugs
+        run: |
+          ./gradlew check --no-daemon
+          find . -name "*.xml"
         continue-on-error: true
 
       - name: PMD report check
@@ -74,5 +76,5 @@ jobs:
       - name: Spotbugs report check
         uses: jwgmeligmeyling/spotbugs-github-action@master
         with:
-          path: 'build/reports/spotbugs/main.xml'
+          path: '**/build/reports/spotbugs/**/*.xml'
           token: ${{ secrets.GITHUB_TOKEN }}
