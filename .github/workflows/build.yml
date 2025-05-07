@@ -76,3 +76,7 @@ jobs:
         with:
           path: '**/build/reports/checkstyle/*.xml'
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Validate checks report
+        if: steps.run-checks-step.outputs.exit_code != '0'
+        run: exit 1
