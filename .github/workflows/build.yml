@@ -55,7 +55,7 @@ jobs:
         continue-on-error: true
 
       - name: Annotate PR with PMD report
-        uses: jwgmeligmeyling/pmd-github-action@v1
+        uses: jwgmeligmeyling/pmd-github-action@master
         with:
           path: '**/build/reports/pmd/*.xml'
           token: ${{ secrets.GITHUB_TOKEN }}
