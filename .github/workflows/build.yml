@@ -41,5 +41,12 @@ jobs:
       - name: Generate code coverage report
         run: ./gradlew jacocoTestReport --no-daemon
 
+      - name: Validate code coverage percentage
+        uses: romankh3/jacoco-report-diff@v2.6
+        with:
+          jacocoReportPath: build/reports/jacoco/test/jacocoTestReport.xml
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          minCoveragePercentage: 80
+
       - name: Run checks
         run: ./gradlew check --no-daemon
