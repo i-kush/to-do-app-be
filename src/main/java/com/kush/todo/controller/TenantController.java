@@ -17,6 +17,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;
+import java.util.Vector;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -46,6 +47,7 @@ public class TenantController {
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public TenantResponseDto create(@Valid @RequestBody TenantRequestDto tenantDto) {
+        new Vector<>();
         return tenantService.create(tenantDto);
     }
 
