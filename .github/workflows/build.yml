@@ -56,7 +56,9 @@ jobs:
 
       - name: Run checks
         id: run-checks-step
-        run: ./gradlew check --no-daemon
+        run: |
+          ./gradlew check --no-daemon
+          echo "exit-code=$?" >> "$GITHUB_OUTPUT"
         continue-on-error: true
 
       - name: Spotbugs report check
@@ -78,5 +80,5 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Validate checks report
-        if: steps.run-checks-step.outputs.exit_code != '0'
+        if: steps.run-checks-step.outputs.exit-code != '0'
         run: exit 1
