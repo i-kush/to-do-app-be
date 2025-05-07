@@ -10,6 +10,7 @@ import com.kush.todo.repository.TenantRepository;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -67,5 +68,10 @@ public class TenantService {
         Page<TenantResponseDto> pages = tenantRepository.findAll(PageRequest.of(page - 1, size))
                                                         .map(tenantMapper::toTenantDto);
         return tenantMapper.toCustomPage(pages);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Tenant> findAll() {
+        return tenantRepository.findAll();
     }
 }
