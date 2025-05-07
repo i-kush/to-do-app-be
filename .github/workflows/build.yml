@@ -42,25 +42,24 @@ jobs:
       - name: Run integration tests
         run: ./gradlew integrationTest -x test --no-daemon
 
-      - name: Generate code coverage report
+      - name: Code coverage
         run: ./gradlew jacocoTestReport --no-daemon
 
-      - name: Upload code coverage to Codecov
-        uses: codecov/codecov-action@v4
+      - name: Code coverage report check
+        id: jacoco
+        uses: madrapps/jacoco-report@v1.7.2
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          fail_ci_if_error: true
-          files: build/reports/jacoco/test/jacocoTestReport.xml
-          name: coverage-report
-          verbose: true
-          status: true
+          paths: ${{ github.workspace }}/**/build/reports/jacoco/test/jacocoTestReport.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: 80
+          min-coverage-changed-files: 80
 
-      - name: Run checks
-        id: run-checks-step
+      - name: Spotbugs
+        id: spotbugs-check
         run: |
           set +e
-          ./gradlew check --no-daemon
-          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+          ./gradlew spotbugsMain spotbugsTest spotbugsIntegration --no-daemon
+          echo "spotbugs_exit_code=$?" >> "$GITHUB_OUTPUT"
           set -e
         continue-on-error: true
 
@@ -70,11 +69,14 @@ jobs:
           path: '**/build/reports/spotbugs/*.xml'
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: PMD report check
-        uses: jwgmeligmeyling/pmd-github-action@master
-        with:
-          path: '**/build/reports/pmd/*.xml'
-          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkstyle
+        id: checkstyle-check
+        run: |
+          set +e
+          ./gradlew checkstyleMain checkstyleTest checkstyleIntegration --no-daemon
+          echo "checkstyle_exit_code=$?" >> "$GITHUB_OUTPUT"
+          set -e
+        continue-on-error: true
 
       - name: Checkstyle report check
         uses: jwgmeligmeyling/checkstyle-github-action@master
@@ -82,8 +84,25 @@ jobs:
           path: '**/build/reports/checkstyle/*.xml'
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: PMD
+        id: pmd-check
+        run: |
+          set +e
+          ./gradlew pmdMain pmdTest pmdIntegration --no-daemon
+          echo "checkstyle_exit_code=$?" >> "$GITHUB_OUTPUT"
+          set -e
+        continue-on-error: true
+
+      - name: PMD report check
+        uses: jwgmeligmeyling/pmd-github-action@master
+        with:
+          path: '**/build/reports/pmd/*.xml'
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Validate checks report
-        if: steps.run-checks-step.outputs.exit_code != '0'
+        if: steps.spotbugs-check.outputs.spotbugs_exit_code != '0' ||
+          steps.checkstyle-check.outputs.checkstyle_exit_code != '0' ||
+          steps.pmd-check.outputs.pmd_exit_code != '0'
         run: |
           echo "See checks steps for more details"
           exit 1
