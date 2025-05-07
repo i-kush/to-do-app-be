@@ -62,17 +62,17 @@ jobs:
       - name: PMD report check
         uses: jwgmeligmeyling/pmd-github-action@master
         with:
-          path: '**/reports/pmd/*.xml'
+          path: '**/build/reports/pmd/*.xml'
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Checkstyle report check
         uses: jwgmeligmeyling/checkstyle-github-action@master
         with:
-          path: '**/reports/checkstyle/*.xml'
+          path: '**/build/reports/checkstyle/*.xml'
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Spotbugs report check
         uses: jwgmeligmeyling/spotbugs-github-action@master
         with:
-          path: '**/reports/spotbugs/*.xml'
+          path: '**/build/reports/**/*.xml'
           token: ${{ secrets.GITHUB_TOKEN }}
