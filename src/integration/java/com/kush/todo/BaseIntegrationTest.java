@@ -1,5 +1,6 @@
 package com.kush.todo;
 
+import jakarta.annotation.PreDestroy;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -16,7 +17,7 @@ import org.springframework.test.context.jdbc.Sql;
 @Sql(scripts = "/cleanup.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 public abstract class BaseIntegrationTest {
 
-    private static final PostgreSQLContainer<?> DB = new PostgreSQLContainer<>("postgres:13.0-alpine")
+    private static final PostgreSQLContainer<?> DB = new PostgreSQLContainer<>("postgres:17.0-alpine")
             .withDatabaseName("to-do-database")
             .withUsername("postgres")
             .withPassword("password2")
@@ -34,4 +35,8 @@ public abstract class BaseIntegrationTest {
         registry.add("spring.datasource.password", DB::getPassword);
     }
 
+    @PreDestroy
+    public static void tearDown() {
+        DB.stop();
+    }
 }
