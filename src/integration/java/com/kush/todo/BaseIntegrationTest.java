@@ -1,6 +1,5 @@
 package com.kush.todo;
 
-import org.junit.jupiter.api.AfterAll;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -9,10 +8,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
 @ActiveProfiles("integration-test")
+@Sql(scripts = "/cleanup.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 public abstract class BaseIntegrationTest {
 
     private static final PostgreSQLContainer<?> DB = new PostgreSQLContainer<>("postgres:13.0-alpine")
@@ -33,8 +34,4 @@ public abstract class BaseIntegrationTest {
         registry.add("spring.datasource.password", DB::getPassword);
     }
 
-    @AfterAll
-    public static void tearDown() {
-        DB.stop();
-    }
 }
