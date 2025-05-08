@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.method.MethodValidationResult;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -76,6 +77,12 @@ public class BaseExceptionHandler {
     public ResponseEntity<ErrorsDto> handle(MissingServletRequestParameterException e) {
         log.warn("Missing request param", e);
         return new ResponseEntity<>(new ErrorsDto(new ErrorDto(String.format("Missing request param '%s'", e.getParameterName()))), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<ErrorsDto> handle(HttpMediaTypeNotSupportedException e) {
+        log.warn("Invalid content type", e);
+        return new ResponseEntity<>(new ErrorsDto(new ErrorDto(e.getMessage())), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)

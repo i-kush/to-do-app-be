@@ -7,7 +7,6 @@ import com.kush.todo.entity.Tenant;
 import com.kush.todo.exception.NotFoundException;
 import com.kush.todo.mapper.TenantMapper;
 import com.kush.todo.repository.TenantRepository;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;
@@ -26,13 +25,17 @@ public class TenantService {
 
     @Transactional
     public TenantResponseDto create(TenantRequestDto tenantDto) {
-        if (tenantRepository.existsByName(tenantDto.name())) {
-            throw new IllegalArgumentException("Tenant name already exists");
-        }
+        validateName(tenantDto.name());
 
         Tenant tenant = tenantMapper.toTenant(tenantDto);
         Tenant createdTenant = tenantRepository.save(tenant);
         return tenantMapper.toTenantDto(createdTenant);
+    }
+
+    private void validateName(String name) {
+        if (tenantRepository.existsByName(name)) {
+            throw new IllegalArgumentException("Tenant name already exists");
+        }
     }
 
     @Transactional(readOnly = true)
@@ -41,14 +44,15 @@ public class TenantService {
     }
 
     @Transactional
-    public TenantResponseDto update(@NotNull UUID id, TenantRequestDto tenantDto) {
+    public TenantResponseDto update(UUID id, TenantRequestDto tenantDto) {
+        validateName(tenantDto.name());
         Tenant tenant = tenantMapper.toTenant(getRequired(id), tenantDto);
         Tenant udpatedTenant = tenantRepository.save(tenant);
         return tenantMapper.toTenantDto(udpatedTenant);
     }
 
     @Transactional
-    public void delete(@NotNull UUID id) {
+    public void delete(UUID id) {
         if (!tenantRepository.existsById(id)) {
             throw new NotFoundException(String.format("No tenant with id '%s'", id));
         }

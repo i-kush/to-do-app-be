@@ -94,8 +94,21 @@ if (System.properties["test.profile"] == "integration") {
 
 tasks.named("jacocoTestReport") {
     dependsOn test
-    executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/test.exec",
-            "**/build/jacoco/integrationTest.exec")
+    executionData fileTree(project.rootDir.absolutePath).include(
+            "**/build/jacoco/test.exec",
+            "**/build/jacoco/integrationTest.exec"
+    )
+
+    classDirectories.setFrom(
+            fileTree(dir: layout.buildDirectory.dir("classes/java/main").get().asFile, excludes: [
+                    "com/kush/todo/dto/**",
+                    "com/kush/todo/entity/**",
+                    "com/kush/todo/mapper/**",
+                    "com/kush/todo/exception/**",
+                    "com/kush/todo/config/**",
+                    "com/kush/todo/ToDoApplication.class"
+            ])
+    )
 
     reports {
         xml.required = true
