@@ -1,0 +1,11 @@
+name: Pull Request Quality Gates
+
+on:
+  pull_request:
+    branches: [ main, feature/* ]
+  push:
+    branches: [ feature/* ]
+
+jobs:
+  base-quality-gates:
+    uses: ./.github/workflows/base-quality-gates.yml
