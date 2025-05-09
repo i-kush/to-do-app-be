@@ -1,12 +1,9 @@
-name: Base Quality Gates
+name: ToDo App Build
 
 on:
-  workflow_call:
-    inputs:
-      override-step:
-        description: "Code coverage report check"
-        required: false
-        type: string
+  pull_request:
+  push:
+    branches: [ main ]
 
 permissions:
   pull-requests: write
@@ -63,7 +60,7 @@ jobs:
 
 
       - name: Code coverage report check
-        if: ${{ steps.jacoco.outputs.coverage-changed-files < 90.0 && inputs.override-step != 'coverage-check' }}
+        if: ${{ steps.jacoco.outputs.coverage-changed-files < 90.0 || steps.jacoco.outputs.coverage-overall < 90.0 }}
         uses: actions/github-script@v6
         with:
           script: |
