@@ -48,6 +48,20 @@ class TenantControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    void createDuplicate() {
+        TenantRequestDto tenantRequestDto = IntegrationTestDataBuilder.buildTenantRequestDto();
+        restTemplate.postForEntity(BASE_URL, IntegrationTestDataBuilder.buildRequest(tenantRequestDto), TenantResponseDto.class);
+
+        ResponseEntity<ErrorsDto> response = restTemplate.postForEntity(BASE_URL, IntegrationTestDataBuilder.buildRequest(tenantRequestDto), ErrorsDto.class);
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode().value());
+        Assertions.assertNotNull(response.getBody());
+        List<ErrorDto> errors = response.getBody().errors();
+        Assertions.assertFalse(CollectionUtils.isEmpty(errors));
+        Assertions.assertEquals("Tenant name already exists", errors.getFirst().message());
+    }
+
+    @Test
     void createWithExistingName() {
         TenantRequestDto request = IntegrationTestDataBuilder.buildTenantRequestDto();
         ResponseEntity<TenantResponseDto> successfulResponse = restTemplate.postForEntity(BASE_URL,
