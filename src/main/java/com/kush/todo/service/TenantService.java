@@ -26,7 +26,6 @@ public class TenantService {
     @Transactional
     public TenantResponseDto create(TenantRequestDto tenantDto) {
         validateName(tenantDto.name());
-
         Tenant tenant = tenantMapper.toTenant(tenantDto);
         Tenant createdTenant = tenantRepository.save(tenant);
         return tenantMapper.toTenantDto(createdTenant);
@@ -56,7 +55,6 @@ public class TenantService {
         if (!tenantRepository.existsById(id)) {
             throw new NotFoundException(String.format("No tenant with id '%s'", id));
         }
-
         tenantRepository.deleteById(id);
     }
 
