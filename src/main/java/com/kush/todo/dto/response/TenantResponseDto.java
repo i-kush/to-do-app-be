@@ -7,6 +7,7 @@ import java.util.UUID;
 @Builder
 public record TenantResponseDto(
         UUID id,
+
         String name
 ) {
 
