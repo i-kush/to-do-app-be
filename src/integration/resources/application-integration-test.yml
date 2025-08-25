@@ -1,3 +1,6 @@
+logging:
+  config: classpath:logback-spring-local.xml
+
 spring:
   main:
     lazy-initialization: true

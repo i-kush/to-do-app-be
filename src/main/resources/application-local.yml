@@ -1,3 +1,6 @@
+logging:
+  config: classpath:logback-spring-local.xml
+
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/to-do-app-db
