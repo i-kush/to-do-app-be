@@ -10,14 +10,14 @@ import org.mapstruct.Mapping;
 public abstract class TenantMapper extends PageMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "created", ignore = true)
-    @Mapping(target = "updated", ignore = true)
+    @Mapping(target = "created", expression = MappingConstants.TIMESTAMP_NOW_EXPRESSION)
+    @Mapping(target = "updated", expression = MappingConstants.TIMESTAMP_NOW_EXPRESSION)
     public abstract Tenant toTenant(TenantRequestDto tenantDto);
 
     @Mapping(target = "id", source = "tenant.id")
     @Mapping(target = "name", source = "tenantDto.name")
     @Mapping(target = "created", source = "tenant.created")
-    @Mapping(target = "updated", ignore = true)
+    @Mapping(target = "updated", expression = MappingConstants.TIMESTAMP_NOW_EXPRESSION)
     public abstract Tenant toTenant(Tenant tenant, TenantRequestDto tenantDto);
 
     public abstract TenantResponseDto toTenantDto(Tenant tenant);

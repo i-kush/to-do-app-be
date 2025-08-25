@@ -1,13 +1,11 @@
 package com.kush.todo.repository;
 
-import com.kush.todo.entity.Tenant;
+import com.kush.todo.entity.AppUser;
 
 import java.util.UUID;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface TenantRepository extends CrudRepository<Tenant, UUID>, PagingAndSortingRepository<Tenant, UUID> {
-
-    boolean existsByName(String name);
+public interface AppUserRepository extends CrudRepository<AppUser, UUID>, PagingAndSortingRepository<AppUser, UUID> {
 }

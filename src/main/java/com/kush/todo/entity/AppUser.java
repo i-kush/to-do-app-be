@@ -10,10 +10,17 @@ import org.springframework.data.relational.core.mapping.Table;
 
 @Table
 @Builder
-public record Tenant(
+public record AppUser(
         @Id
         UUID id,
-        String name,
+        UUID tenantId,
+        String username,
+        String passwordHash,
+        String email,
+        String firstname,
+        String lastname,
+        boolean isLocked,
+        boolean isActivated,
         Instant created,
         Instant updated
 ) {

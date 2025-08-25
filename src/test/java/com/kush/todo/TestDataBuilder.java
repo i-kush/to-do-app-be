@@ -31,13 +31,11 @@ public final class TestDataBuilder {
     }
 
     public static Tenant buildTenant() {
-        Tenant tenant = new Tenant();
-
-        tenant.setId(UUID.randomUUID());
-        tenant.setName(UUID.randomUUID().toString());
-        tenant.setCreated(Instant.now());
-        tenant.setUpdated(Instant.now().minus(10, ChronoUnit.DAYS));
-
-        return tenant;
+        return Tenant.builder()
+                     .id(UUID.randomUUID())
+                     .name(UUID.randomUUID().toString())
+                     .created(Instant.now().minus(10, ChronoUnit.DAYS))
+                     .updated(Instant.now())
+                     .build();
     }
 }

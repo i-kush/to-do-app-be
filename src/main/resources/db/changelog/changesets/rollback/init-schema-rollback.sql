@@ -1,3 +1,9 @@
 drop table if exists task;
+drop table if exists project;
+drop table if exists user_role;
+drop table if exists role_permission;
+drop table if exists permission;
+drop table if exists role;
+drop table if exists app_user;
 drop table if exists tenant;
 drop extension if exists "uuid-ossp";
