@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/tenants")
 @RequiredArgsConstructor
+// ToDo add common API Response response codes...not only for 500 and add media types
 public class TenantController {
 
     private final TenantService tenantService;
@@ -41,7 +42,7 @@ public class TenantController {
     @Operation(summary = "Create tenant", description = "Creates a tenant with the specific settings")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Successfully created tenant"),
-            @ApiResponse(responseCode = "4**/5**", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
+            @ApiResponse(responseCode = "500", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
     })
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
@@ -52,7 +53,7 @@ public class TenantController {
     @Operation(summary = "Get tenant by ID", description = "Gets tenant details by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved tenant"),
-            @ApiResponse(responseCode = "4**/5**", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
+            @ApiResponse(responseCode = "500", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
     })
     @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public TenantResponseDto get(@NotNull @PathVariable UUID id) {
@@ -62,7 +63,7 @@ public class TenantController {
     @Operation(summary = "Get tenants", description = "Gets paginated tenants list with details")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved paginated tenants"),
-            @ApiResponse(responseCode = "4**/5**", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
+            @ApiResponse(responseCode = "500", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
     })
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public CustomPage<TenantResponseDto> getAll(@Min(1) @RequestParam int page, @Min(1) @Max(200) @RequestParam int size) {
@@ -72,7 +73,7 @@ public class TenantController {
     @Operation(summary = "Update tenant by ID", description = "Updates tenant details by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully updated tenant"),
-            @ApiResponse(responseCode = "4**/5**", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
+            @ApiResponse(responseCode = "500", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
     })
     @PutMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public TenantResponseDto update(@NotNull @PathVariable UUID id, @Valid @RequestBody TenantRequestDto tenantDto) {
@@ -82,7 +83,7 @@ public class TenantController {
     @Operation(summary = "Delete tenant by ID", description = "Deletes tenant by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully deleted tenant"),
-            @ApiResponse(responseCode = "4**/5**", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
+            @ApiResponse(responseCode = "500", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
     })
     @DeleteMapping("{id}")
     public void delete(@NotNull @PathVariable UUID id) {
