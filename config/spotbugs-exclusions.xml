@@ -8,4 +8,8 @@
     <Match>
         <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"/>
     </Match>
+    <Match>
+        <Class name="~.*MapperImpl"/>
+        <Bug pattern="NP_NULL_ON_SOME_PATH"/>
+    </Match>
 </FindBugsFilter>

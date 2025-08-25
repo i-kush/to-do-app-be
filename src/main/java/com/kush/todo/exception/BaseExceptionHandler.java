@@ -8,7 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.relational.core.conversion.DbActionExecutionException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -104,10 +105,15 @@ public class BaseExceptionHandler {
         return new ResponseEntity<>(new ErrorsDto(new ErrorDto(message)), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(DataAccessException.class)
-    public ResponseEntity<ErrorsDto> handle(DataAccessException e) {
-        log.error("Database access error", e);
-        return new ResponseEntity<>(new ErrorsDto(new ErrorDto("Database error")), HttpStatus.INTERNAL_SERVER_ERROR);
+    @ExceptionHandler(DbActionExecutionException.class)
+    public ResponseEntity<ErrorsDto> handle(DbActionExecutionException e) {
+        Throwable cause = e.getCause();
+        String message = "Unknown data error";
+        if (cause instanceof DuplicateKeyException duplicateKeyException) {
+            message = duplicateKeyException.getMessage().split("Detail: Key ")[1];
+        }
+        log.error("Database action error error", e);
+        return new ResponseEntity<>(new ErrorsDto(new ErrorDto(message)), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)

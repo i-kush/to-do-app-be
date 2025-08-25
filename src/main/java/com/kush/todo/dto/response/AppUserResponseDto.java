@@ -3,11 +3,13 @@ package com.kush.todo.dto.response;
 import lombok.Builder;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Builder
 public record AppUserResponseDto(
+        UUID id,
+        UUID tenantId,
         String username,
-        String passwordHash,
         String email,
         String firstname,
         String lastname,

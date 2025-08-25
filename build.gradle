@@ -41,6 +41,7 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-data-jdbc"
     implementation "org.springframework.boot:spring-boot-starter-validation"
     implementation "org.springframework.boot:spring-boot-starter-web"
+    implementation "org.springframework.security:spring-security-crypto"
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springDocVersion}"
     implementation "org.liquibase:liquibase-core"
     implementation "org.postgresql:postgresql"
@@ -166,6 +167,14 @@ tasks.withType(SpotBugsTask).configureEach {
         html.required = true
         xml.required = true
     }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += [
+            "-Amapstruct.defaultComponentModel=spring",
+            "-Werror",
+            "-Amapstruct.unmappedTargetPolicy=ERROR"
+    ]
 }
 
 tasks.named("check") {

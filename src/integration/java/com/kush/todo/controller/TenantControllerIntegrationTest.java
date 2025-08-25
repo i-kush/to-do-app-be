@@ -48,20 +48,6 @@ class TenantControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    void createDuplicate() {
-        TenantRequestDto tenantRequestDto = IntegrationTestDataBuilder.buildTenantRequestDto();
-        restTemplate.postForEntity(BASE_URL, IntegrationTestDataBuilder.buildRequest(tenantRequestDto), TenantResponseDto.class);
-
-        ResponseEntity<ErrorsDto> response = restTemplate.postForEntity(BASE_URL, IntegrationTestDataBuilder.buildRequest(tenantRequestDto), ErrorsDto.class);
-
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode().value());
-        Assertions.assertNotNull(response.getBody());
-        List<ErrorDto> errors = response.getBody().errors();
-        Assertions.assertFalse(CollectionUtils.isEmpty(errors));
-        Assertions.assertEquals("Tenant name already exists", errors.getFirst().message());
-    }
-
-    @Test
     void createWithExistingName() {
         TenantRequestDto request = IntegrationTestDataBuilder.buildTenantRequestDto();
         ResponseEntity<TenantResponseDto> successfulResponse = restTemplate.postForEntity(BASE_URL,
@@ -77,7 +63,7 @@ class TenantControllerIntegrationTest extends BaseIntegrationTest {
         Assertions.assertNotNull(errorResponse.getBody());
         List<ErrorDto> errors = errorResponse.getBody().errors();
         Assertions.assertFalse(CollectionUtils.isEmpty(errors));
-        Assertions.assertEquals("Tenant name already exists", errors.getFirst().message());
+        Assertions.assertEquals(String.format("(name)=(%s) already exists.", request.name()), errors.getFirst().message());
     }
 
     @ParameterizedTest
@@ -204,21 +190,28 @@ class TenantControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void updateWithExistingName() {
-        TenantRequestDto request = IntegrationTestDataBuilder.buildTenantRequestDto();
-        ResponseEntity<TenantResponseDto> successfulResponse = restTemplate.postForEntity(BASE_URL,
-                                                                                          IntegrationTestDataBuilder.buildRequest(request),
-                                                                                          TenantResponseDto.class);
+        TenantRequestDto request1 = IntegrationTestDataBuilder.buildTenantRequestDto();
+        ResponseEntity<TenantResponseDto> successfulResponse1 = restTemplate.postForEntity(BASE_URL,
+                                                                                           IntegrationTestDataBuilder.buildRequest(request1),
+                                                                                           TenantResponseDto.class);
+        Assertions.assertEquals(HttpStatus.CREATED.value(), successfulResponse1.getStatusCode().value());
+
+        TenantRequestDto request2 = IntegrationTestDataBuilder.buildTenantRequestDto();
+        ResponseEntity<TenantResponseDto> successfulResponse2 = restTemplate.postForEntity(BASE_URL,
+                                                                                           IntegrationTestDataBuilder.buildRequest(request2),
+                                                                                           TenantResponseDto.class);
+        Assertions.assertEquals(HttpStatus.CREATED.value(), successfulResponse2.getStatusCode().value());
 
         ResponseEntity<ErrorsDto> errorResponse = restTemplate.exchange(BASE_URL + "/{id}",
                                                                         HttpMethod.PUT,
-                                                                        IntegrationTestDataBuilder.buildRequest(request),
+                                                                        IntegrationTestDataBuilder.buildRequest(request1),
                                                                         ErrorsDto.class,
-                                                                        successfulResponse.getBody().id());
+                                                                        successfulResponse2.getBody().id());
         Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatusCode().value());
         Assertions.assertNotNull(errorResponse.getBody());
         List<ErrorDto> errors = errorResponse.getBody().errors();
         Assertions.assertFalse(CollectionUtils.isEmpty(errors));
-        Assertions.assertEquals("Tenant name already exists", errors.getFirst().message());
+        Assertions.assertEquals(String.format("(name)=(%s) already exists.", request1.name()), errors.getFirst().message());
     }
 
     @Test

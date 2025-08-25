@@ -25,18 +25,10 @@ public class TenantService {
 
     @Transactional
     public TenantResponseDto create(TenantRequestDto tenantDto) {
-        validateName(tenantDto.name());
-
         Tenant tenant = tenantMapper.toTenant(tenantDto);
         Tenant createdTenant = tenantRepository.save(tenant);
 
         return tenantMapper.toTenantDto(createdTenant);
-    }
-
-    private void validateName(String name) {
-        if (tenantRepository.existsByName(name)) {
-            throw new IllegalArgumentException("Tenant name already exists");
-        }
     }
 
     @Transactional(readOnly = true)
@@ -46,8 +38,6 @@ public class TenantService {
 
     @Transactional
     public TenantResponseDto update(UUID id, TenantRequestDto tenantDto) {
-        validateName(tenantDto.name());
-
         Tenant tenant = tenantMapper.toTenant(getRequired(id), tenantDto);
         Tenant udpatedTenant = tenantRepository.save(tenant);
 

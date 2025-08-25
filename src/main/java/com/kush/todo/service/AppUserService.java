@@ -25,7 +25,7 @@ public class AppUserService {
 
     @Transactional
     public AppUserResponseDto create(AppUserRequestDto appUserRequestDto) {
-        AppUser appUser = appUserMapper.toAppUser(appUserRequestDto);
+        AppUser appUser = appUserMapper.toAppUser(appUserRequestDto, UUID.fromString("8cd702dc-fb77-4854-8192-3cb8b92def41")); //ToDo use tenant ID from the context
         AppUser createdUser = appUserRepository.save(appUser);
         return appUserMapper.toAppUserDto(createdUser);
     }
