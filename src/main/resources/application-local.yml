@@ -2,6 +2,11 @@ logging:
   config: classpath:logback-spring-local.xml
 
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          secret-key: local-secret-key-with-40-symbols-1234567
   datasource:
     url: jdbc:postgresql://localhost:5432/to-do-app-db
     username: postgres

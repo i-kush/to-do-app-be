@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("api/users")
 @RequiredArgsConstructor
 public class AppUserController {
 
@@ -46,7 +46,7 @@ public class AppUserController {
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public AppUserResponseDto create(@Valid @RequestBody AppUserRequestDto userDto) {
-        return appUserService.create(userDto);
+        return appUserService.create(userDto, UUID.fromString("8cd702dc-fb77-4854-8192-3cb8b92def41")); //ToDo use tenant ID from the context
     }
 
     @Operation(summary = "Get user by ID", description = "Gets user details by ID")
@@ -56,7 +56,7 @@ public class AppUserController {
     })
     @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public AppUserResponseDto get(@NotNull @PathVariable UUID id) {
-        return appUserService.findById(id);
+        return appUserService.findByIdRequired(id);
     }
 
     @Operation(summary = "Get users", description = "Gets paginated users list with details")

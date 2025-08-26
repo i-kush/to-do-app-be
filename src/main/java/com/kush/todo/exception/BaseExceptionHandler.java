@@ -13,6 +13,7 @@ import org.springframework.data.relational.core.conversion.DbActionExecutionExce
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.method.MethodValidationResult;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -103,6 +104,16 @@ public class BaseExceptionHandler {
         String message = messageParts.length > 1 ? messageParts[0] : e.getMessage();
         log.error("Invalid HTTP request", e);
         return new ResponseEntity<>(new ErrorsDto(new ErrorDto(message)), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ErrorsDto> handle(UnauthorizedException e) {
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<ErrorsDto> handle(AuthorizationDeniedException e) {
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(DbActionExecutionException.class)

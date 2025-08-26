@@ -9,6 +9,7 @@ import com.kush.todo.mapper.AppUserMapper;
 import com.kush.todo.repository.AppUserRepository;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -24,15 +25,21 @@ public class AppUserService {
     private final AppUserMapper appUserMapper;
 
     @Transactional
-    public AppUserResponseDto create(AppUserRequestDto appUserRequestDto) {
-        AppUser appUser = appUserMapper.toAppUser(appUserRequestDto, UUID.fromString("8cd702dc-fb77-4854-8192-3cb8b92def41")); //ToDo use tenant ID from the context
+    public AppUserResponseDto create(AppUserRequestDto appUserRequestDto, UUID tenantId) {
+        AppUser appUser = appUserMapper.toAppUser(appUserRequestDto, tenantId);
         AppUser createdUser = appUserRepository.save(appUser);
         return appUserMapper.toAppUserDto(createdUser);
     }
 
     @Transactional(readOnly = true)
-    public AppUserResponseDto findById(UUID id) {
+    public AppUserResponseDto findByIdRequired(UUID id) {
         return appUserMapper.toAppUserDto(getRequired(id));
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<AppUserResponseDto> findByUsername(String username) {
+        return appUserRepository.findByUsername(username)
+                                .map(appUserMapper::toAppUserDto);
     }
 
     @Transactional

@@ -1,5 +1,6 @@
 package com.kush.todo.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 
 import java.time.Instant;
@@ -13,6 +14,8 @@ public record AppUserResponseDto(
         String email,
         String firstname,
         String lastname,
+        @JsonIgnore
+        String passwordHash,
         boolean isLocked,
         boolean isActivated,
         Instant created,
