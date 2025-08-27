@@ -34,8 +34,8 @@ public final class TestDataBuilder {
         return Tenant.builder()
                      .id(UUID.randomUUID())
                      .name(UUID.randomUUID().toString())
-                     .created(Instant.now().minus(10, ChronoUnit.DAYS))
-                     .updated(Instant.now())
+                     .createdAt(Instant.now().minus(10, ChronoUnit.DAYS))
+                     .updatedAt(Instant.now())
                      .build();
     }
 }

@@ -1,5 +1,6 @@
 package com.kush.todo.entity;
 
+import com.kush.todo.dto.Role;
 import lombok.Builder;
 
 import java.time.Instant;
@@ -14,14 +15,15 @@ public record AppUser(
         @Id
         UUID id,
         UUID tenantId,
+        Role roleId,
         String username,
         String passwordHash,
         String email,
         String firstname,
         String lastname,
         boolean isLocked,
-        boolean isActivated,
-        Instant created,
-        Instant updated
+        Instant lockedAt,
+        Instant createdAt,
+        Instant updatedAt
 ) {
 }

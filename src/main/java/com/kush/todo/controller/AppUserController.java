@@ -46,7 +46,7 @@ public class AppUserController {
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public AppUserResponseDto create(@Valid @RequestBody AppUserRequestDto userDto) {
-        return appUserService.create(userDto, UUID.fromString("8cd702dc-fb77-4854-8192-3cb8b92def41")); //ToDo use tenant ID from the context
+        return appUserService.create(userDto);
     }
 
     @Operation(summary = "Get user by ID", description = "Gets user details by ID")

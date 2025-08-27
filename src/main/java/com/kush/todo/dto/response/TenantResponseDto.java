@@ -9,8 +9,8 @@ import java.util.UUID;
 public record TenantResponseDto(
         UUID id,
         String name,
-        Instant created,
-        Instant updated
+        Instant createdAt,
+        Instant updatedAt
 ) {
 
 }

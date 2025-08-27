@@ -1,6 +1,7 @@
 package com.kush.todo.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.kush.todo.dto.Role;
 import lombok.Builder;
 
 import java.time.Instant;
@@ -10,6 +11,7 @@ import java.util.UUID;
 public record AppUserResponseDto(
         UUID id,
         UUID tenantId,
+        Role roleId,
         String username,
         String email,
         String firstname,
@@ -17,8 +19,9 @@ public record AppUserResponseDto(
         @JsonIgnore
         String passwordHash,
         boolean isLocked,
-        boolean isActivated,
-        Instant created,
-        Instant updated
+        @JsonIgnore
+        Instant lockedAt,
+        Instant createdAt,
+        Instant updatedAt
 ) {
 }

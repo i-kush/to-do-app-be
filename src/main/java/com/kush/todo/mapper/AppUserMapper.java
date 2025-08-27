@@ -19,20 +19,22 @@ public abstract class AppUserMapper extends PageMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "passwordHash", expression = MappingConstants.EXPRESSION_PASSWORD_HASH)
-    @Mapping(target = "isActivated", constant = "false")
     @Mapping(target = "isLocked", constant = "false")
-    @Mapping(target = "created", expression = MappingConstants.EXPRESSION_TIMESTAMP_NOW)
-    @Mapping(target = "updated", expression = MappingConstants.EXPRESSION_TIMESTAMP_NOW)
+    @Mapping(target = "lockedAt", ignore = true)
+    @Mapping(target = "createdAt", expression = MappingConstants.EXPRESSION_TIMESTAMP_NOW)
+    @Mapping(target = "updatedAt", expression = MappingConstants.EXPRESSION_TIMESTAMP_NOW)
     public abstract AppUser toAppUser(AppUserRequestDto appUserRequestDto, UUID tenantId);
 
     @Mapping(target = "id", source = "appUser.id")
     @Mapping(target = "username", source = "appUserRequestDto.username")
     @Mapping(target = "passwordHash", expression = MappingConstants.EXPRESSION_PASSWORD_HASH)
     @Mapping(target = "email", source = "appUserRequestDto.email")
+    @Mapping(target = "roleId", source = "appUserRequestDto.roleId")
     @Mapping(target = "firstname", source = "appUserRequestDto.firstname")
     @Mapping(target = "lastname", source = "appUserRequestDto.lastname")
-    @Mapping(target = "created", source = "appUser.created")
-    @Mapping(target = "updated", expression = MappingConstants.EXPRESSION_TIMESTAMP_NOW)
+    @Mapping(target = "lockedAt", source = "appUser.lockedAt")
+    @Mapping(target = "createdAt", source = "appUser.createdAt")
+    @Mapping(target = "updatedAt", expression = MappingConstants.EXPRESSION_TIMESTAMP_NOW)
     public abstract AppUser toAppUser(AppUser appUser, AppUserRequestDto appUserRequestDto);
 
     public abstract AppUserResponseDto toAppUserDto(AppUser appUser);

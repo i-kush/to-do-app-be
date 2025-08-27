@@ -1,7 +1,7 @@
-insert into tenant (id, name, created, updated)
+insert into tenant (id, name, created_at, updated_at)
 values (uuid_generate_v4(), 'TestTenant', now(), now());
 
-insert into app_user (id, tenant_id, username, password_hash, email, firstname, lastname, is_locked, is_activated, created, updated)
+insert into app_user (id, tenant_id, username, password_hash, email, firstname, lastname, is_locked, created_at, updated_at)
 values (uuid_generate_v4(),
         (select id from tenant where name = 'TestTenant' limit 1),
         'testenko',

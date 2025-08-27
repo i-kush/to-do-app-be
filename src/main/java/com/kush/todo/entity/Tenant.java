@@ -14,7 +14,7 @@ public record Tenant(
         @Id
         UUID id,
         String name,
-        Instant created,
-        Instant updated
+        Instant createdAt,
+        Instant updatedAt
 ) {
 }

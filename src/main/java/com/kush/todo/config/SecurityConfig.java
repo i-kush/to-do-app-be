@@ -1,5 +1,7 @@
 package com.kush.todo.config;
 
+import com.kush.todo.dto.CurrentUser;
+import com.kush.todo.mapper.AuthMapper;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
@@ -10,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +22,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
@@ -27,6 +32,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.context.annotation.RequestScope;
 
 @Configuration
 @RequiredArgsConstructor
@@ -36,6 +42,7 @@ public class SecurityConfig {
 
     @Value("${spring.security.oauth2.resourceserver.jwt.secret-key}")
     private final String jwtSecret;
+    private final AuthMapper authMapper;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -85,5 +92,17 @@ public class SecurityConfig {
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    @RequestScope
+    public CurrentUser currentUser() {
+        return Optional.ofNullable(SecurityContextHolder.getContext())
+                       .map(org.springframework.security.core.context.SecurityContext::getAuthentication)
+                       .map(Authentication::getPrincipal)
+                       .filter(org.springframework.security.oauth2.jwt.Jwt.class::isInstance)
+                       .map(org.springframework.security.oauth2.jwt.Jwt.class::cast)
+                       .map(authMapper::toCurrentUser)
+                       .orElseThrow(() -> new IllegalStateException("No current user detected"));
     }
 }

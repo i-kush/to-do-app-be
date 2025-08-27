@@ -7,7 +7,6 @@ import com.kush.todo.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Instant;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -45,8 +44,10 @@ public class AuthService {
                                           .expiresAt(now.plusSeconds(jwtExpirationInSeconds))
                                           .subject(user.id().toString())
                                           .claim("scope", "READ WRITE") //ToDo set actual permissions
-                                          .claim("role", List.of("ROLE1", "ROLE2")) //ToDo set actual roles
+                                          .claim("role", user.roleId().toString())
                                           .claim("tenant", user.tenantId().toString())
+                                          .claim("username", user.username())
+                                          .claim("email", user.email())
                                           .build();
 
         return new LoginResponseDto(jwtEncoder.encode(JwtEncoderParameters.from(JWS_HEADER, claims)).getTokenValue());
