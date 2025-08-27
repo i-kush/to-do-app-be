@@ -39,7 +39,6 @@ public class AuthService {
 
         Instant now = Instant.now();
         JwtClaimsSet claims = JwtClaimsSet.builder()
-                                          .issuer("todo-backend")
                                           .issuedAt(now)
                                           .expiresAt(now.plusSeconds(jwtExpirationInSeconds))
                                           .subject(user.id().toString())
@@ -50,6 +49,8 @@ public class AuthService {
                                           .claim("email", user.email())
                                           .build();
 
-        return new LoginResponseDto(jwtEncoder.encode(JwtEncoderParameters.from(JWS_HEADER, claims)).getTokenValue());
+        return LoginResponseDto.builder()
+                               .accessToken(jwtEncoder.encode(JwtEncoderParameters.from(JWS_HEADER, claims)).getTokenValue())
+                               .build();
     }
 }

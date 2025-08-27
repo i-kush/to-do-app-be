@@ -11,6 +11,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -47,6 +48,7 @@ public abstract class BaseIntegrationTest {
     protected JdbcTemplate jdbcTemplate;
 
     protected String defaultAccessToken;
+    protected UUID defaultTenantId;
 
     @DynamicPropertySource
     public static void setDynamicProperties(DynamicPropertyRegistry registry) {
@@ -65,10 +67,12 @@ public abstract class BaseIntegrationTest {
         jdbcTemplate.execute(Files.readString(Paths.get("src/integration/resources/test-init.sql")));
 
         ResponseEntity<LoginResponseDto> response = restTemplate.postForEntity("/api/auth/login", IntegrationTestDataBuilder.buildLoginRequest(), LoginResponseDto.class);
+        Assertions.assertNotNull(response);
         Assertions.assertEquals(HttpStatus.OK.value(), response.getStatusCode().value());
         Assertions.assertNotNull(response.getBody());
         Assertions.assertNotNull(response.getBody().accessToken());
 
         defaultAccessToken = response.getBody().accessToken();
+        defaultTenantId = jdbcTemplate.queryForObject("select id from tenant where name = 'TestTenant' limit 1", UUID.class);
     }
 }

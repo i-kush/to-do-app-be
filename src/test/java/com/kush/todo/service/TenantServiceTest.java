@@ -26,7 +26,7 @@ class TenantServiceTest extends BaseTest {
         Mockito.when(tenantRepository.findById(id)).thenReturn(Optional.empty());
 
         NotFoundException exception = Assertions.assertThrows(NotFoundException.class,
-                                                              () -> tenantService.findById(id));
+                                                              () -> tenantService.findByIdRequired(id));
 
         Assertions.assertEquals(String.format("No tenant with id '%s'", id), exception.getMessage());
     }

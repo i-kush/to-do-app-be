@@ -10,7 +10,7 @@ import lombok.Builder;
 @Builder
 public record AppUserRequestDto(
         @NotBlank
-        @Size(min = 1, max = 10)
+        @Size(min = 1, max = 20)
         String username,
         @NotBlank
         @Size(min = 1, max = 20)

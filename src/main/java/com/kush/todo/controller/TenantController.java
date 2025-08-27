@@ -59,7 +59,7 @@ public class TenantController {
     })
     @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public TenantResponseDto get(@NotNull @PathVariable UUID id) {
-        return tenantService.findById(id);
+        return tenantService.findByIdRequired(id);
     }
 
     @Operation(summary = "Get tenants", description = "Gets paginated tenants list with details")

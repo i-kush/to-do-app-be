@@ -32,7 +32,7 @@ public class TenantService {
     }
 
     @Transactional(readOnly = true)
-    public TenantResponseDto findById(UUID id) {
+    public TenantResponseDto findByIdRequired(UUID id) {
         return tenantMapper.toTenantDto(getRequired(id));
     }
 

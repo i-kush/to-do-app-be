@@ -14,6 +14,11 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 public interface TenantAwareRepository<T, ID> extends CrudRepository<T, ID>, PagingAndSortingRepository<T, ID> {
 
     @Override
+    default Iterable<T> findAll() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     default Iterable<T> findAll(Sort sort) {
         throw new UnsupportedOperationException();
     }
