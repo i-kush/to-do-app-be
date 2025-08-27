@@ -1,15 +1,22 @@
 package com.kush.todo;
 
+import com.kush.todo.dto.Role;
+import com.kush.todo.dto.request.AppUserRequestDto;
+import com.kush.todo.dto.request.LoginRequestDto;
 import com.kush.todo.dto.request.TenantRequestDto;
-import com.kush.todo.service.TenantService;
 
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.util.StringUtils;
 
 public final class IntegrationTestDataBuilder {
+
+    public static final String TEST_PASSWORD = "password";
+    public static final String TEST_USERNAME = "testenko";
 
     private IntegrationTestDataBuilder() {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
@@ -27,17 +34,42 @@ public final class IntegrationTestDataBuilder {
                                .build();
     }
 
-    public static void createTenants(TenantService tenantService, int count) {
-        for (int i = 0; i < count; i++) {
-            tenantService.create(buildTenantRequestDto());
-        }
+    public static AppUserRequestDto buildAppUserRequestDto() {
+        return buildAppUserRequestDto("u-" + ThreadLocalRandom.current().nextInt(1_000_000));
+    }
+
+    public static AppUserRequestDto buildAppUserRequestDto(String username) {
+        return AppUserRequestDto.builder()
+                                .username(username)
+                                .password("p-" + ThreadLocalRandom.current().nextInt(1_000_000))
+                                .roleId(Role.TENANT_ADMIN)
+                                .email(UUID.randomUUID() + "@email.com")
+                                .firstname("firstname-" + UUID.randomUUID())
+                                .lastname("lastname-" + UUID.randomUUID())
+                                .build();
+    }
+
+    public static <T> HttpEntity<T> buildRequest(String accessToken) {
+        return buildRequest(null, accessToken);
     }
 
     @SuppressWarnings("PMD.LooseCoupling")
-    public static <T> HttpEntity<T> buildRequest(T body) {
+    public static <T> HttpEntity<T> buildRequest(T body, String accessToken) {
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+        if (body != null) {
+            headers.setContentType(MediaType.APPLICATION_JSON);
+        }
+        if (StringUtils.hasText(accessToken)) {
+            headers.setBearerAuth(accessToken);
+        }
 
         return new HttpEntity<>(body, headers);
+    }
+
+    public static LoginRequestDto buildLoginRequest() {
+        return LoginRequestDto.builder()
+                              .username(TEST_USERNAME)
+                              .password(TEST_PASSWORD)
+                              .build();
     }
 }

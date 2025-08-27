@@ -8,7 +8,7 @@
               class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <pattern>
-                %date{iso8601} %green(%-5level) [%20.20thread] %cyan(%-40.40logger{40}) %magenta([%X{traceId}-%X{spanId}]) - %msg%n%throwable)
+                %date %highlight(%-5level) [%20.20thread] %cyan(%-40.40logger{40}) %magenta([%X{traceId}-%X{spanId}]) - %msg%n%throwable)
             </pattern>
             <charset>UTF-8</charset>
         </encoder>

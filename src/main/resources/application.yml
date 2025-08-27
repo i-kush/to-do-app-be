@@ -4,13 +4,13 @@ server:
     enabled: true
 
 spring:
-  profiles:
-    active: local
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          expiration-seconds: 300
   jpa:
     open-in-view: false
-  mvc:
-    servlet:
-      path: /api
   liquibase:
     change-log: classpath:/db/changelog/changelog-master.xml
 

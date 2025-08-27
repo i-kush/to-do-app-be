@@ -2,5 +2,10 @@ logging:
   config: classpath:logback-spring-local.xml
 
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          secret-key: test-secret-key-with-40-symbols-12345678
   main:
     lazy-initialization: true

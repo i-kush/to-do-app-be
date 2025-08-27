@@ -2,11 +2,11 @@ package com.kush.todo.controller;
 
 import com.kush.todo.BaseIntegrationTest;
 import com.kush.todo.IntegrationTestDataBuilder;
-import com.kush.todo.dto.request.TenantRequestDto;
+import com.kush.todo.dto.request.AppUserRequestDto;
+import com.kush.todo.dto.response.AppUserResponseDto;
 import com.kush.todo.dto.response.CustomPage;
 import com.kush.todo.dto.response.ErrorDto;
 import com.kush.todo.dto.response.ErrorsDto;
-import com.kush.todo.dto.response.TenantResponseDto;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -26,47 +26,47 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 
 //ToDo permissions tests
-class TenantControllerIntegrationTest extends BaseIntegrationTest {
+class AppUserControllerIntegrationTest extends BaseIntegrationTest {
 
-    public static final String BASE_URL = "/api/tenants";
+    public static final String BASE_URL = "/api/users";
 
     @Test
     void create() {
-        TenantRequestDto tenantRequestDto = IntegrationTestDataBuilder.buildTenantRequestDto();
-        ResponseEntity<TenantResponseDto> response = restTemplate.postForEntity(BASE_URL,
-                                                                                IntegrationTestDataBuilder.buildRequest(tenantRequestDto, defaultAccessToken),
-                                                                                TenantResponseDto.class);
+        AppUserRequestDto request = IntegrationTestDataBuilder.buildAppUserRequestDto();
+        ResponseEntity<AppUserResponseDto> response = restTemplate.postForEntity(BASE_URL,
+                                                                                 IntegrationTestDataBuilder.buildRequest(request, defaultAccessToken),
+                                                                                 AppUserResponseDto.class);
 
         Assertions.assertEquals(HttpStatus.CREATED.value(), response.getStatusCode().value());
-        Assertions.assertNotNull(response.getBody());
-        Assertions.assertNotNull(response.getBody().id());
-        Assertions.assertEquals(tenantRequestDto.name(), response.getBody().name());
+        assertAppUser(request, response);
     }
 
     @Test
-    void createWithExistingName() {
-        TenantRequestDto request = IntegrationTestDataBuilder.buildTenantRequestDto();
-        ResponseEntity<TenantResponseDto> successfulResponse = restTemplate.postForEntity(BASE_URL,
-                                                                                          IntegrationTestDataBuilder.buildRequest(request, defaultAccessToken),
-                                                                                          TenantResponseDto.class);
+    void createWithExistingUsername() {
+        AppUserRequestDto request = IntegrationTestDataBuilder.buildAppUserRequestDto();
+        ResponseEntity<AppUserResponseDto> successfulResponse = restTemplate.postForEntity(BASE_URL,
+                                                                                           IntegrationTestDataBuilder.buildRequest(request, defaultAccessToken),
+                                                                                           AppUserResponseDto.class);
 
         Assertions.assertEquals(HttpStatus.CREATED.value(), successfulResponse.getStatusCode().value());
 
+        AppUserRequestDto newRequest = IntegrationTestDataBuilder.buildAppUserRequestDto(request.username());
         ResponseEntity<ErrorsDto> errorResponse = restTemplate.postForEntity(BASE_URL,
-                                                                             IntegrationTestDataBuilder.buildRequest(request, defaultAccessToken),
+                                                                             IntegrationTestDataBuilder.buildRequest(newRequest, defaultAccessToken),
                                                                              ErrorsDto.class);
         Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatusCode().value());
         Assertions.assertNotNull(errorResponse.getBody());
         List<ErrorDto> errors = errorResponse.getBody().errors();
         Assertions.assertFalse(CollectionUtils.isEmpty(errors));
-        Assertions.assertEquals(String.format("(name)=(%s) already exists.", request.name()), errors.getFirst().message());
+        Assertions.assertEquals(String.format("(tenant_id, username)=(%s, %s) already exists.", defaultTenantId, request.username()),
+                                errors.getFirst().message());
     }
 
     @ParameterizedTest
     @NullAndEmptySource
     @ValueSource(strings = {" ", "  ", "11111111111111111111111111111111111111111111111111111"})
-    void createWithInvalidName(String name) {
-        TenantRequestDto request = IntegrationTestDataBuilder.buildTenantRequestDto(name);
+    void createWithInvalidUserName(String username) {
+        AppUserRequestDto request = IntegrationTestDataBuilder.buildAppUserRequestDto(username);
         ResponseEntity<ErrorsDto> response = restTemplate.postForEntity(BASE_URL,
                                                                         IntegrationTestDataBuilder.buildRequest(request, defaultAccessToken),
                                                                         ErrorsDto.class);
@@ -77,22 +77,18 @@ class TenantControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void get() {
-        TenantRequestDto request = IntegrationTestDataBuilder.buildTenantRequestDto();
-        ResponseEntity<TenantResponseDto> createResponse = restTemplate.postForEntity(BASE_URL,
-                                                                                      IntegrationTestDataBuilder.buildRequest(request, defaultAccessToken),
-                                                                                      TenantResponseDto.class);
-        ResponseEntity<TenantResponseDto> getResponse = restTemplate.exchange(BASE_URL + "/{id}",
-                                                                              HttpMethod.GET,
-                                                                              IntegrationTestDataBuilder.buildRequest(defaultAccessToken),
-                                                                              TenantResponseDto.class,
-                                                                              createResponse.getBody().id());
+        AppUserRequestDto request = IntegrationTestDataBuilder.buildAppUserRequestDto();
+        ResponseEntity<AppUserResponseDto> createResponse = restTemplate.postForEntity(BASE_URL,
+                                                                                       IntegrationTestDataBuilder.buildRequest(request, defaultAccessToken),
+                                                                                       AppUserResponseDto.class);
+        ResponseEntity<AppUserResponseDto> getResponse = restTemplate.exchange(BASE_URL + "/{id}",
+                                                                               HttpMethod.GET,
+                                                                               IntegrationTestDataBuilder.buildRequest(defaultAccessToken),
+                                                                               AppUserResponseDto.class,
+                                                                               createResponse.getBody().id());
 
         Assertions.assertEquals(HttpStatus.OK.value(), getResponse.getStatusCode().value());
-        TenantResponseDto getResponseBody = getResponse.getBody();
-        Assertions.assertNotNull(getResponseBody);
-        Assertions.assertEquals(createResponse.getBody().id(), getResponseBody.id());
-        Assertions.assertEquals(createResponse.getBody().name(), getResponseBody.name());
-        Assertions.assertEquals(request.name(), getResponseBody.name());
+        assertAppUser(request, getResponse);
     }
 
     @Test
@@ -108,22 +104,22 @@ class TenantControllerIntegrationTest extends BaseIntegrationTest {
         Assertions.assertNotNull(response.getBody());
         List<ErrorDto> errors = response.getBody().errors();
         Assertions.assertFalse(CollectionUtils.isEmpty(errors));
-        Assertions.assertEquals(String.format("No tenant with id '%s'", absentId), errors.getFirst().message());
+        Assertions.assertEquals(String.format("No user with id '%s'", absentId), errors.getFirst().message());
     }
 
     @Test
     void getAll() {
-        TenantRequestDto request = IntegrationTestDataBuilder.buildTenantRequestDto();
-        restTemplate.postForEntity(BASE_URL, IntegrationTestDataBuilder.buildRequest(request, defaultAccessToken), TenantResponseDto.class);
-        ParameterizedTypeReference<CustomPage<TenantResponseDto>> responseType = new ParameterizedTypeReference<>() {
+        AppUserRequestDto request = IntegrationTestDataBuilder.buildAppUserRequestDto();
+        restTemplate.postForEntity(BASE_URL, IntegrationTestDataBuilder.buildRequest(request, defaultAccessToken), AppUserResponseDto.class);
+        ParameterizedTypeReference<CustomPage<AppUserResponseDto>> responseType = new ParameterizedTypeReference<>() {
         };
-        ResponseEntity<CustomPage<TenantResponseDto>> getAllResponse = restTemplate.exchange(BASE_URL + "?page=1&size=10",
-                                                                                             HttpMethod.GET,
-                                                                                             IntegrationTestDataBuilder.buildRequest(defaultAccessToken),
-                                                                                             responseType);
+        ResponseEntity<CustomPage<AppUserResponseDto>> getAllResponse = restTemplate.exchange(BASE_URL + "?page=1&size=10",
+                                                                                              HttpMethod.GET,
+                                                                                              IntegrationTestDataBuilder.buildRequest(defaultAccessToken),
+                                                                                              responseType);
 
         Assertions.assertEquals(HttpStatus.OK.value(), getAllResponse.getStatusCode().value());
-        CustomPage<TenantResponseDto> getAllResponseBody = getAllResponse.getBody();
+        CustomPage<AppUserResponseDto> getAllResponseBody = getAllResponse.getBody();
         Assertions.assertNotNull(getAllResponseBody);
         Assertions.assertFalse(CollectionUtils.isEmpty(getAllResponseBody.items()));
         Assertions.assertEquals(2, getAllResponseBody.items().size());
@@ -173,37 +169,34 @@ class TenantControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void update() {
-        TenantRequestDto createRequest = IntegrationTestDataBuilder.buildTenantRequestDto();
-        ResponseEntity<TenantResponseDto> createResponse = restTemplate.postForEntity(BASE_URL,
-                                                                                      IntegrationTestDataBuilder.buildRequest(createRequest, defaultAccessToken),
-                                                                                      TenantResponseDto.class);
+        AppUserRequestDto createRequest = IntegrationTestDataBuilder.buildAppUserRequestDto();
+        ResponseEntity<AppUserResponseDto> createResponse = restTemplate.postForEntity(BASE_URL,
+                                                                                       IntegrationTestDataBuilder.buildRequest(createRequest, defaultAccessToken),
+                                                                                       AppUserResponseDto.class);
 
-        TenantRequestDto updateRequest = IntegrationTestDataBuilder.buildTenantRequestDto();
-        ResponseEntity<TenantResponseDto> updateResponse = restTemplate.exchange(BASE_URL + "/{id}",
-                                                                                 HttpMethod.PUT,
-                                                                                 IntegrationTestDataBuilder.buildRequest(updateRequest, defaultAccessToken),
-                                                                                 TenantResponseDto.class,
-                                                                                 createResponse.getBody().id());
+        AppUserRequestDto updateRequest = IntegrationTestDataBuilder.buildAppUserRequestDto();
+        ResponseEntity<AppUserResponseDto> updateResponse = restTemplate.exchange(BASE_URL + "/{id}",
+                                                                                  HttpMethod.PUT,
+                                                                                  IntegrationTestDataBuilder.buildRequest(updateRequest, defaultAccessToken),
+                                                                                  AppUserResponseDto.class,
+                                                                                  createResponse.getBody().id());
 
         Assertions.assertEquals(HttpStatus.OK.value(), updateResponse.getStatusCode().value());
-        Assertions.assertNotNull(updateResponse.getBody());
-        Assertions.assertNotNull(updateResponse.getBody().id());
-        Assertions.assertEquals(updateRequest.name(), updateResponse.getBody().name());
-        Assertions.assertNotEquals(createRequest.name(), updateResponse.getBody().name());
+        assertAppUser(updateRequest, updateResponse);
     }
 
     @Test
     void updateWithExistingName() {
-        TenantRequestDto request1 = IntegrationTestDataBuilder.buildTenantRequestDto();
-        ResponseEntity<TenantResponseDto> successfulResponse1 = restTemplate.postForEntity(BASE_URL,
-                                                                                           IntegrationTestDataBuilder.buildRequest(request1, defaultAccessToken),
-                                                                                           TenantResponseDto.class);
+        AppUserRequestDto request1 = IntegrationTestDataBuilder.buildAppUserRequestDto();
+        ResponseEntity<AppUserResponseDto> successfulResponse1 = restTemplate.postForEntity(BASE_URL,
+                                                                                            IntegrationTestDataBuilder.buildRequest(request1, defaultAccessToken),
+                                                                                            AppUserResponseDto.class);
         Assertions.assertEquals(HttpStatus.CREATED.value(), successfulResponse1.getStatusCode().value());
 
-        TenantRequestDto request2 = IntegrationTestDataBuilder.buildTenantRequestDto();
-        ResponseEntity<TenantResponseDto> successfulResponse2 = restTemplate.postForEntity(BASE_URL,
-                                                                                           IntegrationTestDataBuilder.buildRequest(request2, defaultAccessToken),
-                                                                                           TenantResponseDto.class);
+        AppUserRequestDto request2 = IntegrationTestDataBuilder.buildAppUserRequestDto();
+        ResponseEntity<AppUserResponseDto> successfulResponse2 = restTemplate.postForEntity(BASE_URL,
+                                                                                            IntegrationTestDataBuilder.buildRequest(request2, defaultAccessToken),
+                                                                                            AppUserResponseDto.class);
         Assertions.assertEquals(HttpStatus.CREATED.value(), successfulResponse2.getStatusCode().value());
 
         ResponseEntity<ErrorsDto> errorResponse = restTemplate.exchange(BASE_URL + "/{id}",
@@ -215,15 +208,16 @@ class TenantControllerIntegrationTest extends BaseIntegrationTest {
         Assertions.assertNotNull(errorResponse.getBody());
         List<ErrorDto> errors = errorResponse.getBody().errors();
         Assertions.assertFalse(CollectionUtils.isEmpty(errors));
-        Assertions.assertEquals(String.format("(name)=(%s) already exists.", request1.name()), errors.getFirst().message());
+        Assertions.assertEquals(String.format("(tenant_id, username)=(%s, %s) already exists.", defaultTenantId, request1.username()), errors
+                .getFirst().message());
     }
 
     @Test
     void delete() {
-        TenantRequestDto request = IntegrationTestDataBuilder.buildTenantRequestDto();
+        AppUserRequestDto request = IntegrationTestDataBuilder.buildAppUserRequestDto();
         String id = restTemplate.postForEntity(BASE_URL,
                                                IntegrationTestDataBuilder.buildRequest(request, defaultAccessToken),
-                                               TenantResponseDto.class)
+                                               AppUserResponseDto.class)
                                 .getBody()
                                 .id()
                                 .toString();
@@ -258,6 +252,22 @@ class TenantControllerIntegrationTest extends BaseIntegrationTest {
         Assertions.assertNotNull(response.getBody());
         List<ErrorDto> errors = response.getBody().errors();
         Assertions.assertFalse(CollectionUtils.isEmpty(errors));
-        Assertions.assertEquals(String.format("No tenant with id '%s'", absentId), errors.getFirst().message());
+        Assertions.assertEquals(String.format("No user with id '%s'", absentId), errors.getFirst().message());
+    }
+
+    private void assertAppUser(AppUserRequestDto request, ResponseEntity<AppUserResponseDto> response) {
+        AppUserResponseDto responseBody = response.getBody();
+        Assertions.assertNotNull(responseBody);
+        Assertions.assertNotNull(responseBody.id());
+        Assertions.assertEquals(defaultTenantId, responseBody.tenantId());
+        Assertions.assertEquals(request.roleId(), responseBody.roleId());
+        Assertions.assertEquals(request.username(), responseBody.username());
+        Assertions.assertEquals(request.email(), responseBody.email());
+        Assertions.assertEquals(request.firstname(), responseBody.firstname());
+        Assertions.assertEquals(request.lastname(), responseBody.lastname());
+        Assertions.assertFalse(responseBody.isLocked());
+        Assertions.assertNull(responseBody.lockedAt());
+        Assertions.assertNotNull(responseBody.createdAt());
+        Assertions.assertNotNull(responseBody.updatedAt());
     }
 }

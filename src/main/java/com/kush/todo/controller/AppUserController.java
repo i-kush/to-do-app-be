@@ -1,10 +1,10 @@
 package com.kush.todo.controller;
 
-import com.kush.todo.dto.request.TenantRequestDto;
+import com.kush.todo.dto.request.AppUserRequestDto;
+import com.kush.todo.dto.response.AppUserResponseDto;
 import com.kush.todo.dto.response.CustomPage;
 import com.kush.todo.dto.response.ErrorsDto;
-import com.kush.todo.dto.response.TenantResponseDto;
-import com.kush.todo.service.TenantService;
+import com.kush.todo.service.AppUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -20,7 +20,6 @@ import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,62 +32,60 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("api/tenants")
+@RequestMapping("api/users")
 @RequiredArgsConstructor
-// ToDo add common API Response response codes...not only for 500 and add media types
-public class TenantController {
+public class AppUserController {
 
-    private final TenantService tenantService;
+    private final AppUserService appUserService;
 
-    @Operation(summary = "Create tenant", description = "Creates a tenant with the specific settings")
+    @Operation(summary = "Create user", description = "Creates a user")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Successfully created tenant"),
+            @ApiResponse(responseCode = "201", description = "Successfully created user"),
             @ApiResponse(responseCode = "500", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
     })
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasAuthority('READ')") //ToDo use correct authority
-    public TenantResponseDto create(@Valid @RequestBody TenantRequestDto tenantDto) {
-        return tenantService.create(tenantDto);
+    public AppUserResponseDto create(@Valid @RequestBody AppUserRequestDto userDto) {
+        return appUserService.create(userDto);
     }
 
-    @Operation(summary = "Get tenant by ID", description = "Gets tenant details by ID")
+    @Operation(summary = "Get user by ID", description = "Gets user details by ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved tenant"),
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved user"),
             @ApiResponse(responseCode = "500", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
     })
     @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public TenantResponseDto get(@NotNull @PathVariable UUID id) {
-        return tenantService.findByIdRequired(id);
+    public AppUserResponseDto get(@NotNull @PathVariable UUID id) {
+        return appUserService.findByIdRequired(id);
     }
 
-    @Operation(summary = "Get tenants", description = "Gets paginated tenants list with details")
+    @Operation(summary = "Get users", description = "Gets paginated users list with details")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved paginated tenants"),
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved paginated users"),
             @ApiResponse(responseCode = "500", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
     })
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public CustomPage<TenantResponseDto> getAll(@Min(1) @RequestParam int page, @Min(1) @Max(200) @RequestParam int size) {
-        return tenantService.findAll(page, size);
+    public CustomPage<AppUserResponseDto> getAll(@Min(1) @RequestParam int page, @Min(1) @Max(200) @RequestParam int size) {
+        return appUserService.findAll(page, size);
     }
 
-    @Operation(summary = "Update tenant by ID", description = "Updates tenant details by ID")
+    @Operation(summary = "Update user by ID", description = "Updates user details by ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully updated tenant"),
+            @ApiResponse(responseCode = "200", description = "Successfully updated user"),
             @ApiResponse(responseCode = "500", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
     })
     @PutMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public TenantResponseDto update(@NotNull @PathVariable UUID id, @Valid @RequestBody TenantRequestDto tenantDto) {
-        return tenantService.update(id, tenantDto);
+    public AppUserResponseDto update(@NotNull @PathVariable UUID id, @Valid @RequestBody AppUserRequestDto userDto) {
+        return appUserService.update(id, userDto);
     }
 
-    @Operation(summary = "Delete tenant by ID", description = "Deletes tenant by ID")
+    @Operation(summary = "Delete user by ID", description = "Deletes user by ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully deleted tenant"),
+            @ApiResponse(responseCode = "200", description = "Successfully deleted user"),
             @ApiResponse(responseCode = "500", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
     })
     @DeleteMapping("{id}")
     public void delete(@NotNull @PathVariable UUID id) {
-        tenantService.delete(id);
+        appUserService.delete(id);
     }
 }

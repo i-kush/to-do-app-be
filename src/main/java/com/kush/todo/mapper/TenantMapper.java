@@ -6,18 +6,18 @@ import com.kush.todo.entity.Tenant;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper
 public abstract class TenantMapper extends PageMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "created", ignore = true)
-    @Mapping(target = "updated", ignore = true)
+    @Mapping(target = "createdAt", expression = MappingConstants.EXPRESSION_TIMESTAMP_NOW)
+    @Mapping(target = "updatedAt", expression = MappingConstants.EXPRESSION_TIMESTAMP_NOW)
     public abstract Tenant toTenant(TenantRequestDto tenantDto);
 
     @Mapping(target = "id", source = "tenant.id")
     @Mapping(target = "name", source = "tenantDto.name")
-    @Mapping(target = "created", source = "tenant.created")
-    @Mapping(target = "updated", ignore = true)
+    @Mapping(target = "createdAt", source = "tenant.createdAt")
+    @Mapping(target = "updatedAt", expression = MappingConstants.EXPRESSION_TIMESTAMP_NOW)
     public abstract Tenant toTenant(Tenant tenant, TenantRequestDto tenantDto);
 
     public abstract TenantResponseDto toTenantDto(Tenant tenant);

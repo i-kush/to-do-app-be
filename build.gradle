@@ -1,8 +1,12 @@
+import com.github.spotbugs.snom.Confidence
+import com.github.spotbugs.snom.Effort
+import com.github.spotbugs.snom.SpotBugsTask
+
 plugins {
     id "java"
     id "org.springframework.boot" version "3.4.6"
     id "io.spring.dependency-management" version "1.1.7"
-    id "com.github.spotbugs" version "6.1.12"
+    id "com.github.spotbugs" version "6.2.5"
     id "checkstyle"
     id "pmd"
     id "jacoco"
@@ -34,9 +38,11 @@ ext {
 
 dependencies {
     implementation "org.springframework.boot:spring-boot-starter-actuator"
-    implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+    implementation "org.springframework.boot:spring-boot-starter-data-jdbc"
     implementation "org.springframework.boot:spring-boot-starter-validation"
     implementation "org.springframework.boot:spring-boot-starter-web"
+    implementation "org.springframework.boot:spring-boot-starter-security"
+    implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springDocVersion}"
     implementation "org.liquibase:liquibase-core"
     implementation "org.postgresql:postgresql"
@@ -137,8 +143,8 @@ pmd {
 
 spotbugs {
     toolVersion = "4.8.4"
-    effort = "max"
-    reportLevel = "low"
+    effort = Effort.MAX
+    reportLevel = Confidence.valueOf("LOW") //A workaround to overcome build warning to to plugin issues
     ignoreFailures = false
     excludeFilter = file("config/spotbugs-exclusions.xml")
 }
@@ -157,11 +163,19 @@ tasks.withType(Pmd).configureEach {
     }
 }
 
-tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach {
+tasks.withType(SpotBugsTask).configureEach {
     reports {
         html.required = true
         xml.required = true
     }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += [
+            "-Amapstruct.defaultComponentModel=spring",
+            "-Werror",
+            "-Amapstruct.unmappedTargetPolicy=ERROR"
+    ]
 }
 
 tasks.named("check") {

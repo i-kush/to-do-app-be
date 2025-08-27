@@ -1,1 +1,0 @@
-truncate table tenant cascade;

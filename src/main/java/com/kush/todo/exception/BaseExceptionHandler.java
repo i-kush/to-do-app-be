@@ -8,9 +8,12 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.relational.core.conversion.DbActionExecutionException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.method.MethodValidationResult;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -103,9 +106,30 @@ public class BaseExceptionHandler {
         return new ResponseEntity<>(new ErrorsDto(new ErrorDto(message)), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ErrorsDto> handle(UnauthorizedException e) {
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<ErrorsDto> handle(AuthorizationDeniedException e) {
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(DbActionExecutionException.class)
+    public ResponseEntity<ErrorsDto> handle(DbActionExecutionException e) {
+        Throwable cause = e.getCause();
+        String message = "Unknown data error";
+        if (cause instanceof DuplicateKeyException duplicateKeyException) {
+            message = duplicateKeyException.getMessage().split("Detail: Key ")[1];
+        }
+        log.error("Database action error error", e);
+        return new ResponseEntity<>(new ErrorsDto(new ErrorDto(message)), HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorsDto> handle(Exception e) {
         log.error("Unknown error", e);
-        return new ResponseEntity<>(new ErrorsDto(new ErrorDto(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(new ErrorsDto(new ErrorDto("Unknown application error")), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
