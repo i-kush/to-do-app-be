@@ -42,7 +42,7 @@ class AuthMapperTest {
         for (int i = 0; i < permissions.size(); i++) {
             stringBuilder.append(permissions.get(i));
             if (i != permissions.size() - 1) {
-                stringBuilder.append(" ");
+                stringBuilder.append(' ');
             }
         }
 

@@ -84,7 +84,7 @@ public class AppUserService {
     }
 
     @Transactional(readOnly = true)
-    List<Permission> findUserPermission(UUID id, UUID tenantId) {
+    public List<Permission> findUserPermission(UUID id, UUID tenantId) {
         return appUserRepository.findUserPermissions(id, tenantId);
     }
 }

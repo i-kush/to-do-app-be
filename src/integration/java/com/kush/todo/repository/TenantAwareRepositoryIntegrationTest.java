@@ -4,9 +4,10 @@ import com.kush.todo.BaseIntegrationTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
+import java.util.Collections;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
@@ -36,43 +37,47 @@ class TenantAwareRepositoryIntegrationTest extends BaseIntegrationTest {
     @Test
     void findByIdForbidden() {
         Assertions.assertThrows(UnsupportedOperationException.class,
-                                () -> tenantAwareRepository.findById(1L));
+                                () -> tenantAwareRepository.findById(new ParameterizedTypeReference<>() {
+                                }));
     }
 
     @Test
     void existsByIdForbidden() {
         Assertions.assertThrows(UnsupportedOperationException.class,
-                                () -> tenantAwareRepository.existsById(1L));
+                                () -> tenantAwareRepository.existsById(new ParameterizedTypeReference<>() {
+                                }));
     }
 
     @Test
     void findAllByIdForbidden() {
         Assertions.assertThrows(UnsupportedOperationException.class,
-                                () -> tenantAwareRepository.findAllById(List.of(1L, 2L)));
+                                () -> tenantAwareRepository.findAllById(Collections.emptyList()));
     }
 
     @Test
     void deleteByIdForbidden() {
         Assertions.assertThrows(UnsupportedOperationException.class,
-                                () -> tenantAwareRepository.deleteById(1L));
+                                () -> tenantAwareRepository.deleteById(new ParameterizedTypeReference<>() {
+                                }));
     }
 
     @Test
     void deleteForbidden() {
         Assertions.assertThrows(UnsupportedOperationException.class,
-                                () -> tenantAwareRepository.delete(new Object()));
+                                () -> tenantAwareRepository.delete(new ParameterizedTypeReference<>() {
+                                }));
     }
 
     @Test
     void deleteAllByIdForbidden() {
         Assertions.assertThrows(UnsupportedOperationException.class,
-                                () -> tenantAwareRepository.deleteAllById(List.of(1L, 2L)));
+                                () -> tenantAwareRepository.deleteAllById(Collections.emptyList()));
     }
 
     @Test
     void deleteAllIterableForbidden() {
         Assertions.assertThrows(UnsupportedOperationException.class,
-                                () -> tenantAwareRepository.deleteAll(List.of(new Object())));
+                                () -> tenantAwareRepository.deleteAll(Collections.emptyList()));
     }
 
     @Test

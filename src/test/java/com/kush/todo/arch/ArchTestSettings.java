@@ -4,6 +4,10 @@ import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
 
+import java.util.Collection;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 public final class ArchTestSettings {
 
     @SuppressWarnings("PMD.LooseCoupling")
@@ -13,5 +17,11 @@ public final class ArchTestSettings {
 
     private ArchTestSettings() {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+    }
+
+    public static String buildExcludeList(Collection<String> collection) {
+        return collection.stream()
+                         .map(Pattern::quote)
+                         .collect(Collectors.joining("|"));
     }
 }

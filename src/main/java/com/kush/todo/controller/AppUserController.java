@@ -59,7 +59,7 @@ public class AppUserController {
             @ApiResponse(responseCode = "500", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
     })
     @GetMapping(value = "me", produces = MediaType.APPLICATION_JSON_VALUE)
-    public AppUserResponseDto get() {
+    public AppUserResponseDto me() {
         return appUserService.findByIdRequired(currentUser.getId());
     }
 
