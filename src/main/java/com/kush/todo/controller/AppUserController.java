@@ -1,5 +1,6 @@
 package com.kush.todo.controller;
 
+import com.kush.todo.dto.CurrentUser;
 import com.kush.todo.dto.request.AppUserRequestDto;
 import com.kush.todo.dto.response.AppUserResponseDto;
 import com.kush.todo.dto.response.CustomPage;
@@ -20,6 +21,7 @@ import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,6 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AppUserController {
 
     private final AppUserService appUserService;
+    private final CurrentUser currentUser;
 
     @Operation(summary = "Create user", description = "Creates a user")
     @ApiResponses(value = {
@@ -45,8 +48,19 @@ public class AppUserController {
     })
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAuthority('USER_WRITE')")
     public AppUserResponseDto create(@Valid @RequestBody AppUserRequestDto userDto) {
         return appUserService.create(userDto);
+    }
+
+    @Operation(summary = "Get logged in user", description = "Gets logged in user details")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved user"),
+            @ApiResponse(responseCode = "500", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
+    })
+    @GetMapping(value = "me", produces = MediaType.APPLICATION_JSON_VALUE)
+    public AppUserResponseDto get() {
+        return appUserService.findByIdRequired(currentUser.getId());
     }
 
     @Operation(summary = "Get user by ID", description = "Gets user details by ID")
@@ -55,6 +69,7 @@ public class AppUserController {
             @ApiResponse(responseCode = "500", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
     })
     @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('USER_READ')")
     public AppUserResponseDto get(@NotNull @PathVariable UUID id) {
         return appUserService.findByIdRequired(id);
     }
@@ -65,6 +80,7 @@ public class AppUserController {
             @ApiResponse(responseCode = "500", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
     })
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('USER_READ')")
     public CustomPage<AppUserResponseDto> getAll(@Min(1) @RequestParam int page, @Min(1) @Max(200) @RequestParam int size) {
         return appUserService.findAll(page, size);
     }
@@ -75,6 +91,7 @@ public class AppUserController {
             @ApiResponse(responseCode = "500", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
     })
     @PutMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('USER_WRITE')")
     public AppUserResponseDto update(@NotNull @PathVariable UUID id, @Valid @RequestBody AppUserRequestDto userDto) {
         return appUserService.update(id, userDto);
     }
@@ -85,6 +102,7 @@ public class AppUserController {
             @ApiResponse(responseCode = "500", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
     })
     @DeleteMapping("{id}")
+    @PreAuthorize("hasAuthority('USER_WRITE')")
     public void delete(@NotNull @PathVariable UUID id) {
         appUserService.delete(id);
     }

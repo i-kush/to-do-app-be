@@ -4,6 +4,7 @@ import com.kush.todo.dto.request.LoginRequestDto;
 import com.kush.todo.dto.response.AppUserResponseDto;
 import com.kush.todo.dto.response.LoginResponseDto;
 import com.kush.todo.exception.UnauthorizedException;
+import com.kush.todo.mapper.AuthMapper;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Instant;
@@ -26,6 +27,7 @@ public class AuthService {
     private final JwtEncoder jwtEncoder;
     private final AppUserService appUserService;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final AuthMapper authMapper;
     @Value("${spring.security.oauth2.resourceserver.jwt.expiration-seconds}")
     private final int jwtExpirationInSeconds;
 
@@ -42,7 +44,7 @@ public class AuthService {
                                           .issuedAt(now)
                                           .expiresAt(now.plusSeconds(jwtExpirationInSeconds))
                                           .subject(user.id().toString())
-                                          .claim("scope", "READ WRITE") //ToDo set actual permissions
+                                          .claim("scope", authMapper.toScope(appUserService.findUserPermission(user.id(), user.tenantId())))
                                           .claim("role", user.roleId().toString())
                                           .claim("tenant", user.tenantId().toString())
                                           .claim("username", user.username())

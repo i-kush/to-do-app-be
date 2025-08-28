@@ -1,11 +1,14 @@
 package com.kush.todo.mapper;
 
 import com.kush.todo.dto.CurrentUser;
+import com.kush.todo.dto.Permission;
 import com.kush.todo.dto.Role;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.Mapper;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.security.oauth2.jwt.Jwt;
 
@@ -21,5 +24,11 @@ public abstract class AuthMapper {
                           .username(jwt.getClaimAsString("username"))
                           .email(jwt.getClaimAsString("email"))
                           .build();
+    }
+
+    public String toScope(List<Permission> userPermission) {
+        return userPermission.stream()
+                             .map(Permission::toString)
+                             .collect(Collectors.joining(" "));
     }
 }
