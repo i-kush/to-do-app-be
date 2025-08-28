@@ -6,6 +6,6 @@ public final class MappingConstants {
     public static final String EXPRESSION_PASSWORD_HASH = "java(passwordEncoder.encode(appUserRequestDto.password()))";
 
     private MappingConstants() {
-        throw new UnsupportedOperationException("Cannot instantiate utility class");
+        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
 }
