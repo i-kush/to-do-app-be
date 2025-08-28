@@ -6,6 +6,7 @@ import com.tngtech.archunit.core.importer.ImportOption;
 
 public final class ArchTestSettings {
 
+    @SuppressWarnings("PMD.LooseCoupling")
     public static final JavaClasses JAVA_CLASSES = new ClassFileImporter()
             .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
             .importPackages("com.kush.todo");
