@@ -58,7 +58,7 @@ class AppUserControllerIntegrationTest extends BaseIntegrationTest {
         Assertions.assertNotNull(errorResponse.getBody());
         List<ErrorDto> errors = errorResponse.getBody().errors();
         Assertions.assertFalse(CollectionUtils.isEmpty(errors));
-        Assertions.assertEquals(String.format("(tenant_id, username)=(%s, %s) already exists.", defaultTenantId, request.username()),
+        Assertions.assertEquals(String.format("(username)=(%s) already exists.", request.username()),
                                 errors.getFirst().message());
     }
 
@@ -89,6 +89,18 @@ class AppUserControllerIntegrationTest extends BaseIntegrationTest {
 
         Assertions.assertEquals(HttpStatus.OK.value(), getResponse.getStatusCode().value());
         assertAppUser(request, getResponse);
+    }
+
+    @Test
+    void me() {
+        ResponseEntity<AppUserResponseDto> response = restTemplate.exchange(BASE_URL + "/me",
+                                                                            HttpMethod.GET,
+                                                                            IntegrationTestDataBuilder.buildRequest(defaultAccessToken),
+                                                                            AppUserResponseDto.class);
+
+        Assertions.assertEquals(HttpStatus.OK.value(), response.getStatusCode().value());
+        Assertions.assertNotNull(response.getBody());
+        Assertions.assertEquals(IntegrationTestDataBuilder.TEST_USERNAME, response.getBody().username());
     }
 
     @Test
@@ -208,7 +220,7 @@ class AppUserControllerIntegrationTest extends BaseIntegrationTest {
         Assertions.assertNotNull(errorResponse.getBody());
         List<ErrorDto> errors = errorResponse.getBody().errors();
         Assertions.assertFalse(CollectionUtils.isEmpty(errors));
-        Assertions.assertEquals(String.format("(tenant_id, username)=(%s, %s) already exists.", defaultTenantId, request1.username()), errors
+        Assertions.assertEquals(String.format("(username)=(%s) already exists.", request1.username()), errors
                 .getFirst().message());
     }
 

@@ -1,6 +1,7 @@
 package com.kush.todo.service;
 
 import com.kush.todo.dto.CurrentUser;
+import com.kush.todo.dto.Permission;
 import com.kush.todo.dto.request.AppUserRequestDto;
 import com.kush.todo.dto.response.AppUserResponseDto;
 import com.kush.todo.dto.response.CustomPage;
@@ -11,6 +12,7 @@ import com.kush.todo.repository.AppUserRepository;
 import com.kush.todo.validator.AppUserValidator;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -79,5 +81,10 @@ public class AppUserService {
         Page<AppUserResponseDto> pages = appUserRepository.findAllByTenantId(PageRequest.of(page - 1, size), currentUser.getTenantId())
                                                           .map(appUserMapper::toAppUserDto);
         return appUserMapper.toCustomPage(pages);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Permission> findUserPermission(UUID id, UUID tenantId) {
+        return appUserRepository.findUserPermissions(id, tenantId);
     }
 }

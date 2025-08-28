@@ -47,7 +47,7 @@ public class TenantController {
     })
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasAuthority('READ')") //ToDo use correct authority
+    @PreAuthorize("hasAuthority('TENANT_WRITE')")
     public TenantResponseDto create(@Valid @RequestBody TenantRequestDto tenantDto) {
         return tenantService.create(tenantDto);
     }
@@ -58,6 +58,7 @@ public class TenantController {
             @ApiResponse(responseCode = "500", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
     })
     @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('TENANT_READ')")
     public TenantResponseDto get(@NotNull @PathVariable UUID id) {
         return tenantService.findByIdRequired(id);
     }
@@ -68,6 +69,7 @@ public class TenantController {
             @ApiResponse(responseCode = "500", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
     })
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('TENANT_READ')")
     public CustomPage<TenantResponseDto> getAll(@Min(1) @RequestParam int page, @Min(1) @Max(200) @RequestParam int size) {
         return tenantService.findAll(page, size);
     }
@@ -78,6 +80,7 @@ public class TenantController {
             @ApiResponse(responseCode = "500", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
     })
     @PutMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('TENANT_WRITE')")
     public TenantResponseDto update(@NotNull @PathVariable UUID id, @Valid @RequestBody TenantRequestDto tenantDto) {
         return tenantService.update(id, tenantDto);
     }
@@ -88,6 +91,7 @@ public class TenantController {
             @ApiResponse(responseCode = "500", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
     })
     @DeleteMapping("{id}")
+    @PreAuthorize("hasAuthority('TENANT_WRITE')")
     public void delete(@NotNull @PathVariable UUID id) {
         tenantService.delete(id);
     }
