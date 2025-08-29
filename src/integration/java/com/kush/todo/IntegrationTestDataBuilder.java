@@ -49,6 +49,17 @@ public final class IntegrationTestDataBuilder {
                                 .build();
     }
 
+    public static AppUserRequestDto buildAppUserRequestDto(Role role) {
+        return AppUserRequestDto.builder()
+                                .username("u-" + ThreadLocalRandom.current().nextInt(1_000_000))
+                                .password("p-" + ThreadLocalRandom.current().nextInt(1_000_000))
+                                .roleId(role)
+                                .email(UUID.randomUUID() + "@email.com")
+                                .firstname("firstname-" + UUID.randomUUID())
+                                .lastname("lastname-" + UUID.randomUUID())
+                                .build();
+    }
+
     public static <T> HttpEntity<T> buildRequest(String accessToken) {
         return buildRequest(null, accessToken);
     }
@@ -66,10 +77,14 @@ public final class IntegrationTestDataBuilder {
         return new HttpEntity<>(body, headers);
     }
 
-    public static LoginRequestDto buildLoginRequest() {
+    public static LoginRequestDto buildDefaultLoginRequest() {
+        return buildLoginRequest(TEST_USERNAME, TEST_PASSWORD);
+    }
+
+    public static LoginRequestDto buildLoginRequest(String username, String password) {
         return LoginRequestDto.builder()
-                              .username(TEST_USERNAME)
-                              .password(TEST_PASSWORD)
+                              .username(username)
+                              .password(password)
                               .build();
     }
 }
