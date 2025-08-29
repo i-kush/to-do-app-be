@@ -36,6 +36,7 @@ public class UserLoggingFilter extends OncePerRequestFilter {
         }
     }
 
+    @SuppressWarnings("PMD.EmptyCatchBlock")
     private void trySetUserId() {
         try {
             CurrentUser currentUser = authMapper.buildCurrentUser();

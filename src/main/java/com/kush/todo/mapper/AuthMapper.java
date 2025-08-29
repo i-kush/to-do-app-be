@@ -12,6 +12,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 
@@ -37,10 +38,10 @@ public abstract class AuthMapper {
 
     public CurrentUser buildCurrentUser() {
         return Optional.ofNullable(SecurityContextHolder.getContext())
-                       .map(org.springframework.security.core.context.SecurityContext::getAuthentication)
+                       .map(SecurityContext::getAuthentication)
                        .map(Authentication::getPrincipal)
-                       .filter(org.springframework.security.oauth2.jwt.Jwt.class::isInstance)
-                       .map(org.springframework.security.oauth2.jwt.Jwt.class::cast)
+                       .filter(Jwt.class::isInstance)
+                       .map(Jwt.class::cast)
                        .map(this::toCurrentUser)
                        .orElseThrow(() -> new IllegalStateException("No current user detected"));
     }

@@ -51,4 +51,9 @@ class AuthMapperTest {
         Assertions.assertNotNull(actual);
         Assertions.assertEquals(stringBuilder.toString(), actual);
     }
+
+    @Test
+    void buildCurrentUser() {
+        Assertions.assertThrows(IllegalStateException.class, authMapper::buildCurrentUser);
+    }
 }
