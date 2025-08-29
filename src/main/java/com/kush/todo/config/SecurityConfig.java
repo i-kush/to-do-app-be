@@ -39,6 +39,14 @@ import org.springframework.web.context.annotation.RequestScope;
 @EnableMethodSecurity
 public class SecurityConfig {
 
+    private static final String[] ALLOWED_ENDPOINTS = new String[]{
+            "/api/auth/login",
+            "/actuator/**",
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html"
+    };
+
     @Value("${spring.security.oauth2.resourceserver.jwt.secret-key}")
     private final String jwtSecret;
     private final AuthMapper authMapper;
@@ -48,7 +56,7 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/login").permitAll() //ToDo add exclusions for the swagger-ui and v3 api-docs
+                        .requestMatchers(ALLOWED_ENDPOINTS).permitAll() //ToDo add exclusions for the swagger-ui and v3 api-docs
                         .anyRequest().authenticated()
                 )
                 .addFilterAfter(userLoggingFilter, BearerTokenAuthenticationFilter.class)
