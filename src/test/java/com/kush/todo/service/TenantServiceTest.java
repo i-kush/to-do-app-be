@@ -34,7 +34,7 @@ class TenantServiceTest extends BaseTest {
     @Test
     void deleteNotFound() {
         UUID id = UUID.randomUUID();
-        Mockito.when(tenantRepository.existsById(id)).thenReturn(false);
+        Mockito.when(tenantRepository.findById(id)).thenReturn(Optional.empty());
 
         NotFoundException exception = Assertions.assertThrows(NotFoundException.class,
                                                               () -> tenantService.delete(id));

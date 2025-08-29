@@ -125,9 +125,10 @@ class TenantControllerIntegrationTest extends BaseIntegrationTest {
         CustomPage<TenantResponseDto> getAllResponseBody = getAllResponse.getBody();
         Assertions.assertNotNull(getAllResponseBody);
         Assertions.assertFalse(CollectionUtils.isEmpty(getAllResponseBody.items()));
-        Assertions.assertEquals(2, getAllResponseBody.items().size());
+        int expectedTotalElements = 3; //2 created by the tests + 1 'system' tenant
+        Assertions.assertEquals(expectedTotalElements, getAllResponseBody.items().size());
         Assertions.assertEquals(1, getAllResponseBody.totalPages());
-        Assertions.assertEquals(2, getAllResponseBody.totalElements());
+        Assertions.assertEquals(expectedTotalElements, getAllResponseBody.totalElements());
     }
 
     @Test
@@ -258,5 +259,19 @@ class TenantControllerIntegrationTest extends BaseIntegrationTest {
         List<ErrorDto> errors = response.getBody().errors();
         Assertions.assertFalse(CollectionUtils.isEmpty(errors));
         Assertions.assertEquals(String.format("No tenant with id '%s'", absentId), errors.getFirst().message());
+    }
+
+    @Test
+    void deleteSystemTenantDenied() {
+        ResponseEntity<ErrorsDto> response = restTemplate.exchange(BASE_URL + "/{id}",
+                                                                   HttpMethod.DELETE,
+                                                                   IntegrationTestDataBuilder.buildRequest(defaultAccessToken),
+                                                                   ErrorsDto.class,
+                                                                   systemTenantId);
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode().value());
+        Assertions.assertNotNull(response.getBody());
+        List<ErrorDto> errors = response.getBody().errors();
+        Assertions.assertFalse(CollectionUtils.isEmpty(errors));
+        Assertions.assertEquals(String.format("Tenant '%s' cannot be deleted", systemTenantId), errors.getFirst().message());
     }
 }

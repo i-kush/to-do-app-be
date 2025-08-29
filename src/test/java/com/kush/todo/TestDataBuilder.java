@@ -1,7 +1,9 @@
 package com.kush.todo;
 
 import com.kush.todo.dto.Role;
+import com.kush.todo.entity.Tenant;
 
+import java.time.Instant;
 import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
@@ -23,6 +25,19 @@ public final class TestDataBuilder {
         return new PageImpl<>(IntStream.range(0, size)
                                        .mapToObj(i -> objectGenerator.get())
                                        .toList());
+    }
+
+    public static Tenant buildTenant() {
+        return buildTenant("t-" + UUID.randomUUID());
+    }
+
+    public static Tenant buildTenant(String name) {
+        return Tenant.builder()
+                     .id(UUID.randomUUID())
+                     .name(name)
+                     .createdAt(Instant.now())
+                     .updatedAt(Instant.now())
+                     .build();
     }
 
     public static Jwt buildJwt() {

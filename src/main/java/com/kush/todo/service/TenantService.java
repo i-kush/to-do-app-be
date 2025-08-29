@@ -7,6 +7,7 @@ import com.kush.todo.entity.Tenant;
 import com.kush.todo.exception.NotFoundException;
 import com.kush.todo.mapper.TenantMapper;
 import com.kush.todo.repository.TenantRepository;
+import com.kush.todo.validator.TenantValidator;
 import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;
@@ -20,8 +21,11 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class TenantService {
 
+    public static final String SYSTEM_TENANT_NAME = "system";
+
     private final TenantRepository tenantRepository;
     private final TenantMapper tenantMapper;
+    private final TenantValidator tenantValidator;
 
     @Transactional
     public TenantResponseDto create(TenantRequestDto tenantDto) {
@@ -46,9 +50,7 @@ public class TenantService {
 
     @Transactional
     public void delete(UUID id) {
-        if (!tenantRepository.existsById(id)) {
-            throw new NotFoundException(String.format("No tenant with id '%s'", id));
-        }
+        tenantValidator.validateTenantDeletion(getRequired(id));
         tenantRepository.deleteById(id);
     }
 
