@@ -1,6 +1,7 @@
 package com.kush.todo.config;
 
 import com.kush.todo.dto.CurrentUser;
+import com.kush.todo.filter.UserLoggingFilter;
 import com.kush.todo.mapper.AuthMapper;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -12,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -22,8 +22,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
@@ -31,6 +29,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.context.annotation.RequestScope;
 
@@ -45,13 +44,14 @@ public class SecurityConfig {
     private final AuthMapper authMapper;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, UserLoggingFilter userLoggingFilter) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/login").permitAll() //ToDo add exclusions for the swagger-ui and v3 api-docs
                         .anyRequest().authenticated()
                 )
+                .addFilterAfter(userLoggingFilter, BearerTokenAuthenticationFilter.class)
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtGrantedAuthoritiesConverter()))
                 )
@@ -97,12 +97,6 @@ public class SecurityConfig {
     @Bean
     @RequestScope
     public CurrentUser currentUser() {
-        return Optional.ofNullable(SecurityContextHolder.getContext())
-                       .map(org.springframework.security.core.context.SecurityContext::getAuthentication)
-                       .map(Authentication::getPrincipal)
-                       .filter(org.springframework.security.oauth2.jwt.Jwt.class::isInstance)
-                       .map(org.springframework.security.oauth2.jwt.Jwt.class::cast)
-                       .map(authMapper::toCurrentUser)
-                       .orElseThrow(() -> new IllegalStateException("No current user detected"));
+        return authMapper.buildCurrentUser();
     }
 }
