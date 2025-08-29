@@ -50,6 +50,7 @@ public abstract class BaseIntegrationTest {
 
     protected String defaultAccessToken;
     protected UUID defaultTenantId;
+    protected UUID systemTenantId;
 
     @DynamicPropertySource
     public static void setDynamicProperties(DynamicPropertyRegistry registry) {
@@ -69,6 +70,7 @@ public abstract class BaseIntegrationTest {
         defaultAccessToken = login(IntegrationTestDataBuilder.buildDefaultLoginRequest());
 
         defaultTenantId = jdbcTemplate.queryForObject("select id from tenant where name = 'TestTenant' limit 1", UUID.class);
+        systemTenantId = jdbcTemplate.queryForObject("select id from tenant where name = 'system' limit 1", UUID.class);
     }
 
     protected String login(LoginRequestDto loginRequestDto) {
