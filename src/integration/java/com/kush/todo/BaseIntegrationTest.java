@@ -1,5 +1,6 @@
 package com.kush.todo;
 
+import com.kush.todo.dto.request.LoginRequestDto;
 import com.kush.todo.dto.response.LoginResponseDto;
 import jakarta.annotation.PreDestroy;
 import org.junit.jupiter.api.Assertions;
@@ -65,14 +66,18 @@ public abstract class BaseIntegrationTest {
     @BeforeEach
     public void setUp() throws IOException {
         jdbcTemplate.execute(Files.readString(Paths.get("src/integration/resources/test-init.sql")));
+        defaultAccessToken = login(IntegrationTestDataBuilder.buildDefaultLoginRequest());
 
-        ResponseEntity<LoginResponseDto> response = restTemplate.postForEntity("/api/auth/login", IntegrationTestDataBuilder.buildLoginRequest(), LoginResponseDto.class);
+        defaultTenantId = jdbcTemplate.queryForObject("select id from tenant where name = 'TestTenant' limit 1", UUID.class);
+    }
+
+    protected String login(LoginRequestDto loginRequestDto) {
+        ResponseEntity<LoginResponseDto> response = restTemplate.postForEntity("/api/auth/login", loginRequestDto, LoginResponseDto.class);
         Assertions.assertNotNull(response);
         Assertions.assertEquals(HttpStatus.OK.value(), response.getStatusCode().value());
         Assertions.assertNotNull(response.getBody());
         Assertions.assertNotNull(response.getBody().accessToken());
 
-        defaultAccessToken = response.getBody().accessToken();
-        defaultTenantId = jdbcTemplate.queryForObject("select id from tenant where name = 'TestTenant' limit 1", UUID.class);
+        return response.getBody().accessToken();
     }
 }

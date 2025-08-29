@@ -37,7 +37,7 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void login() {
-        LoginRequestDto loginRequestDto = IntegrationTestDataBuilder.buildLoginRequest();
+        LoginRequestDto loginRequestDto = IntegrationTestDataBuilder.buildDefaultLoginRequest();
         ResponseEntity<LoginResponseDto> response = restTemplate.postForEntity(BASE_URL, loginRequestDto, LoginResponseDto.class);
 
         Assertions.assertEquals(HttpStatus.OK.value(), response.getStatusCode().value());

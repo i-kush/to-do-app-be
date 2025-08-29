@@ -2,6 +2,7 @@ package com.kush.todo.controller;
 
 import com.kush.todo.BaseIntegrationTest;
 import com.kush.todo.IntegrationTestDataBuilder;
+import com.kush.todo.dto.Role;
 import com.kush.todo.dto.request.AppUserRequestDto;
 import com.kush.todo.dto.response.AppUserResponseDto;
 import com.kush.todo.dto.response.CustomPage;
@@ -25,7 +26,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 
-//ToDo permissions tests
 class AppUserControllerIntegrationTest extends BaseIntegrationTest {
 
     public static final String BASE_URL = "/api/users";
@@ -39,6 +39,23 @@ class AppUserControllerIntegrationTest extends BaseIntegrationTest {
 
         Assertions.assertEquals(HttpStatus.CREATED.value(), response.getStatusCode().value());
         assertAppUser(request, response);
+    }
+
+    @Test
+    void createForbidden() {
+        AppUserRequestDto request = IntegrationTestDataBuilder.buildAppUserRequestDto(Role.USER);
+        ResponseEntity<AppUserResponseDto> createResponse = restTemplate.postForEntity(BASE_URL,
+                                                                                       IntegrationTestDataBuilder.buildRequest(request, defaultAccessToken),
+                                                                                       AppUserResponseDto.class);
+
+        Assertions.assertEquals(HttpStatus.CREATED.value(), createResponse.getStatusCode().value());
+        assertAppUser(request, createResponse);
+
+        String simpleUserAccessToken = login(IntegrationTestDataBuilder.buildLoginRequest(request.username(), request.password()));
+        ResponseEntity<AppUserResponseDto> forbiddenCreateResponse = restTemplate.postForEntity(BASE_URL,
+                                                                                                IntegrationTestDataBuilder.buildRequest(request, simpleUserAccessToken),
+                                                                                                AppUserResponseDto.class);
+        Assertions.assertEquals(HttpStatus.FORBIDDEN.value(), forbiddenCreateResponse.getStatusCode().value());
     }
 
     @Test

@@ -25,7 +25,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 
-//ToDo permissions tests
 class TenantControllerIntegrationTest extends BaseIntegrationTest {
 
     public static final String BASE_URL = "/api/tenants";
