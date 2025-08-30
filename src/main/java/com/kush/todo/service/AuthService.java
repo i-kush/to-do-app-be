@@ -32,6 +32,7 @@ public class AuthService {
     @Value("${spring.security.oauth2.resourceserver.jwt.expiration-seconds}")
     private final int jwtExpirationInSeconds;
 
+    @SuppressWarnings("PMD.ConfusingTernary") //False positive - if password is correct then we will nullify login attempts
     @Transactional
     public LoginResponseDto login(LoginRequestDto request) {
         AppUser user = appUserService.findByUsername(request.username())
