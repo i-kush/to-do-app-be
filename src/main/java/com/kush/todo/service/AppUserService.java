@@ -130,4 +130,14 @@ public class AppUserService {
             appUserRepository.unlockUsers(ids);
         }
     }
+
+    @Transactional
+    public void unlockUser(UUID id) {
+        AppUser currentAppUser = getRequired(id);
+        if (!currentAppUser.isLocked()) {
+            throw new IllegalStateException("User is not locked");
+        }
+
+        appUserRepository.unlockUser(id);
+    }
 }

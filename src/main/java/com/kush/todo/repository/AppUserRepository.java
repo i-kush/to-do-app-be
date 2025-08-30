@@ -86,4 +86,15 @@ public interface AppUserRepository extends TenantAwareRepository<AppUser, UUID> 
            limit 500
            """)
     Set<UUID> findUserIdsToUnlock();
+
+    @Modifying
+    @Query("""
+           update app_user
+           set login_attempts = null,
+               is_locked = false,
+               locked_at = null,
+               last_login_attempt_at = null
+           where id = :id
+           """)
+    void unlockUser(UUID id);
 }
