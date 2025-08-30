@@ -4,11 +4,11 @@ import com.kush.todo.service.AppUserService;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 @RequiredArgsConstructor
-public class Scheduler {
+public class SchedulerComponent {
 
     private final AppUserService appUserService;
 
