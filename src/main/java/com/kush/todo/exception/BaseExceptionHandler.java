@@ -108,7 +108,7 @@ public class BaseExceptionHandler {
 
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<ErrorsDto> handle(UnauthorizedException e) {
-        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(new ErrorsDto(new ErrorDto(e.getMessage())), HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(AuthorizationDeniedException.class)

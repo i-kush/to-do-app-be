@@ -20,6 +20,7 @@ public record AppUser(
         String firstname,
         String lastname,
         Integer loginAttempts,
+        Instant lastLoginAttemptAt,
         boolean isLocked,
         Instant lockedAt,
         Instant createdAt,

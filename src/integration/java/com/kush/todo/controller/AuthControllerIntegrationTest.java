@@ -71,7 +71,11 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
         ResponseEntity<ErrorsDto> errorResponse = restTemplate.postForEntity(BASE_URL, loginRequestDto, ErrorsDto.class);
 
         Assertions.assertEquals(HttpStatus.UNAUTHORIZED.value(), errorResponse.getStatusCode().value());
-        Assertions.assertNull(errorResponse.getBody());
+        Assertions.assertNotNull(errorResponse.getBody());
+        List<ErrorDto> errors = errorResponse.getBody().errors();
+        Assertions.assertFalse(CollectionUtils.isEmpty(errors));
+        Assertions.assertEquals(1, errors.size());
+        Assertions.assertEquals("Invalid username or password", errors.getFirst().message());
     }
 
     @ParameterizedTest
