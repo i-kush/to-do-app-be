@@ -5,6 +5,7 @@ import com.kush.todo.entity.AppUser;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.jdbc.repository.query.Modifying;
@@ -65,4 +66,24 @@ public interface AppUserRepository extends TenantAwareRepository<AppUser, UUID> 
              and tenant_id = :tenantId
            """)
     void nullifyLoginAttempts(UUID id, UUID tenantId);
+
+    @Modifying
+    @Query("""
+           update app_user
+           set login_attempts = null,
+               is_locked = false,
+               locked_at = null,
+               last_login_attempt_at = null
+           where id in (:ids)
+           """)
+    void unlockUsers(Set<UUID> ids);
+
+    @Query("""
+           select id
+           from app_user
+           where is_locked = true
+             and locked_at <= now() - interval '30 minutes'
+           limit 500
+           """)
+    Set<UUID> findUserIdsToUnlock();
 }

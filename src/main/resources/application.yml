@@ -25,5 +25,8 @@ management:
     health:
       show-details: ALWAYS
 todo:
-  max-login-attempts: 5
-  max-login-attempts-window-minutes: 3
+  login:
+    max-attempts: 5
+    max-attempts-window-minutes: 3
+  job:
+    user-unlocking: 5m

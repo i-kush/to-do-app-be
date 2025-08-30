@@ -4,7 +4,9 @@ import com.kush.todo.dto.Role;
 import com.kush.todo.dto.request.AppUserRequestDto;
 import com.kush.todo.dto.request.LoginRequestDto;
 import com.kush.todo.dto.request.TenantRequestDto;
+import com.kush.todo.entity.AppUser;
 
+import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -58,6 +60,24 @@ public final class IntegrationTestDataBuilder {
                                 .firstname("firstname-" + UUID.randomUUID())
                                 .lastname("lastname-" + UUID.randomUUID())
                                 .build();
+    }
+
+    public static AppUser buildLockedAppUser(Instant lockedAt, UUID tenantId) {
+        return AppUser.builder()
+                      .username("u-" + ThreadLocalRandom.current().nextInt(1_000_000))
+                      .tenantId(tenantId)
+                      .passwordHash("p-" + ThreadLocalRandom.current().nextInt(1_000_000))
+                      .roleId(Role.TENANT_ADMIN)
+                      .email(UUID.randomUUID() + "@email.com")
+                      .firstname("firstname-" + UUID.randomUUID())
+                      .lastname("lastname-" + UUID.randomUUID())
+                      .createdAt(Instant.now())
+                      .updatedAt(Instant.now())
+                      .lockedAt(lockedAt)
+                      .loginAttempts(1)
+                      .lastLoginAttemptAt(Instant.now())
+                      .isLocked(true)
+                      .build();
     }
 
     public static <T> HttpEntity<T> buildRequest(String accessToken) {

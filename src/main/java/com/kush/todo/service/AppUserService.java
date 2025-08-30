@@ -17,6 +17,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +26,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -35,9 +37,9 @@ public class AppUserService {
     private final AppUserMapper appUserMapper;
     private final AppUserValidator appUserValidator;
     private final CurrentUser currentUser;
-    @Value("${todo.max-login-attempts}")
+    @Value("${todo.login.max-attempts}")
     private int maxLoginAttempts;
-    @Value("${todo.max-login-attempts-window-minutes}")
+    @Value("${todo.login.max-attempts-window-minutes}")
     private int maxLoginAttemptWindowMinutes;
 
     @Transactional
@@ -118,5 +120,14 @@ public class AppUserService {
     @Transactional
     public void nullifyLoginAttempts(AppUser appUser) {
         appUserRepository.nullifyLoginAttempts(appUser.id(), appUser.tenantId());
+    }
+
+    @Transactional
+    public void unlockUsers() {
+        Set<UUID> ids = appUserRepository.findUserIdsToUnlock();
+        if (!CollectionUtils.isEmpty(ids)) {
+            log.info("About to unlock {} users", ids.size());
+            appUserRepository.unlockUsers(ids);
+        }
     }
 }
