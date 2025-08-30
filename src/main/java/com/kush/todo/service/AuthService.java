@@ -1,8 +1,8 @@
 package com.kush.todo.service;
 
 import com.kush.todo.dto.request.LoginRequestDto;
-import com.kush.todo.dto.response.AppUserResponseDto;
 import com.kush.todo.dto.response.LoginResponseDto;
+import com.kush.todo.entity.AppUser;
 import com.kush.todo.exception.UnauthorizedException;
 import com.kush.todo.mapper.AuthMapper;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +17,7 @@ import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -31,12 +32,20 @@ public class AuthService {
     @Value("${spring.security.oauth2.resourceserver.jwt.expiration-seconds}")
     private final int jwtExpirationInSeconds;
 
+    @SuppressWarnings("PMD.ConfusingTernary") //False positive - if password is correct then we will nullify login attempts
+    @Transactional
     public LoginResponseDto login(LoginRequestDto request) {
-        AppUserResponseDto user = appUserService.findByUsername(request.username())
-                                                .orElseThrow(UnauthorizedException::new);
+        AppUser user = appUserService.findByUsername(request.username())
+                                     .orElseThrow(() -> new UnauthorizedException("Invalid username or password"));
+        if (user.isLocked()) {
+            throw new UnauthorizedException("User is locked");
+        }
 
         if (!passwordEncoder.matches(request.password(), user.passwordHash())) {
-            throw new UnauthorizedException();
+            appUserService.lockUserIfNeeded(user);
+            throw new UnauthorizedException("Invalid username or password");
+        } else if (user.loginAttempts() != null) {
+            appUserService.nullifyLoginAttempts(user);
         }
 
         Instant now = Instant.now();

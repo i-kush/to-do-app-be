@@ -49,6 +49,7 @@ public abstract class BaseIntegrationTest {
     protected JdbcTemplate jdbcTemplate;
 
     protected String defaultAccessToken;
+    protected UUID defaultUserId;
     protected UUID defaultTenantId;
     protected UUID systemTenantId;
 
@@ -70,6 +71,7 @@ public abstract class BaseIntegrationTest {
         defaultAccessToken = login(IntegrationTestDataBuilder.buildDefaultLoginRequest());
 
         defaultTenantId = jdbcTemplate.queryForObject("select id from tenant where name = 'TestTenant' limit 1", UUID.class);
+        defaultUserId = jdbcTemplate.queryForObject("select id from app_user where tenant_id = ? limit 1", UUID.class, defaultTenantId);
         systemTenantId = jdbcTemplate.queryForObject("select id from tenant where name = 'system' limit 1", UUID.class);
     }
 

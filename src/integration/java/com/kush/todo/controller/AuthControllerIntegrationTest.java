@@ -16,9 +16,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -34,6 +36,9 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private AppUserRepository appUserRepository;
+
+    @Value("${todo.login.max-attempts}")
+    private int maxAttempts;
 
     @Test
     void login() {
@@ -71,7 +76,109 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
         ResponseEntity<ErrorsDto> errorResponse = restTemplate.postForEntity(BASE_URL, loginRequestDto, ErrorsDto.class);
 
         Assertions.assertEquals(HttpStatus.UNAUTHORIZED.value(), errorResponse.getStatusCode().value());
-        Assertions.assertNull(errorResponse.getBody());
+        Assertions.assertNotNull(errorResponse.getBody());
+        List<ErrorDto> errors = errorResponse.getBody().errors();
+        Assertions.assertFalse(CollectionUtils.isEmpty(errors));
+        Assertions.assertEquals(1, errors.size());
+        Assertions.assertEquals("Invalid username or password", errors.getFirst().message());
+    }
+
+    @Test
+    void loginUnauthorizedUserLocked() {
+        LoginRequestDto request = IntegrationTestDataBuilder.buildLoginRequest(IntegrationTestDataBuilder.TEST_USERNAME,
+                                                                               UUID.randomUUID().toString());
+        ResponseEntity<ErrorsDto> errorResponse;
+
+        for (int i = 0; i < maxAttempts; i++) {
+            errorResponse = restTemplate.postForEntity(BASE_URL, request, ErrorsDto.class);
+            Assertions.assertEquals(HttpStatus.UNAUTHORIZED.value(), errorResponse.getStatusCode().value());
+            Assertions.assertNotNull(errorResponse.getBody());
+            List<ErrorDto> errors = errorResponse.getBody().errors();
+            Assertions.assertFalse(CollectionUtils.isEmpty(errors));
+            Assertions.assertEquals(1, errors.size());
+            Assertions.assertEquals("Invalid username or password", errors.getFirst().message());
+        }
+
+        errorResponse = restTemplate.postForEntity(BASE_URL, request, ErrorsDto.class);
+        Assertions.assertEquals(HttpStatus.UNAUTHORIZED.value(), errorResponse.getStatusCode().value());
+        Assertions.assertNotNull(errorResponse.getBody());
+        List<ErrorDto> errors = errorResponse.getBody().errors();
+        Assertions.assertFalse(CollectionUtils.isEmpty(errors));
+        Assertions.assertEquals(1, errors.size());
+        Assertions.assertEquals("User is locked", errors.getFirst().message());
+
+        Optional<AppUser> optionalUser = appUserRepository.findByUsername(IntegrationTestDataBuilder.TEST_USERNAME);
+        Assertions.assertTrue(optionalUser.isPresent());
+        AppUser user = optionalUser.get();
+        Assertions.assertTrue(user.isLocked());
+        Assertions.assertNotNull(user.lockedAt());
+        Assertions.assertNotNull(user.loginAttempts());
+        Assertions.assertNotNull(user.lastLoginAttemptAt());
+    }
+
+    @Test
+    void loginWindowAttemptsNullifier() {
+        LoginRequestDto invalidRequest = IntegrationTestDataBuilder.buildLoginRequest(IntegrationTestDataBuilder.TEST_USERNAME,
+                                                                                      UUID.randomUUID().toString());
+        ResponseEntity<ErrorsDto> errorResponse;
+
+        for (int i = 0; i < maxAttempts - 1; i++) {
+            errorResponse = restTemplate.postForEntity(BASE_URL, invalidRequest, ErrorsDto.class);
+            Assertions.assertEquals(HttpStatus.UNAUTHORIZED.value(), errorResponse.getStatusCode().value());
+            Assertions.assertNotNull(errorResponse.getBody());
+            List<ErrorDto> errors = errorResponse.getBody().errors();
+            Assertions.assertFalse(CollectionUtils.isEmpty(errors));
+            Assertions.assertEquals(1, errors.size());
+            Assertions.assertEquals("Invalid username or password", errors.getFirst().message());
+        }
+
+        LoginRequestDto validRequest = IntegrationTestDataBuilder.buildDefaultLoginRequest();
+        ResponseEntity<LoginResponseDto> validResponse = restTemplate.postForEntity(BASE_URL, validRequest, LoginResponseDto.class);
+        Assertions.assertEquals(HttpStatus.OK.value(), validResponse.getStatusCode().value());
+        Assertions.assertNotNull(validResponse.getBody());
+
+        Optional<AppUser> optionalUser = appUserRepository.findByIdAndTenantId(defaultUserId, defaultTenantId);
+        Assertions.assertTrue(optionalUser.isPresent());
+        AppUser user = optionalUser.get();
+        Assertions.assertFalse(user.isLocked());
+        Assertions.assertNull(user.lockedAt());
+        Assertions.assertNull(user.loginAttempts());
+        Assertions.assertNull(user.lastLoginAttemptAt());
+    }
+
+    @Test
+    void loginWindowAttemptsOutsideWindow() {
+        String username = IntegrationTestDataBuilder.TEST_USERNAME;
+        LoginRequestDto request = IntegrationTestDataBuilder.buildLoginRequest(username, UUID.randomUUID().toString());
+        ResponseEntity<ErrorsDto> errorResponse;
+
+        for (int i = 0; i < maxAttempts - 1; i++) {
+            errorResponse = restTemplate.postForEntity(BASE_URL, request, ErrorsDto.class);
+            Assertions.assertEquals(HttpStatus.UNAUTHORIZED.value(), errorResponse.getStatusCode().value());
+            Assertions.assertNotNull(errorResponse.getBody());
+            List<ErrorDto> errors = errorResponse.getBody().errors();
+            Assertions.assertFalse(CollectionUtils.isEmpty(errors));
+            Assertions.assertEquals(1, errors.size());
+            Assertions.assertEquals("Invalid username or password", errors.getFirst().message());
+        }
+
+        jdbcTemplate.update("update app_user set last_login_attempt_at = now() - interval '40 minutes' where username = ?", username);
+
+        errorResponse = restTemplate.postForEntity(BASE_URL, request, ErrorsDto.class);
+        Assertions.assertEquals(HttpStatus.UNAUTHORIZED.value(), errorResponse.getStatusCode().value());
+        Assertions.assertNotNull(errorResponse.getBody());
+        List<ErrorDto> errors = errorResponse.getBody().errors();
+        Assertions.assertFalse(CollectionUtils.isEmpty(errors));
+        Assertions.assertEquals(1, errors.size());
+        Assertions.assertEquals("Invalid username or password", errors.getFirst().message());
+
+        Optional<AppUser> optionalUser = appUserRepository.findByUsername(username);
+        Assertions.assertTrue(optionalUser.isPresent());
+        AppUser user = optionalUser.get();
+        Assertions.assertFalse(user.isLocked());
+        Assertions.assertNull(user.lockedAt());
+        Assertions.assertEquals(1, user.loginAttempts());
+        Assertions.assertNotNull(user.lastLoginAttemptAt());
     }
 
     @ParameterizedTest

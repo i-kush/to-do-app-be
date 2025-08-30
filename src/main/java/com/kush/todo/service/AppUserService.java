@@ -11,24 +11,36 @@ import com.kush.todo.mapper.AppUserMapper;
 import com.kush.todo.repository.AppUserRepository;
 import com.kush.todo.validator.AppUserValidator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AppUserService {
 
     private final AppUserRepository appUserRepository;
     private final AppUserMapper appUserMapper;
     private final AppUserValidator appUserValidator;
     private final CurrentUser currentUser;
+    @Value("${todo.login.max-attempts}")
+    private int maxLoginAttempts;
+    @Value("${todo.login.max-attempts-window-minutes}")
+    private int maxLoginAttemptWindowMinutes;
 
     @Transactional
     public AppUserResponseDto create(AppUserRequestDto appUserRequestDto) {
@@ -45,9 +57,8 @@ public class AppUserService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<AppUserResponseDto> findByUsername(String username) {
-        return appUserRepository.findByUsername(username)
-                                .map(appUserMapper::toAppUserDto);
+    public Optional<AppUser> findByUsername(String username) {
+        return appUserRepository.findByUsername(username);
     }
 
     @Transactional
@@ -86,5 +97,37 @@ public class AppUserService {
     @Transactional(readOnly = true)
     public List<Permission> findUserPermission(UUID id, UUID tenantId) {
         return appUserRepository.findUserPermissions(id, tenantId);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void lockUserIfNeeded(AppUser appUser) {
+        boolean isAttemptWithinWindow = Optional.ofNullable(appUser.lastLoginAttemptAt())
+                                                .map(a -> a.isAfter(Instant.now().minus(Duration.ofMinutes(maxLoginAttemptWindowMinutes))))
+                                                .orElse(true);
+        int loginAttempts = appUser.loginAttempts() == null ? 1 : appUser.loginAttempts() + 1;
+        if (!isAttemptWithinWindow) {
+            loginAttempts = 1;
+        }
+
+        if (loginAttempts >= maxLoginAttempts) {
+            log.info("Locking user {} due to {} invalid attempts within {} minutes", appUser.id(), maxLoginAttempts, maxLoginAttemptWindowMinutes);
+            appUserRepository.lockUser(appUser.id(), appUser.tenantId());
+        } else {
+            appUserRepository.incrementLoginAttempts(appUser.id(), appUser.tenantId(), loginAttempts);
+        }
+    }
+
+    @Transactional
+    public void nullifyLoginAttempts(AppUser appUser) {
+        appUserRepository.nullifyLoginAttempts(appUser.id(), appUser.tenantId());
+    }
+
+    @Transactional
+    public void unlockUsers() {
+        Set<UUID> ids = appUserRepository.findUserIdsToUnlock();
+        if (!CollectionUtils.isEmpty(ids)) {
+            log.info("About to unlock {} users", ids.size());
+            appUserRepository.unlockUsers(ids);
+        }
     }
 }
