@@ -24,3 +24,6 @@ management:
   endpoint:
     health:
       show-details: ALWAYS
+todo:
+  max-login-attempts: 5
+  max-login-attempts-window-minutes: 3

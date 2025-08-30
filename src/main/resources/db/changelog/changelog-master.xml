@@ -6,11 +6,11 @@
 
     <changeSet author="Igor Kushnir"
                id="init-schema">
-        <sqlFile path="changesets/init-schema.sql"
+        <sqlFile path="changesets/1.0.0-init-schema.sql"
                  relativeToChangelogFile="true"
                  splitStatements="false"/>
         <rollback>
-            <sqlFile path="changesets/rollback/init-schema-rollback.sql"
+            <sqlFile path="changesets/rollback/1.0.0-init-schema-rollback.sql"
                      relativeToChangelogFile="true"
                      splitStatements="false"/>
         </rollback>
@@ -18,11 +18,11 @@
 
     <changeSet author="Igor Kushnir"
                id="populate-default-data">
-        <sqlFile path="changesets/populate-default-data.sql"
+        <sqlFile path="changesets/1.0.1-populate-default-data.sql"
                  relativeToChangelogFile="true"
                  splitStatements="false"/>
         <rollback>
-            <sqlFile path="changesets/rollback/populate-default-data-rollback.sql"
+            <sqlFile path="changesets/rollback/1.0.1-populate-default-data-rollback.sql"
                      relativeToChangelogFile="true"
                      splitStatements="false"/>
         </rollback>
