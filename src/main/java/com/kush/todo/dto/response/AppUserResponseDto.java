@@ -18,6 +18,8 @@ public record AppUserResponseDto(
         String lastname,
         @JsonIgnore
         String passwordHash,
+        @JsonIgnore
+        Integer loginAttempts,
         boolean isLocked,
         @JsonIgnore
         Instant lockedAt,
