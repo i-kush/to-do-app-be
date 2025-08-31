@@ -24,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthService {
 
     public static final JwsHeader JWS_HEADER = JwsHeader.with(MacAlgorithm.HS256).build();
+    public static final String ERROR_MESSAGE_USER_LOCKED = "User is locked";
+    public static final String ERROR_MESSAGE_INVALID_CREDS = "Invalid username or password";
 
     private final JwtEncoder jwtEncoder;
     private final AppUserService appUserService;
@@ -36,14 +38,14 @@ public class AuthService {
     @Transactional
     public LoginResponseDto login(LoginRequestDto request) {
         AppUser user = appUserService.findByUsername(request.username())
-                                     .orElseThrow(() -> new UnauthorizedException("Invalid username or password"));
+                                     .orElseThrow(() -> new UnauthorizedException(ERROR_MESSAGE_INVALID_CREDS));
         if (user.isLocked()) {
-            throw new UnauthorizedException("User is locked");
+            throw new UnauthorizedException(ERROR_MESSAGE_USER_LOCKED);
         }
 
         if (!passwordEncoder.matches(request.password(), user.passwordHash())) {
             appUserService.lockUserIfNeeded(user);
-            throw new UnauthorizedException("Invalid username or password");
+            throw new UnauthorizedException(ERROR_MESSAGE_INVALID_CREDS);
         } else if (user.loginAttempts() != null) {
             appUserService.nullifyLoginAttempts(user);
         }

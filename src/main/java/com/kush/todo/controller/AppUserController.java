@@ -106,4 +106,16 @@ public class AppUserController {
     public void delete(@NotNull @PathVariable UUID id) {
         appUserService.delete(id);
     }
+
+    @Operation(summary = "Unlock user", description = "Unlocks a user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "500", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
+    })
+    @PostMapping("{id}/unlock")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('USER_WRITE')")
+    public void unlock(@NotNull @PathVariable UUID id) {
+        appUserService.unlockUser(id);
+    }
 }

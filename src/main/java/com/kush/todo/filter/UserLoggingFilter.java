@@ -1,7 +1,7 @@
 package com.kush.todo.filter;
 
 import com.kush.todo.dto.CurrentUser;
-import com.kush.todo.mapper.AuthMapper;
+import com.kush.todo.util.RequestUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,7 +20,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Slf4j
 public class UserLoggingFilter extends OncePerRequestFilter {
 
-    private final AuthMapper authMapper;
+    private final CurrentUser currentUser;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -29,20 +29,13 @@ public class UserLoggingFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         try {
-            trySetUserId();
+            if (!RequestUtils.isAllowedEndpoint(request.getRequestURI())) {
+                MDC.put("userId", currentUser.getId().toString());
+            }
             filterChain.doFilter(request, response);
         } finally {
             MDC.clear();
         }
     }
 
-    @SuppressWarnings("PMD.EmptyCatchBlock")
-    private void trySetUserId() {
-        try {
-            CurrentUser currentUser = authMapper.buildCurrentUser();
-            MDC.put("userId", currentUser.getId().toString());
-        } catch (IllegalStateException e) {
-            //ignore
-        }
-    }
 }

@@ -47,7 +47,7 @@ class AppUserServiceTest extends BaseTest {
         NotFoundException exception = Assertions.assertThrows(NotFoundException.class,
                                                               () -> appUserService.findByIdRequired(id));
 
-        Assertions.assertEquals(String.format("No user with id '%s'", id), exception.getMessage());
+        Assertions.assertEquals(String.format(AppUserService.ERROR_MESSAGE_PATTER_NOT_FOUND, id), exception.getMessage());
     }
 
     @Test
@@ -58,7 +58,7 @@ class AppUserServiceTest extends BaseTest {
         NotFoundException exception = Assertions.assertThrows(NotFoundException.class,
                                                               () -> appUserService.update(id, null));
 
-        Assertions.assertEquals(String.format("No user with id '%s'", id), exception.getMessage());
+        Assertions.assertEquals(String.format(AppUserService.ERROR_MESSAGE_PATTER_NOT_FOUND, id), exception.getMessage());
     }
 
     @Test
@@ -69,6 +69,6 @@ class AppUserServiceTest extends BaseTest {
         NotFoundException exception = Assertions.assertThrows(NotFoundException.class,
                                                               () -> appUserService.delete(id));
 
-        Assertions.assertEquals(String.format("No user with id '%s'", id), exception.getMessage());
+        Assertions.assertEquals(String.format(AppUserService.ERROR_MESSAGE_PATTER_NOT_FOUND, id), exception.getMessage());
     }
 }
