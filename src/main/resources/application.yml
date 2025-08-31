@@ -6,6 +6,8 @@ server:
 spring:
   data:
     redis:
+      repositories:
+        enabled: false
       ttl: 3 # hours
   security:
     oauth2:

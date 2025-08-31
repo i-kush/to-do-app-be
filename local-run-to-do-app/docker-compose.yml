@@ -18,8 +18,6 @@ services:
     container_name: to-do-app-redis
     ports:
       - "9988:6379"
-    volumes:
-      - to-do-app-data:/data
     restart: always
 
   backend:
@@ -30,6 +28,7 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - postgres
+      - redis
     environment:
       SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/to-do-app-db"
       SPRING_DATE_REDIS_HOST: "redis"
