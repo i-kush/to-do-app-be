@@ -95,6 +95,10 @@ public interface AppUserRepository extends TenantAwareRepository<AppUser, UUID> 
                locked_at = null,
                last_login_attempt_at = null
            where id = :id
+             and tenant_id = :tenantId
            """)
-    void unlockUser(UUID id);
+    void unlockUser(UUID id, UUID tenantId);
+
+    @Query("select is_locked from app_user where id = :id and tenant_id = :tenantId")
+    boolean isUserLocked(UUID id, UUID tenantId);
 }

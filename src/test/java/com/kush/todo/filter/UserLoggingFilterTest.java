@@ -1,10 +1,9 @@
 package com.kush.todo.filter;
 
-import com.kush.todo.mapper.AuthMapper;
+import com.kush.todo.TestDataBuilder;
 import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
 import org.slf4j.MDC;
 
 import java.io.IOException;
@@ -15,7 +14,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 class UserLoggingFilterTest {
 
-    private final UserLoggingFilter userLoggingFilter = new UserLoggingFilter(Mappers.getMapper(AuthMapper.class));
+    private final UserLoggingFilter userLoggingFilter = new UserLoggingFilter(TestDataBuilder.buildCurrentUser());
 
     @Test
     void doFilterInternalClearsMdcEventually() throws ServletException, IOException {

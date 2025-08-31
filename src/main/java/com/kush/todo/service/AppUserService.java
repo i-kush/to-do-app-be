@@ -133,11 +133,15 @@ public class AppUserService {
 
     @Transactional
     public void unlockUser(UUID id) {
-        AppUser currentAppUser = getRequired(id);
-        if (!currentAppUser.isLocked()) {
-            throw new IllegalStateException("User is not locked");
+        if (!getRequired(id).isLocked()) {
+            throw new IllegalArgumentException("User is not locked");
         }
 
-        appUserRepository.unlockUser(id);
+        appUserRepository.unlockUser(id, currentUser.getTenantId());
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isCurrentUserLocked() {
+        return appUserRepository.isUserLocked(currentUser.getId(), currentUser.getTenantId());
     }
 }

@@ -2,6 +2,7 @@ package com.kush.todo.config;
 
 import com.kush.todo.dto.CurrentUser;
 import com.kush.todo.filter.UserLoggingFilter;
+import com.kush.todo.filter.UserStateVerificationFilter;
 import com.kush.todo.mapper.AuthMapper;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -35,26 +37,27 @@ import org.springframework.web.context.annotation.RequestScope;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private static final String[] ALLOWED_ENDPOINTS = new String[]{
-            "/api/auth/login",
-            "/actuator/**",
-            "/v3/api-docs/**",
-            "/swagger-ui/**",
-            "/swagger-ui.html"
-    };
+    public static final List<String> ALLOWED_ENDPOINTS = List.of("/api/auth/login",
+                                                                 "/actuator/**",
+                                                                 "/v3/api-docs/**",
+                                                                 "/swagger-ui/**",
+                                                                 "/swagger-ui.html");
 
     @Value("${spring.security.oauth2.resourceserver.jwt.secret-key}")
     private final String jwtSecret;
     private final AuthMapper authMapper;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, UserLoggingFilter userLoggingFilter) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   UserLoggingFilter userLoggingFilter,
+                                                   UserStateVerificationFilter userStateVerificationFilter) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(ALLOWED_ENDPOINTS).permitAll() //ToDo add exclusions for the swagger-ui and v3 api-docs
+                        .requestMatchers(ALLOWED_ENDPOINTS.toArray(new String[]{})).permitAll()
                         .anyRequest().authenticated()
                 )
+                .addFilterAfter(userStateVerificationFilter, BearerTokenAuthenticationFilter.class)
                 .addFilterAfter(userLoggingFilter, BearerTokenAuthenticationFilter.class)
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtGrantedAuthoritiesConverter()))

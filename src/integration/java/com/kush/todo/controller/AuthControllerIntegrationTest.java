@@ -8,6 +8,7 @@ import com.kush.todo.dto.response.ErrorsDto;
 import com.kush.todo.dto.response.LoginResponseDto;
 import com.kush.todo.entity.AppUser;
 import com.kush.todo.repository.AppUserRepository;
+import com.kush.todo.service.AuthService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -80,7 +81,7 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
         List<ErrorDto> errors = errorResponse.getBody().errors();
         Assertions.assertFalse(CollectionUtils.isEmpty(errors));
         Assertions.assertEquals(1, errors.size());
-        Assertions.assertEquals("Invalid username or password", errors.getFirst().message());
+        Assertions.assertEquals(AuthService.ERROR_MESSAGE_INVALID_CREDS, errors.getFirst().message());
     }
 
     @Test
@@ -96,7 +97,7 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
             List<ErrorDto> errors = errorResponse.getBody().errors();
             Assertions.assertFalse(CollectionUtils.isEmpty(errors));
             Assertions.assertEquals(1, errors.size());
-            Assertions.assertEquals("Invalid username or password", errors.getFirst().message());
+            Assertions.assertEquals(AuthService.ERROR_MESSAGE_INVALID_CREDS, errors.getFirst().message());
         }
 
         errorResponse = restTemplate.postForEntity(BASE_URL, request, ErrorsDto.class);
@@ -105,7 +106,7 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
         List<ErrorDto> errors = errorResponse.getBody().errors();
         Assertions.assertFalse(CollectionUtils.isEmpty(errors));
         Assertions.assertEquals(1, errors.size());
-        Assertions.assertEquals("User is locked", errors.getFirst().message());
+        Assertions.assertEquals(AuthService.ERROR_MESSAGE_USER_LOCKED, errors.getFirst().message());
 
         Optional<AppUser> optionalUser = appUserRepository.findByUsername(IntegrationTestDataBuilder.TEST_USERNAME);
         Assertions.assertTrue(optionalUser.isPresent());
@@ -129,7 +130,7 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
             List<ErrorDto> errors = errorResponse.getBody().errors();
             Assertions.assertFalse(CollectionUtils.isEmpty(errors));
             Assertions.assertEquals(1, errors.size());
-            Assertions.assertEquals("Invalid username or password", errors.getFirst().message());
+            Assertions.assertEquals(AuthService.ERROR_MESSAGE_INVALID_CREDS, errors.getFirst().message());
         }
 
         LoginRequestDto validRequest = IntegrationTestDataBuilder.buildDefaultLoginRequest();
@@ -159,7 +160,7 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
             List<ErrorDto> errors = errorResponse.getBody().errors();
             Assertions.assertFalse(CollectionUtils.isEmpty(errors));
             Assertions.assertEquals(1, errors.size());
-            Assertions.assertEquals("Invalid username or password", errors.getFirst().message());
+            Assertions.assertEquals(AuthService.ERROR_MESSAGE_INVALID_CREDS, errors.getFirst().message());
         }
 
         jdbcTemplate.update("update app_user set last_login_attempt_at = now() - interval '40 minutes' where username = ?", username);
@@ -170,7 +171,7 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
         List<ErrorDto> errors = errorResponse.getBody().errors();
         Assertions.assertFalse(CollectionUtils.isEmpty(errors));
         Assertions.assertEquals(1, errors.size());
-        Assertions.assertEquals("Invalid username or password", errors.getFirst().message());
+        Assertions.assertEquals(AuthService.ERROR_MESSAGE_INVALID_CREDS, errors.getFirst().message());
 
         Optional<AppUser> optionalUser = appUserRepository.findByUsername(username);
         Assertions.assertTrue(optionalUser.isPresent());

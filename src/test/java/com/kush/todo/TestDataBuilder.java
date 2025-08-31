@@ -1,5 +1,6 @@
 package com.kush.todo;
 
+import com.kush.todo.dto.CurrentUser;
 import com.kush.todo.dto.Role;
 import com.kush.todo.entity.Tenant;
 
@@ -49,5 +50,15 @@ public final class TestDataBuilder {
                   .claim("username", "u" + UUID.randomUUID())
                   .claim("email", "e" + UUID.randomUUID())
                   .build();
+    }
+
+    public static CurrentUser buildCurrentUser() {
+        return CurrentUser.builder()
+                          .id(UUID.randomUUID())
+                          .tenantId(UUID.randomUUID())
+                          .username("u" + UUID.randomUUID())
+                          .email(String.format("e%s@test.com", UUID.randomUUID()))
+                          .role(Role.USER)
+                          .build();
     }
 }
