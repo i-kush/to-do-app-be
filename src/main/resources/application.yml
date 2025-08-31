@@ -4,6 +4,9 @@ server:
     enabled: true
 
 spring:
+  data:
+    redis:
+      ttl: 3 # hours
   security:
     oauth2:
       resourceserver:
