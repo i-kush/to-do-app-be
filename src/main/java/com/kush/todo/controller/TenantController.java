@@ -1,15 +1,14 @@
 package com.kush.todo.controller;
 
+import com.kush.todo.annotation.CommonApiErrors;
 import com.kush.todo.dto.request.TenantRequestDto;
 import com.kush.todo.dto.response.CustomPage;
-import com.kush.todo.dto.response.ErrorsDto;
 import com.kush.todo.dto.response.TenantResponseDto;
 import com.kush.todo.service.TenantService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -35,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("api/tenants")
 @RequiredArgsConstructor
-// ToDo add common API Response response codes...not only for 500 and add media types
+@Tag(name = "tenants")
 public class TenantController {
 
     private final TenantService tenantService;
@@ -43,8 +42,8 @@ public class TenantController {
     @Operation(summary = "Create tenant", description = "Creates a tenant with the specific settings")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Successfully created tenant"),
-            @ApiResponse(responseCode = "500", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
     })
+    @CommonApiErrors
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAuthority('TENANT_WRITE')")
@@ -55,8 +54,8 @@ public class TenantController {
     @Operation(summary = "Get tenant by ID", description = "Gets tenant details by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved tenant"),
-            @ApiResponse(responseCode = "500", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
     })
+    @CommonApiErrors
     @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('TENANT_READ')")
     public TenantResponseDto get(@NotNull @PathVariable UUID id) {
@@ -66,8 +65,8 @@ public class TenantController {
     @Operation(summary = "Get tenants", description = "Gets paginated tenants list with details")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved paginated tenants"),
-            @ApiResponse(responseCode = "500", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
     })
+    @CommonApiErrors
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('TENANT_READ')")
     public CustomPage<TenantResponseDto> getAll(@Min(1) @RequestParam int page, @Min(1) @Max(200) @RequestParam int size) {
@@ -77,8 +76,8 @@ public class TenantController {
     @Operation(summary = "Update tenant by ID", description = "Updates tenant details by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully updated tenant"),
-            @ApiResponse(responseCode = "500", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
     })
+    @CommonApiErrors
     @PutMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('TENANT_WRITE')")
     public TenantResponseDto update(@NotNull @PathVariable UUID id, @Valid @RequestBody TenantRequestDto tenantDto) {
@@ -88,8 +87,8 @@ public class TenantController {
     @Operation(summary = "Delete tenant by ID", description = "Deletes tenant by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully deleted tenant"),
-            @ApiResponse(responseCode = "500", description = "Error response", content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
     })
+    @CommonApiErrors
     @DeleteMapping("{id}")
     @PreAuthorize("hasAuthority('TENANT_WRITE')")
     public void delete(@NotNull @PathVariable UUID id) {

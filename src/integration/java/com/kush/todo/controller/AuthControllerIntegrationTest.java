@@ -57,7 +57,8 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
         Assertions.assertNotNull(jwt.getIssuedAt());
         Assertions.assertNotNull(jwt.getExpiresAt());
         Assertions.assertFalse(CollectionUtils.isEmpty(jwt.getClaims()));
-        Assertions.assertNotNull(jwt.getClaimAsString("scope")); //ToDo add scope check
+        String rawScope = jwt.getClaimAsString("scope");
+        Assertions.assertNotNull(rawScope);
 
         Optional<AppUser> foundUserOptional = appUserRepository.findByUsername(loginRequestDto.username());
         Assertions.assertTrue(foundUserOptional.isPresent());
@@ -69,6 +70,14 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
         Assertions.assertEquals(foundUser.username(), jwt.getClaimAsString("username"));
         Assertions.assertEquals(loginRequestDto.username(), jwt.getClaimAsString("username"));
         Assertions.assertEquals(foundUser.email(), jwt.getClaimAsString("email"));
+
+        List<String> expected = appUserRepository.findUserPermissions(foundUser.id(), foundUser.tenantId())
+                                                 .stream()
+                                                 .map(Enum::toString)
+                                                 .toList();
+        List<String> actual = List.of(rawScope.split(" "));
+        Assertions.assertTrue(expected.containsAll(actual));
+        Assertions.assertTrue(actual.containsAll(expected));
     }
 
     @ParameterizedTest
