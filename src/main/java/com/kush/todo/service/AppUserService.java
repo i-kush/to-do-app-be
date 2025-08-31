@@ -33,6 +33,9 @@ import org.springframework.util.CollectionUtils;
 @Slf4j
 public class AppUserService {
 
+    public static final String ERROR_MESSAGE_USER_IS_NOT_LOCKED = "User is not locked";
+    public static final String ERROR_MESSAGE_PATTER_NOT_FOUND = "No user with id '%s'";
+
     private final AppUserRepository appUserRepository;
     private final AppUserMapper appUserMapper;
     private final AppUserValidator appUserValidator;
@@ -76,7 +79,7 @@ public class AppUserService {
         appUserValidator.validateDelete(id, currentUser);
 
         if (!appUserRepository.existsByIdAndTenantId(id, currentUser.getTenantId())) {
-            throw new NotFoundException(String.format("No user with id '%s'", id));
+            throw new NotFoundException(String.format(ERROR_MESSAGE_PATTER_NOT_FOUND, id));
         }
         appUserRepository.deleteByIdAndTenantId(id, currentUser.getTenantId());
     }
@@ -84,7 +87,7 @@ public class AppUserService {
     private AppUser getRequired(UUID id) {
         return appUserRepository
                 .findByIdAndTenantId(id, currentUser.getTenantId())
-                .orElseThrow(() -> new NotFoundException(String.format("No user with id '%s'", id)));
+                .orElseThrow(() -> new NotFoundException(String.format(ERROR_MESSAGE_PATTER_NOT_FOUND, id)));
     }
 
     @Transactional(readOnly = true)
@@ -134,7 +137,7 @@ public class AppUserService {
     @Transactional
     public void unlockUser(UUID id) {
         if (!getRequired(id).isLocked()) {
-            throw new IllegalArgumentException("User is not locked");
+            throw new IllegalArgumentException(ERROR_MESSAGE_USER_IS_NOT_LOCKED);
         }
 
         appUserRepository.unlockUser(id, currentUser.getTenantId());

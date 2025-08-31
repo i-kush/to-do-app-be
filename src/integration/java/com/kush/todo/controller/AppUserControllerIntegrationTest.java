@@ -4,10 +4,14 @@ import com.kush.todo.BaseIntegrationTest;
 import com.kush.todo.IntegrationTestDataBuilder;
 import com.kush.todo.dto.Role;
 import com.kush.todo.dto.request.AppUserRequestDto;
+import com.kush.todo.dto.request.LoginRequestDto;
 import com.kush.todo.dto.response.AppUserResponseDto;
 import com.kush.todo.dto.response.CustomPage;
 import com.kush.todo.dto.response.ErrorDto;
 import com.kush.todo.dto.response.ErrorsDto;
+import com.kush.todo.dto.response.LoginResponseDto;
+import com.kush.todo.service.AppUserService;
+import com.kush.todo.service.AuthService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -20,6 +24,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -28,12 +33,16 @@ import org.springframework.util.CollectionUtils;
 
 class AppUserControllerIntegrationTest extends BaseIntegrationTest {
 
-    public static final String BASE_URL = "/api/users";
+    public static final String BASE_URL_USERS = "/api/users";
+    public static final String BASE_URL_AUTH = "/api/auth/login";
+
+    @Value("${todo.login.max-attempts}")
+    private int maxAttempts;
 
     @Test
     void create() {
         AppUserRequestDto request = IntegrationTestDataBuilder.buildAppUserRequestDto();
-        ResponseEntity<AppUserResponseDto> response = restTemplate.postForEntity(BASE_URL,
+        ResponseEntity<AppUserResponseDto> response = restTemplate.postForEntity(BASE_URL_USERS,
                                                                                  IntegrationTestDataBuilder.buildRequest(request, defaultAccessToken),
                                                                                  AppUserResponseDto.class);
 
@@ -44,7 +53,7 @@ class AppUserControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void createForbidden() {
         AppUserRequestDto request = IntegrationTestDataBuilder.buildAppUserRequestDto(Role.USER);
-        ResponseEntity<AppUserResponseDto> createResponse = restTemplate.postForEntity(BASE_URL,
+        ResponseEntity<AppUserResponseDto> createResponse = restTemplate.postForEntity(BASE_URL_USERS,
                                                                                        IntegrationTestDataBuilder.buildRequest(request, defaultAccessToken),
                                                                                        AppUserResponseDto.class);
 
@@ -52,7 +61,7 @@ class AppUserControllerIntegrationTest extends BaseIntegrationTest {
         assertAppUser(request, createResponse);
 
         String simpleUserAccessToken = login(IntegrationTestDataBuilder.buildLoginRequest(request.username(), request.password()));
-        ResponseEntity<AppUserResponseDto> forbiddenCreateResponse = restTemplate.postForEntity(BASE_URL,
+        ResponseEntity<AppUserResponseDto> forbiddenCreateResponse = restTemplate.postForEntity(BASE_URL_USERS,
                                                                                                 IntegrationTestDataBuilder.buildRequest(request, simpleUserAccessToken),
                                                                                                 AppUserResponseDto.class);
         Assertions.assertEquals(HttpStatus.FORBIDDEN.value(), forbiddenCreateResponse.getStatusCode().value());
@@ -61,14 +70,14 @@ class AppUserControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void createWithExistingUsername() {
         AppUserRequestDto request = IntegrationTestDataBuilder.buildAppUserRequestDto();
-        ResponseEntity<AppUserResponseDto> successfulResponse = restTemplate.postForEntity(BASE_URL,
+        ResponseEntity<AppUserResponseDto> successfulResponse = restTemplate.postForEntity(BASE_URL_USERS,
                                                                                            IntegrationTestDataBuilder.buildRequest(request, defaultAccessToken),
                                                                                            AppUserResponseDto.class);
 
         Assertions.assertEquals(HttpStatus.CREATED.value(), successfulResponse.getStatusCode().value());
 
         AppUserRequestDto newRequest = IntegrationTestDataBuilder.buildAppUserRequestDto(request.username());
-        ResponseEntity<ErrorsDto> errorResponse = restTemplate.postForEntity(BASE_URL,
+        ResponseEntity<ErrorsDto> errorResponse = restTemplate.postForEntity(BASE_URL_USERS,
                                                                              IntegrationTestDataBuilder.buildRequest(newRequest, defaultAccessToken),
                                                                              ErrorsDto.class);
         Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), errorResponse.getStatusCode().value());
@@ -84,7 +93,7 @@ class AppUserControllerIntegrationTest extends BaseIntegrationTest {
     @ValueSource(strings = {" ", "  ", "11111111111111111111111111111111111111111111111111111"})
     void createWithInvalidUserName(String username) {
         AppUserRequestDto request = IntegrationTestDataBuilder.buildAppUserRequestDto(username);
-        ResponseEntity<ErrorsDto> response = restTemplate.postForEntity(BASE_URL,
+        ResponseEntity<ErrorsDto> response = restTemplate.postForEntity(BASE_URL_USERS,
                                                                         IntegrationTestDataBuilder.buildRequest(request, defaultAccessToken),
                                                                         ErrorsDto.class);
 
@@ -95,10 +104,10 @@ class AppUserControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void get() {
         AppUserRequestDto request = IntegrationTestDataBuilder.buildAppUserRequestDto();
-        ResponseEntity<AppUserResponseDto> createResponse = restTemplate.postForEntity(BASE_URL,
+        ResponseEntity<AppUserResponseDto> createResponse = restTemplate.postForEntity(BASE_URL_USERS,
                                                                                        IntegrationTestDataBuilder.buildRequest(request, defaultAccessToken),
                                                                                        AppUserResponseDto.class);
-        ResponseEntity<AppUserResponseDto> getResponse = restTemplate.exchange(BASE_URL + "/{id}",
+        ResponseEntity<AppUserResponseDto> getResponse = restTemplate.exchange(BASE_URL_USERS + "/{id}",
                                                                                HttpMethod.GET,
                                                                                IntegrationTestDataBuilder.buildRequest(defaultAccessToken),
                                                                                AppUserResponseDto.class,
@@ -110,7 +119,7 @@ class AppUserControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void me() {
-        ResponseEntity<AppUserResponseDto> response = restTemplate.exchange(BASE_URL + "/me",
+        ResponseEntity<AppUserResponseDto> response = restTemplate.exchange(BASE_URL_USERS + "/me",
                                                                             HttpMethod.GET,
                                                                             IntegrationTestDataBuilder.buildRequest(defaultAccessToken),
                                                                             AppUserResponseDto.class);
@@ -123,7 +132,7 @@ class AppUserControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void getNotFound() {
         String absentId = UUID.randomUUID().toString();
-        ResponseEntity<ErrorsDto> response = restTemplate.exchange(BASE_URL + "/{id}",
+        ResponseEntity<ErrorsDto> response = restTemplate.exchange(BASE_URL_USERS + "/{id}",
                                                                    HttpMethod.GET,
                                                                    IntegrationTestDataBuilder.buildRequest(defaultAccessToken),
                                                                    ErrorsDto.class,
@@ -133,16 +142,16 @@ class AppUserControllerIntegrationTest extends BaseIntegrationTest {
         Assertions.assertNotNull(response.getBody());
         List<ErrorDto> errors = response.getBody().errors();
         Assertions.assertFalse(CollectionUtils.isEmpty(errors));
-        Assertions.assertEquals(String.format("No user with id '%s'", absentId), errors.getFirst().message());
+        Assertions.assertEquals(String.format(AppUserService.ERROR_MESSAGE_PATTER_NOT_FOUND, absentId), errors.getFirst().message());
     }
 
     @Test
     void getAll() {
         AppUserRequestDto request = IntegrationTestDataBuilder.buildAppUserRequestDto();
-        restTemplate.postForEntity(BASE_URL, IntegrationTestDataBuilder.buildRequest(request, defaultAccessToken), AppUserResponseDto.class);
+        restTemplate.postForEntity(BASE_URL_USERS, IntegrationTestDataBuilder.buildRequest(request, defaultAccessToken), AppUserResponseDto.class);
         ParameterizedTypeReference<CustomPage<AppUserResponseDto>> responseType = new ParameterizedTypeReference<>() {
         };
-        ResponseEntity<CustomPage<AppUserResponseDto>> getAllResponse = restTemplate.exchange(BASE_URL + "?page=1&size=10",
+        ResponseEntity<CustomPage<AppUserResponseDto>> getAllResponse = restTemplate.exchange(BASE_URL_USERS + "?page=1&size=10",
                                                                                               HttpMethod.GET,
                                                                                               IntegrationTestDataBuilder.buildRequest(defaultAccessToken),
                                                                                               responseType);
@@ -158,7 +167,7 @@ class AppUserControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getWithInvalidId() {
-        ResponseEntity<ErrorsDto> response = restTemplate.exchange(BASE_URL + "/{id}",
+        ResponseEntity<ErrorsDto> response = restTemplate.exchange(BASE_URL_USERS + "/{id}",
                                                                    HttpMethod.GET,
                                                                    IntegrationTestDataBuilder.buildRequest(defaultAccessToken),
                                                                    ErrorsDto.class,
@@ -174,7 +183,7 @@ class AppUserControllerIntegrationTest extends BaseIntegrationTest {
     @ParameterizedTest
     @MethodSource("getAllWIthInvalidPageArgs")
     void getAllWIthInvalidPage(int page, int size, String message) {
-        ResponseEntity<ErrorsDto> response = restTemplate.exchange(BASE_URL + "?page={page}&size={size}",
+        ResponseEntity<ErrorsDto> response = restTemplate.exchange(BASE_URL_USERS + "?page={page}&size={size}",
                                                                    HttpMethod.GET,
                                                                    IntegrationTestDataBuilder.buildRequest(defaultAccessToken),
                                                                    ErrorsDto.class,
@@ -199,12 +208,12 @@ class AppUserControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void update() {
         AppUserRequestDto createRequest = IntegrationTestDataBuilder.buildAppUserRequestDto();
-        ResponseEntity<AppUserResponseDto> createResponse = restTemplate.postForEntity(BASE_URL,
+        ResponseEntity<AppUserResponseDto> createResponse = restTemplate.postForEntity(BASE_URL_USERS,
                                                                                        IntegrationTestDataBuilder.buildRequest(createRequest, defaultAccessToken),
                                                                                        AppUserResponseDto.class);
 
         AppUserRequestDto updateRequest = IntegrationTestDataBuilder.buildAppUserRequestDto();
-        ResponseEntity<AppUserResponseDto> updateResponse = restTemplate.exchange(BASE_URL + "/{id}",
+        ResponseEntity<AppUserResponseDto> updateResponse = restTemplate.exchange(BASE_URL_USERS + "/{id}",
                                                                                   HttpMethod.PUT,
                                                                                   IntegrationTestDataBuilder.buildRequest(updateRequest, defaultAccessToken),
                                                                                   AppUserResponseDto.class,
@@ -217,18 +226,18 @@ class AppUserControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void updateWithExistingName() {
         AppUserRequestDto request1 = IntegrationTestDataBuilder.buildAppUserRequestDto();
-        ResponseEntity<AppUserResponseDto> successfulResponse1 = restTemplate.postForEntity(BASE_URL,
+        ResponseEntity<AppUserResponseDto> successfulResponse1 = restTemplate.postForEntity(BASE_URL_USERS,
                                                                                             IntegrationTestDataBuilder.buildRequest(request1, defaultAccessToken),
                                                                                             AppUserResponseDto.class);
         Assertions.assertEquals(HttpStatus.CREATED.value(), successfulResponse1.getStatusCode().value());
 
         AppUserRequestDto request2 = IntegrationTestDataBuilder.buildAppUserRequestDto();
-        ResponseEntity<AppUserResponseDto> successfulResponse2 = restTemplate.postForEntity(BASE_URL,
+        ResponseEntity<AppUserResponseDto> successfulResponse2 = restTemplate.postForEntity(BASE_URL_USERS,
                                                                                             IntegrationTestDataBuilder.buildRequest(request2, defaultAccessToken),
                                                                                             AppUserResponseDto.class);
         Assertions.assertEquals(HttpStatus.CREATED.value(), successfulResponse2.getStatusCode().value());
 
-        ResponseEntity<ErrorsDto> errorResponse = restTemplate.exchange(BASE_URL + "/{id}",
+        ResponseEntity<ErrorsDto> errorResponse = restTemplate.exchange(BASE_URL_USERS + "/{id}",
                                                                         HttpMethod.PUT,
                                                                         IntegrationTestDataBuilder.buildRequest(request1, defaultAccessToken),
                                                                         ErrorsDto.class,
@@ -244,13 +253,13 @@ class AppUserControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void delete() {
         AppUserRequestDto request = IntegrationTestDataBuilder.buildAppUserRequestDto();
-        String id = restTemplate.postForEntity(BASE_URL,
+        String id = restTemplate.postForEntity(BASE_URL_USERS,
                                                IntegrationTestDataBuilder.buildRequest(request, defaultAccessToken),
                                                AppUserResponseDto.class)
                                 .getBody()
                                 .id()
                                 .toString();
-        ResponseEntity<Void> deleteResponse = restTemplate.exchange(BASE_URL + "/{id}",
+        ResponseEntity<Void> deleteResponse = restTemplate.exchange(BASE_URL_USERS + "/{id}",
                                                                     HttpMethod.DELETE,
                                                                     IntegrationTestDataBuilder.buildRequest(defaultAccessToken),
                                                                     Void.class,
@@ -259,7 +268,7 @@ class AppUserControllerIntegrationTest extends BaseIntegrationTest {
         Assertions.assertEquals(HttpStatus.OK.value(), deleteResponse.getStatusCode().value());
         Assertions.assertNull(deleteResponse.getBody());
 
-        ResponseEntity<ErrorsDto> response = restTemplate.exchange(BASE_URL + "/{id}",
+        ResponseEntity<ErrorsDto> response = restTemplate.exchange(BASE_URL_USERS + "/{id}",
                                                                    HttpMethod.DELETE,
                                                                    IntegrationTestDataBuilder.buildRequest(defaultAccessToken),
                                                                    ErrorsDto.class,
@@ -271,7 +280,7 @@ class AppUserControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void deleteNotFound() {
         String absentId = UUID.randomUUID().toString();
-        ResponseEntity<ErrorsDto> response = restTemplate.exchange(BASE_URL + "/{id}",
+        ResponseEntity<ErrorsDto> response = restTemplate.exchange(BASE_URL_USERS + "/{id}",
                                                                    HttpMethod.DELETE,
                                                                    IntegrationTestDataBuilder.buildRequest(defaultAccessToken),
                                                                    ErrorsDto.class,
@@ -281,7 +290,98 @@ class AppUserControllerIntegrationTest extends BaseIntegrationTest {
         Assertions.assertNotNull(response.getBody());
         List<ErrorDto> errors = response.getBody().errors();
         Assertions.assertFalse(CollectionUtils.isEmpty(errors));
-        Assertions.assertEquals(String.format("No user with id '%s'", absentId), errors.getFirst().message());
+        Assertions.assertEquals(String.format(AppUserService.ERROR_MESSAGE_PATTER_NOT_FOUND, absentId), errors.getFirst().message());
+    }
+
+    @Test
+    void unlock() {
+        //new user to support test
+        AppUserRequestDto userWhoTriggersUnlock = IntegrationTestDataBuilder.buildAppUserRequestDto();
+        ResponseEntity<AppUserResponseDto> userWhoTriggersUnlockResponse = restTemplate.postForEntity(BASE_URL_USERS,
+                                                                                                      IntegrationTestDataBuilder.buildRequest(userWhoTriggersUnlock, defaultAccessToken),
+                                                                                                      AppUserResponseDto.class);
+        Assertions.assertEquals(HttpStatus.CREATED.value(), userWhoTriggersUnlockResponse.getStatusCode().value());
+
+        LoginRequestDto userWhoTriggersUnlockLoginRequest = IntegrationTestDataBuilder.buildLoginRequest(userWhoTriggersUnlock.username(),
+                                                                                                         userWhoTriggersUnlock.password());
+        ResponseEntity<LoginResponseDto> response = restTemplate.postForEntity(BASE_URL_AUTH, userWhoTriggersUnlockLoginRequest, LoginResponseDto.class);
+        Assertions.assertEquals(HttpStatus.OK.value(), response.getStatusCode().value());
+        Assertions.assertNotNull(response.getBody());
+        String userWhotTriggersUnlockAccessToken = response.getBody().accessToken();
+        Assertions.assertNotNull(userWhotTriggersUnlockAccessToken);
+
+        //main/default user locking
+        LoginRequestDto invalidMainUserLoginRequest = IntegrationTestDataBuilder.buildLoginRequest(IntegrationTestDataBuilder.TEST_USERNAME,
+                                                                                                   UUID.randomUUID().toString());
+        ResponseEntity<ErrorsDto> errorResponse;
+        for (int i = 0; i < maxAttempts; i++) {
+            errorResponse = restTemplate.postForEntity(BASE_URL_AUTH, invalidMainUserLoginRequest, ErrorsDto.class);
+            Assertions.assertEquals(HttpStatus.UNAUTHORIZED.value(), errorResponse.getStatusCode().value());
+            Assertions.assertNotNull(errorResponse.getBody());
+            List<ErrorDto> errors = errorResponse.getBody().errors();
+            Assertions.assertFalse(CollectionUtils.isEmpty(errors));
+            Assertions.assertEquals(1, errors.size());
+            Assertions.assertEquals(AuthService.ERROR_MESSAGE_INVALID_CREDS, errors.getFirst().message());
+        }
+
+        errorResponse = restTemplate.postForEntity(BASE_URL_AUTH, invalidMainUserLoginRequest, ErrorsDto.class);
+        Assertions.assertEquals(HttpStatus.UNAUTHORIZED.value(), errorResponse.getStatusCode().value());
+        Assertions.assertNotNull(errorResponse.getBody());
+        List<ErrorDto> errors = errorResponse.getBody().errors();
+        Assertions.assertFalse(CollectionUtils.isEmpty(errors));
+        Assertions.assertEquals(1, errors.size());
+        Assertions.assertEquals(AuthService.ERROR_MESSAGE_USER_LOCKED, errors.getFirst().message());
+
+        //verifying user is locked
+        ResponseEntity<AppUserResponseDto> lockedUserGetResponse = restTemplate.exchange(BASE_URL_USERS + "/{id}",
+                                                                                         HttpMethod.GET,
+                                                                                         IntegrationTestDataBuilder.buildRequest(userWhotTriggersUnlockAccessToken),
+                                                                                         AppUserResponseDto.class,
+                                                                                         defaultUserId);
+
+        Assertions.assertEquals(HttpStatus.OK.value(), lockedUserGetResponse.getStatusCode().value());
+        Assertions.assertNotNull(lockedUserGetResponse.getBody());
+        Assertions.assertTrue(lockedUserGetResponse.getBody().isLocked());
+
+        //unlocking user
+        ResponseEntity<Void> unlockUserResponse = restTemplate.exchange(BASE_URL_USERS + "/{id}/unlock",
+                                                                        HttpMethod.POST,
+                                                                        IntegrationTestDataBuilder.buildRequest(userWhotTriggersUnlockAccessToken),
+                                                                        Void.class,
+                                                                        defaultUserId);
+
+        Assertions.assertEquals(HttpStatus.OK.value(), unlockUserResponse.getStatusCode().value());
+        Assertions.assertNull(unlockUserResponse.getBody());
+
+        //verifying user is unlocked
+        ResponseEntity<AppUserResponseDto> unlockedUserGetResponse = restTemplate.exchange(BASE_URL_USERS + "/{id}",
+                                                                                           HttpMethod.GET,
+                                                                                           IntegrationTestDataBuilder.buildRequest(userWhotTriggersUnlockAccessToken),
+                                                                                           AppUserResponseDto.class,
+                                                                                           defaultUserId);
+
+        Assertions.assertEquals(HttpStatus.OK.value(), unlockedUserGetResponse.getStatusCode().value());
+        Assertions.assertNotNull(unlockedUserGetResponse.getBody());
+        Assertions.assertFalse(unlockedUserGetResponse.getBody().isLocked());
+
+        LoginRequestDto validMainUserLoginRequest = IntegrationTestDataBuilder.buildDefaultLoginRequest();
+        ResponseEntity<LoginResponseDto> validMainUserLoginResponse = restTemplate.postForEntity(BASE_URL_AUTH, validMainUserLoginRequest, LoginResponseDto.class);
+        Assertions.assertEquals(HttpStatus.OK.value(), validMainUserLoginResponse.getStatusCode().value());
+    }
+
+    @Test
+    void unlockNotLockedUser() {
+        ResponseEntity<ErrorsDto> response = restTemplate.exchange(BASE_URL_USERS + "/{id}/unlock",
+                                                                   HttpMethod.POST,
+                                                                   IntegrationTestDataBuilder.buildRequest(defaultAccessToken),
+                                                                   ErrorsDto.class,
+                                                                   defaultUserId);
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode().value());
+        Assertions.assertNotNull(response.getBody());
+        List<ErrorDto> errors = response.getBody().errors();
+        Assertions.assertFalse(CollectionUtils.isEmpty(errors));
+        Assertions.assertEquals(AppUserService.ERROR_MESSAGE_USER_IS_NOT_LOCKED, errors.getFirst().message());
     }
 
     private void assertAppUser(AppUserRequestDto request, ResponseEntity<AppUserResponseDto> response) {
