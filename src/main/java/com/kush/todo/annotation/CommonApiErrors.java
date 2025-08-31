@@ -1,4 +1,4 @@
-package com.kush.todo.config;
+package com.kush.todo.annotation;
 
 import com.kush.todo.dto.response.ErrorsDto;
 import io.swagger.v3.oas.annotations.media.Content;

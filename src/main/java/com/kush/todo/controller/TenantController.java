@@ -1,6 +1,6 @@
 package com.kush.todo.controller;
 
-import com.kush.todo.config.CommonApiErrors;
+import com.kush.todo.annotation.CommonApiErrors;
 import com.kush.todo.dto.request.TenantRequestDto;
 import com.kush.todo.dto.response.CustomPage;
 import com.kush.todo.dto.response.TenantResponseDto;
