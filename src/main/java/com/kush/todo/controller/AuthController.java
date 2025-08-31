@@ -30,7 +30,7 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "Successful login and access token generation"),
     })
     @CommonApiErrors
-    @PostMapping(name = "/login", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public LoginResponseDto login(@Valid @RequestBody LoginRequestDto request) {
         return authService.login(request);
     }
