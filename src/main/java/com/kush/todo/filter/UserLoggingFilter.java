@@ -1,6 +1,6 @@
 package com.kush.todo.filter;
 
-import com.kush.todo.dto.CurrentUser;
+import com.kush.todo.dto.common.CurrentUser;
 import com.kush.todo.util.RequestUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

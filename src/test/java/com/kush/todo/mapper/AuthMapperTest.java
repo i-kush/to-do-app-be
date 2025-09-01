@@ -1,8 +1,8 @@
 package com.kush.todo.mapper;
 
 import com.kush.todo.TestDataBuilder;
-import com.kush.todo.dto.CurrentUser;
-import com.kush.todo.dto.Permission;
+import com.kush.todo.dto.common.CurrentUser;
+import com.kush.todo.dto.common.Permission;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;

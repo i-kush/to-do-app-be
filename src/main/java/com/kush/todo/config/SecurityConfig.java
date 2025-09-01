@@ -1,6 +1,6 @@
 package com.kush.todo.config;
 
-import com.kush.todo.dto.CurrentUser;
+import com.kush.todo.dto.common.CurrentUser;
 import com.kush.todo.filter.UserLoggingFilter;
 import com.kush.todo.filter.UserStateVerificationFilter;
 import com.kush.todo.mapper.AuthMapper;

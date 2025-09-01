@@ -1,6 +1,6 @@
 package com.kush.todo.repository;
 
-import com.kush.todo.dto.Permission;
+import com.kush.todo.dto.common.Permission;
 import com.kush.todo.entity.AppUser;
 
 import java.util.List;

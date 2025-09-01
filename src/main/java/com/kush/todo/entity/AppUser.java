@@ -1,6 +1,6 @@
 package com.kush.todo.entity;
 
-import com.kush.todo.dto.Role;
+import com.kush.todo.dto.common.Role;
 import lombok.Builder;
 
 import java.time.Instant;

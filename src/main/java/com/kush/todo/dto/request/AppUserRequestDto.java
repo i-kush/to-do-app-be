@@ -1,6 +1,6 @@
 package com.kush.todo.dto.request;
 
-import com.kush.todo.dto.Role;
+import com.kush.todo.dto.common.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

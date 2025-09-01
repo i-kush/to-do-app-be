@@ -1,8 +1,9 @@
 package com.kush.todo.facade;
 
+import com.kush.todo.dto.async.AsyncOperationDto;
+import com.kush.todo.dto.common.CurrentUser;
 import com.kush.todo.dto.request.TenantRequestDto;
 import com.kush.todo.dto.response.AsyncOperationLaunchedResponseDto;
-import com.kush.todo.dto.response.AsyncOperationResultResponseDto;
 import com.kush.todo.dto.response.TenantResponseDto;
 import com.kush.todo.service.AsyncOperationService;
 import com.kush.todo.service.TenantService;
@@ -19,6 +20,7 @@ public class TenantFacade {
 
     private final TenantService tenantService;
     private final AsyncOperationService asyncOperationService;
+    private final CurrentUser currentUser;
 
     @Transactional
     public TenantResponseDto create(TenantRequestDto request) {
@@ -26,11 +28,11 @@ public class TenantFacade {
         return tenantService.create(request);
     }
 
-    public AsyncOperationResultResponseDto<TenantResponseDto> getAsyncResult(UUID id) {
-        return asyncOperationService.get(id);
+    public AsyncOperationDto<TenantResponseDto> getAsyncResult(UUID id) {
+        return asyncOperationService.get(id, currentUser.getTenantId());
     }
 
     public AsyncOperationLaunchedResponseDto createAsync(TenantRequestDto tenantRequestDto) {
-        return asyncOperationService.launch(tenantRequestDto, "test");
+        return asyncOperationService.launchOperation(currentUser.getTenantId(), tenantRequestDto, "test");
     }
 }

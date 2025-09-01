@@ -1,4 +1,4 @@
-package com.kush.todo.dto;
+package com.kush.todo.dto.async;
 
 public enum AsyncOperationStatus {
     IN_PROGRESS,

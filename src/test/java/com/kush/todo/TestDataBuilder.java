@@ -1,7 +1,7 @@
 package com.kush.todo;
 
-import com.kush.todo.dto.CurrentUser;
-import com.kush.todo.dto.Role;
+import com.kush.todo.dto.common.CurrentUser;
+import com.kush.todo.dto.common.Role;
 import com.kush.todo.entity.Tenant;
 
 import java.time.Instant;

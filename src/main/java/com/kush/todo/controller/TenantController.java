@@ -3,7 +3,7 @@ package com.kush.todo.controller;
 import com.kush.todo.annotation.CommonApiErrors;
 import com.kush.todo.dto.request.TenantRequestDto;
 import com.kush.todo.dto.response.AsyncOperationLaunchedResponseDto;
-import com.kush.todo.dto.response.AsyncOperationResultResponseDto;
+import com.kush.todo.dto.async.AsyncOperationDto;
 import com.kush.todo.dto.response.CustomPage;
 import com.kush.todo.dto.response.TenantResponseDto;
 import com.kush.todo.facade.TenantFacade;
@@ -84,7 +84,7 @@ public class TenantController {
     @CommonApiErrors
     @GetMapping(value = "async/operations/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('TENANT_READ')")
-    public AsyncOperationResultResponseDto<TenantResponseDto> getCreationResult(@NotNull @PathVariable UUID id) {
+    public AsyncOperationDto<TenantResponseDto> getCreationResult(@NotNull @PathVariable UUID id) {
         return tenantFacade.getAsyncResult(id);
     }
 

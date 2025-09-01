@@ -2,7 +2,7 @@ package com.kush.todo.repository;
 
 import com.kush.todo.BaseIntegrationTest;
 import com.kush.todo.IntegrationTestDataBuilder;
-import com.kush.todo.dto.Permission;
+import com.kush.todo.dto.common.Permission;
 import com.kush.todo.entity.AppUser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

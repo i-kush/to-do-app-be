@@ -1,17 +1,16 @@
 package com.kush.todo.service;
 
 import com.kush.todo.config.RedisConfig;
-import com.kush.todo.dto.AsyncOperationStatus;
-import com.kush.todo.dto.CurrentUser;
+import com.kush.todo.dto.async.AsyncOperationDto;
 import com.kush.todo.dto.response.AsyncOperationLaunchedResponseDto;
-import com.kush.todo.dto.response.AsyncOperationResultResponseDto;
 import com.kush.todo.exception.NotFoundException;
-import jakarta.validation.constraints.NotNull;
+import com.kush.todo.mapper.AsyncOperationMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.Cache;
@@ -24,30 +23,39 @@ public class AsyncOperationService {
 
     @Qualifier(RedisConfig.CACHE_NAME_ASYNC_OPERATIONS)
     private final Cache cache;
-    private final CurrentUser currentUser;
+    private final AsyncOperationMapper asyncOperationMapper;
 
     @SuppressWarnings("unchecked")
-    public <T> AsyncOperationResultResponseDto<T> get(@NotNull UUID operationId) {
-        String key = toKey(operationId);
+    public <T> AsyncOperationDto<T> get(UUID operationId, UUID tenantId) {
+        String key = toKey(operationId, tenantId);
         log.info("Searching for async operation result for key {}, id {}", key, operationId);
 
-        return Optional.ofNullable(cache.get(key, AsyncOperationResultResponseDto.class))
+        return Optional.ofNullable(cache.get(key, AsyncOperationDto.class))
                        .orElseThrow(() -> new NotFoundException(String.format("No operation with id '%s'", operationId)));
     }
 
-    public AsyncOperationLaunchedResponseDto launch(Object request, String topicName) {
-        UUID operationId = UUID.randomUUID();
-        AsyncOperationResultResponseDto<?> initial = AsyncOperationResultResponseDto.builder()
-                                                                                    .id(operationId)
-                                                                                    .status(AsyncOperationStatus.IN_PROGRESS)
-                                                                                    .build();
-        cache.put(toKey(operationId), initial);
-        return AsyncOperationLaunchedResponseDto.builder()
-                                                .id(operationId)
-                                                .build();
+    public <T> AsyncOperationLaunchedResponseDto launchOperation(UUID tenantId, T request, String topicName) {
+        AsyncOperationDto<T> launchedOperation = asyncOperationMapper.toLaunchedAsyncOperation(tenantId);
+        cache.put(toKey(launchedOperation.id(), tenantId), launchedOperation);
+
+        return asyncOperationMapper.toAsyncOperationLaunchedResponse(launchedOperation);
     }
 
-    private String toKey(UUID operationId) {
-        return String.format("%s_%s", currentUser.getTenantId(), operationId);
+    public <T> void executeLaunchedOperation(UUID operationId, UUID tenantId, Supplier<T> operation) {
+        String key = toKey(operationId, tenantId);
+        log.info("Executing launched async operation for key {}", key);
+
+        AsyncOperationDto<T> asyncOperation = get(operationId, tenantId);
+        try {
+            asyncOperation = asyncOperationMapper.toSuccessAsyncOperation(asyncOperation, operation.get());
+        } catch (RuntimeException e) {
+            log.error("Error executing async operation for key {}", key, e);
+            asyncOperation = asyncOperationMapper.toErrorAsyncOperation(asyncOperation, e);
+        }
+        cache.put(key, asyncOperation);
+    }
+
+    private String toKey(UUID operationId, UUID tenantId) {
+        return String.format("%s_%s", tenantId, operationId);
     }
 }

@@ -1,7 +1,7 @@
 package com.kush.todo.validator;
 
-import com.kush.todo.dto.CurrentUser;
-import com.kush.todo.dto.Role;
+import com.kush.todo.dto.common.CurrentUser;
+import com.kush.todo.dto.common.Role;
 import com.kush.todo.dto.request.AppUserRequestDto;
 
 import java.util.UUID;

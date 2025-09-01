@@ -1,16 +1,18 @@
-package com.kush.todo.dto.response;
+package com.kush.todo.dto.async;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kush.todo.dto.AsyncOperationStatus;
 import lombok.Builder;
 
 import java.util.UUID;
 
 @Builder
-public record AsyncOperationResultResponseDto<T>(
+public record AsyncOperationDto<T>(
         UUID id,
+        UUID tenantId,
         AsyncOperationStatus status,
         @JsonInclude(JsonInclude.Include.NON_NULL)
-        T result
+        T result,
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        String error
 ) {
 }

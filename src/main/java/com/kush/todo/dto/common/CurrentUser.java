@@ -1,4 +1,4 @@
-package com.kush.todo.dto;
+package com.kush.todo.dto.common;
 
 import lombok.Builder;
 import lombok.Getter;

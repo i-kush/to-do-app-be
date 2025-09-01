@@ -1,6 +1,6 @@
 package com.kush.todo;
 
-import com.kush.todo.dto.Role;
+import com.kush.todo.dto.common.Role;
 import com.kush.todo.dto.request.AppUserRequestDto;
 import com.kush.todo.dto.request.LoginRequestDto;
 import com.kush.todo.dto.request.TenantRequestDto;

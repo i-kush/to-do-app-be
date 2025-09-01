@@ -1,7 +1,7 @@
 package com.kush.todo.controller;
 
 import com.kush.todo.annotation.CommonApiErrors;
-import com.kush.todo.dto.CurrentUser;
+import com.kush.todo.dto.common.CurrentUser;
 import com.kush.todo.dto.request.AppUserRequestDto;
 import com.kush.todo.dto.response.AppUserResponseDto;
 import com.kush.todo.dto.response.CustomPage;
