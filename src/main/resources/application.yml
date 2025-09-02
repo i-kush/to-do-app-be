@@ -1,9 +1,37 @@
+logging:
+  level:
+    com.kush.todo: INFO
+    org.apache.kafka: WARN
+
 server:
   port: 8080
   http2:
     enabled: true
 
+management:
+  server:
+    port: 8081
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics
+  endpoint:
+    health:
+      show-details: ALWAYS
+
 spring:
+  kafka:
+    template:
+      observation-enabled: true
+    listener:
+      observation-enabled: true
+    consumer:
+      group-id: group-id-to-do-app
+      properties:
+        spring.json.trusted.packages: com.kush.todo.dto.request,com.kush.todo.dto.async
+    topics:
+      onboard-tenant: kafka-topic-tenant-onboarding
+
   data:
     redis:
       repositories:
@@ -18,17 +46,6 @@ spring:
     open-in-view: false
   liquibase:
     change-log: classpath:/db/changelog/changelog-master.xml
-
-management:
-  server:
-    port: 8081
-  endpoints:
-    web:
-      exposure:
-        include: health,metrics
-  endpoint:
-    health:
-      show-details: ALWAYS
 
 todo:
   login:

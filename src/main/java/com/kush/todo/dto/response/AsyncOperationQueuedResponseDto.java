@@ -5,5 +5,5 @@ import lombok.Builder;
 import java.util.UUID;
 
 @Builder
-public record AsyncOperationLaunchedResponseDto(UUID id) {
+public record AsyncOperationQueuedResponseDto(UUID id) {
 }

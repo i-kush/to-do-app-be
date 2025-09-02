@@ -2,6 +2,8 @@ logging:
   config: classpath:logback-spring-local.xml
 
 spring:
+  kafka:
+    bootstrap-servers: localhost:29092
   data:
     redis:
       host: localhost

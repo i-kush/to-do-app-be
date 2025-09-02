@@ -25,13 +25,13 @@ public class RedisConfig {
     public static final Set<String> DEFAULT_CACHE_NAMES = Set.of(CACHE_NAME_ASYNC_OPERATIONS);
 
     @Bean
-    public CacheManager cacheManager(RedisConnectionFactory connectionFactory, @Value("${spring.data.redis.ttl}") int ttl) {
+    public CacheManager cacheManager(RedisConnectionFactory connectionFactory,
+                                     @Value("${spring.data.redis.ttl}") int ttl) {
         RedisCacheConfiguration defaultConfig = RedisCacheConfiguration
                 .defaultCacheConfig()
                 .disableCachingNullValues()
                 .entryTtl(Duration.ofHours(ttl))
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
-
 
         return RedisCacheManager.builder(RedisCacheWriter.nonLockingRedisCacheWriter(connectionFactory))
                                 .cacheDefaults(defaultConfig)

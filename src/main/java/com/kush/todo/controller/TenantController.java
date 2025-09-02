@@ -2,7 +2,7 @@ package com.kush.todo.controller;
 
 import com.kush.todo.annotation.CommonApiErrors;
 import com.kush.todo.dto.request.TenantRequestDto;
-import com.kush.todo.dto.response.AsyncOperationLaunchedResponseDto;
+import com.kush.todo.dto.response.AsyncOperationQueuedResponseDto;
 import com.kush.todo.dto.async.AsyncOperationDto;
 import com.kush.todo.dto.response.CustomPage;
 import com.kush.todo.dto.response.TenantResponseDto;
@@ -73,7 +73,7 @@ public class TenantController {
     @CommonApiErrors
     @PostMapping(value = "async/operations", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('TENANT_WRITE')")
-    public AsyncOperationLaunchedResponseDto createAsync(@Valid @RequestBody TenantRequestDto tenantDto) {
+    public AsyncOperationQueuedResponseDto createAsync(@Valid @RequestBody TenantRequestDto tenantDto) {
         return tenantFacade.createAsync(tenantDto);
     }
 

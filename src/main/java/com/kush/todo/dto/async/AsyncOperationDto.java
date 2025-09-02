@@ -11,8 +11,6 @@ public record AsyncOperationDto<T>(
         UUID tenantId,
         AsyncOperationStatus status,
         @JsonInclude(JsonInclude.Include.NON_NULL)
-        T result,
-        @JsonInclude(JsonInclude.Include.NON_NULL)
-        String error
+        T result
 ) {
 }
