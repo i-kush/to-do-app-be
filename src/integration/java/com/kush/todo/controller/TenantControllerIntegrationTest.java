@@ -2,7 +2,10 @@ package com.kush.todo.controller;
 
 import com.kush.todo.BaseIntegrationTest;
 import com.kush.todo.IntegrationTestDataBuilder;
+import com.kush.todo.dto.async.AsyncOperationDto;
+import com.kush.todo.dto.async.AsyncOperationStatus;
 import com.kush.todo.dto.request.TenantRequestDto;
+import com.kush.todo.dto.response.AsyncOperationQueuedResponseDto;
 import com.kush.todo.dto.response.CustomPage;
 import com.kush.todo.dto.response.ErrorDto;
 import com.kush.todo.dto.response.ErrorsDto;
@@ -59,6 +62,98 @@ class TenantControllerIntegrationTest extends BaseIntegrationTest {
         List<ErrorDto> errors = errorResponse.getBody().errors();
         Assertions.assertFalse(CollectionUtils.isEmpty(errors));
         Assertions.assertEquals(String.format("(name)=(%s) already exists.", request.name()), errors.getFirst().message());
+    }
+
+    @Test
+    void createAsync() {
+        TenantRequestDto asyncTenantRequestDto = IntegrationTestDataBuilder.buildTenantRequestDto();
+        ResponseEntity<AsyncOperationQueuedResponseDto> asyncResponse = restTemplate.postForEntity(BASE_URL + "/async/operations",
+                                                                                                   IntegrationTestDataBuilder.buildRequest(asyncTenantRequestDto, defaultAccessToken),
+                                                                                                   AsyncOperationQueuedResponseDto.class);
+
+        Assertions.assertEquals(HttpStatus.OK.value(), asyncResponse.getStatusCode().value());
+        Assertions.assertNotNull(asyncResponse.getBody());
+
+        UUID operationId = asyncResponse.getBody().id();
+        Assertions.assertNotNull(operationId);
+
+        ParameterizedTypeReference<AsyncOperationDto<TenantResponseDto>> responseType = new ParameterizedTypeReference<>() {
+        };
+        ResponseEntity<AsyncOperationDto<TenantResponseDto>> asyncResponseResult = null;
+        for (int i = 0; i < 5; i++) {
+            asyncResponseResult = restTemplate.exchange(BASE_URL + "/async/operations/{id}",
+                                                        HttpMethod.GET,
+                                                        IntegrationTestDataBuilder.buildRequest(defaultAccessToken),
+                                                        responseType,
+                                                        operationId);
+            Assertions.assertEquals(HttpStatus.OK.value(), asyncResponseResult.getStatusCode().value());
+            AsyncOperationDto<TenantResponseDto> asyncResponseResultBody = asyncResponseResult.getBody();
+            Assertions.assertNotNull(asyncResponseResultBody);
+            if (asyncResponseResultBody.status() == AsyncOperationStatus.SUCCESS) {
+                break;
+            }
+            pause(2);
+        }
+
+        Assertions.assertNotNull(asyncResponseResult);
+        Assertions.assertEquals(HttpStatus.OK.value(), asyncResponseResult.getStatusCode().value());
+        AsyncOperationDto<TenantResponseDto> asyncResponseResultBody = asyncResponseResult.getBody();
+        Assertions.assertNotNull(asyncResponseResultBody);
+        Assertions.assertEquals(operationId, asyncResponseResultBody.id());
+        Assertions.assertEquals(defaultTenantId, asyncResponseResultBody.tenantId());
+        Assertions.assertEquals(AsyncOperationStatus.SUCCESS, asyncResponseResultBody.status());
+
+        TenantResponseDto asyncTenantResponseDto = asyncResponseResultBody.result();
+        Assertions.assertNotNull(asyncTenantResponseDto);
+        Assertions.assertNotNull(asyncTenantResponseDto.id());
+        Assertions.assertEquals(asyncTenantResponseDto.name(), asyncTenantResponseDto.name());
+    }
+
+    @Test
+    void createAsyncWithExistingName() {
+        TenantRequestDto request = IntegrationTestDataBuilder.buildTenantRequestDto();
+        ResponseEntity<TenantResponseDto> successfulResponse = restTemplate.postForEntity(BASE_URL,
+                                                                                          IntegrationTestDataBuilder.buildRequest(request, defaultAccessToken),
+                                                                                          TenantResponseDto.class);
+
+        Assertions.assertEquals(HttpStatus.CREATED.value(), successfulResponse.getStatusCode().value());
+
+        ResponseEntity<AsyncOperationQueuedResponseDto> asyncResponse = restTemplate.postForEntity(BASE_URL + "/async/operations",
+                                                                                                   IntegrationTestDataBuilder.buildRequest(request, defaultAccessToken),
+                                                                                                   AsyncOperationQueuedResponseDto.class);
+
+        Assertions.assertEquals(HttpStatus.OK.value(), asyncResponse.getStatusCode().value());
+        Assertions.assertNotNull(asyncResponse.getBody());
+
+        UUID operationId = asyncResponse.getBody().id();
+        Assertions.assertNotNull(operationId);
+
+        ParameterizedTypeReference<AsyncOperationDto<TenantResponseDto>> responseType = new ParameterizedTypeReference<>() {
+        };
+        ResponseEntity<AsyncOperationDto<TenantResponseDto>> asyncResponseResult = null;
+        for (int i = 0; i < 5; i++) {
+            asyncResponseResult = restTemplate.exchange(BASE_URL + "/async/operations/{id}",
+                                                        HttpMethod.GET,
+                                                        IntegrationTestDataBuilder.buildRequest(defaultAccessToken),
+                                                        responseType,
+                                                        operationId);
+            Assertions.assertEquals(HttpStatus.OK.value(), asyncResponseResult.getStatusCode().value());
+            AsyncOperationDto<TenantResponseDto> asyncResponseResultBody = asyncResponseResult.getBody();
+            Assertions.assertNotNull(asyncResponseResultBody);
+            if (asyncResponseResultBody.status() == AsyncOperationStatus.ERROR) {
+                break;
+            }
+            pause(2);
+        }
+
+        Assertions.assertNotNull(asyncResponseResult);
+        Assertions.assertEquals(HttpStatus.OK.value(), asyncResponseResult.getStatusCode().value());
+        AsyncOperationDto<TenantResponseDto> asyncResponseResultBody = asyncResponseResult.getBody();
+        Assertions.assertNotNull(asyncResponseResultBody);
+        Assertions.assertEquals(operationId, asyncResponseResultBody.id());
+        Assertions.assertEquals(defaultTenantId, asyncResponseResultBody.tenantId());
+        Assertions.assertEquals(AsyncOperationStatus.ERROR, asyncResponseResultBody.status());
+        Assertions.assertNull(asyncResponseResultBody.result());
     }
 
     @ParameterizedTest

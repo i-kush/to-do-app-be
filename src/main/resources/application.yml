@@ -27,8 +27,6 @@ spring:
       observation-enabled: true
     consumer:
       group-id: group-id-to-do-app
-      properties:
-        spring.json.trusted.packages: com.kush.todo.dto.request,com.kush.todo.dto.async
     topics:
       onboard-tenant: kafka-topic-tenant-onboarding
 
