@@ -6,8 +6,10 @@ import java.time.Instant;
 import java.util.UUID;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
 
 @Builder
+@Table
 public record Tenant(
         @Id
         UUID id,

@@ -1,7 +1,7 @@
 package com.kush.todo.service;
 
-import com.kush.todo.dto.CurrentUser;
-import com.kush.todo.dto.Permission;
+import com.kush.todo.dto.common.CurrentUser;
+import com.kush.todo.dto.common.Permission;
 import com.kush.todo.dto.request.AppUserRequestDto;
 import com.kush.todo.dto.response.AppUserResponseDto;
 import com.kush.todo.dto.response.CustomPage;

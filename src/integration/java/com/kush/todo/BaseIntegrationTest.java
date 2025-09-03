@@ -2,17 +2,20 @@ package com.kush.todo;
 
 import com.kush.todo.dto.request.LoginRequestDto;
 import com.kush.todo.dto.response.LoginResponseDto;
+import com.redis.testcontainers.RedisContainer;
 import jakarta.annotation.PreDestroy;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.kafka.ConfluentKafkaContainer;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -38,8 +41,16 @@ public abstract class BaseIntegrationTest {
             .withExposedPorts(5432)
             .waitingFor(Wait.forListeningPort());
 
+    private static final RedisContainer REDIS = new RedisContainer("redis:8.2.1")
+            .waitingFor(Wait.forListeningPort());
+
+    private static final ConfluentKafkaContainer KAFKA = new ConfluentKafkaContainer("confluentinc/cp-kafka:7.4.1")
+            .waitingFor(Wait.forListeningPort());
+
     static {
         DB.start();
+        REDIS.start();
+        KAFKA.start();
     }
 
     @Autowired
@@ -58,11 +69,16 @@ public abstract class BaseIntegrationTest {
         registry.add("spring.datasource.url", DB::getJdbcUrl);
         registry.add("spring.datasource.username", DB::getUsername);
         registry.add("spring.datasource.password", DB::getPassword);
+        registry.add("spring.data.redis.host", REDIS::getHost);
+        registry.add("spring.data.redis.port", REDIS::getRedisPort);
+        registry.add("spring.kafka.bootstrap-servers", KAFKA::getBootstrapServers);
     }
 
     @PreDestroy
     public static void tearDown() {
         DB.stop();
+        REDIS.stop();
+        KAFKA.stop();
     }
 
     @BeforeEach
@@ -83,5 +99,13 @@ public abstract class BaseIntegrationTest {
         Assertions.assertNotNull(response.getBody().accessToken());
 
         return response.getBody().accessToken();
+    }
+
+    protected void pause(int seconds) {
+        try {
+            TimeUnit.SECONDS.sleep(seconds);
+        } catch (InterruptedException e) {
+            throw new IllegalStateException("Can't sleep", e);
+        }
     }
 }

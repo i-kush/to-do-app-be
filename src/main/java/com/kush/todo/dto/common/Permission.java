@@ -1,4 +1,4 @@
-package com.kush.todo.dto;
+package com.kush.todo.dto.common;
 
 public enum Permission {
     TENANT_READ,

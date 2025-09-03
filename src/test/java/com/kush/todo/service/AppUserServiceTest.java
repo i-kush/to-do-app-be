@@ -2,7 +2,7 @@ package com.kush.todo.service;
 
 import com.kush.todo.BaseTest;
 import com.kush.todo.TestDataBuilder;
-import com.kush.todo.dto.CurrentUser;
+import com.kush.todo.dto.common.CurrentUser;
 import com.kush.todo.exception.NotFoundException;
 import com.kush.todo.mapper.AppUserMapper;
 import com.kush.todo.repository.AppUserRepository;

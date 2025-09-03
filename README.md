@@ -26,3 +26,7 @@ I will put everything here someday...
 - run dockerized full BE with infra: `docker-compose --profile backend up`
 - run dockerized full BE with infra rebuilding the BE image: `docker-compose --profile backend up --build`
 - run local infra without BE itself, it's assumed BE will be run in dev mode with IDE: `docker-compose up`
+
+## Env
+
+- `LOGGING_LEVEL_COM_KUSH_TODO=DEBUG` if needed

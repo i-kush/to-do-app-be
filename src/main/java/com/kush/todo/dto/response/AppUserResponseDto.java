@@ -1,7 +1,7 @@
 package com.kush.todo.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.kush.todo.dto.Role;
+import com.kush.todo.dto.common.Role;
 import lombok.Builder;
 
 import java.time.Instant;

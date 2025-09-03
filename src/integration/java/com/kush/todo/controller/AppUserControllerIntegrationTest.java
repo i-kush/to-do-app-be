@@ -2,7 +2,7 @@ package com.kush.todo.controller;
 
 import com.kush.todo.BaseIntegrationTest;
 import com.kush.todo.IntegrationTestDataBuilder;
-import com.kush.todo.dto.Role;
+import com.kush.todo.dto.common.Role;
 import com.kush.todo.dto.request.AppUserRequestDto;
 import com.kush.todo.dto.request.LoginRequestDto;
 import com.kush.todo.dto.response.AppUserResponseDto;

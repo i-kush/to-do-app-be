@@ -1,8 +1,8 @@
 package com.kush.todo.validator;
 
 import com.kush.todo.BaseTest;
-import com.kush.todo.dto.CurrentUser;
-import com.kush.todo.dto.Role;
+import com.kush.todo.dto.common.CurrentUser;
+import com.kush.todo.dto.common.Role;
 import com.kush.todo.dto.request.AppUserRequestDto;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

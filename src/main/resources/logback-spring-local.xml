@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true">
 
-    <property name="KUSH_TODO_LOG_LEVEL"
-              value="${KUSH_TODO_LOG_LEVEL:-INFO}"/>
-
     <appender name="KUSH_TODO_CONSOLE"
               class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
@@ -13,12 +10,6 @@
             <charset>UTF-8</charset>
         </encoder>
     </appender>
-
-    <logger name="com.kush.todo"
-            level="${KUSH_TODO_LOG_LEVEL}"
-            additivity="false">
-        <appender-ref ref="KUSH_TODO_CONSOLE"/>
-    </logger>
 
     <root level="INFO">
         <appender-ref ref="KUSH_TODO_CONSOLE"/>

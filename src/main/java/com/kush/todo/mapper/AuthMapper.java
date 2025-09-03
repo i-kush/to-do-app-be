@@ -1,8 +1,8 @@
 package com.kush.todo.mapper;
 
-import com.kush.todo.dto.CurrentUser;
-import com.kush.todo.dto.Permission;
-import com.kush.todo.dto.Role;
+import com.kush.todo.dto.common.CurrentUser;
+import com.kush.todo.dto.common.Permission;
+import com.kush.todo.dto.common.Role;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.Mapper;
 

@@ -2,8 +2,11 @@ package com.kush.todo.controller;
 
 import com.kush.todo.annotation.CommonApiErrors;
 import com.kush.todo.dto.request.TenantRequestDto;
+import com.kush.todo.dto.response.AsyncOperationQueuedResponseDto;
+import com.kush.todo.dto.async.AsyncOperationDto;
 import com.kush.todo.dto.response.CustomPage;
 import com.kush.todo.dto.response.TenantResponseDto;
+import com.kush.todo.facade.TenantFacade;
 import com.kush.todo.service.TenantService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -38,6 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TenantController {
 
     private final TenantService tenantService;
+    private final TenantFacade tenantFacade;
 
     @Operation(summary = "Create tenant", description = "Creates a tenant with the specific settings")
     @ApiResponses(value = {
@@ -48,7 +52,7 @@ public class TenantController {
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAuthority('TENANT_WRITE')")
     public TenantResponseDto create(@Valid @RequestBody TenantRequestDto tenantDto) {
-        return tenantService.create(tenantDto);
+        return tenantFacade.create(tenantDto);
     }
 
     @Operation(summary = "Get tenant by ID", description = "Gets tenant details by ID")
@@ -60,6 +64,28 @@ public class TenantController {
     @PreAuthorize("hasAuthority('TENANT_READ')")
     public TenantResponseDto get(@NotNull @PathVariable UUID id) {
         return tenantService.findByIdRequired(id);
+    }
+
+    @Operation(summary = "Create tenant async", description = "Creates a tenant with the specific settings in the async mode")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Async tenant creation launched successfully"),
+    })
+    @CommonApiErrors
+    @PostMapping(value = "async/operations", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('TENANT_WRITE')")
+    public AsyncOperationQueuedResponseDto createAsync(@Valid @RequestBody TenantRequestDto tenantDto) {
+        return tenantFacade.createAsync(tenantDto);
+    }
+
+    @Operation(summary = "Get tenant async creation result by operation ID", description = "Gets tenant creation async operation result by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved async tenant creation operation"),
+    })
+    @CommonApiErrors
+    @GetMapping(value = "async/operations/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('TENANT_READ')")
+    public AsyncOperationDto<TenantResponseDto> getCreationResult(@NotNull @PathVariable UUID id) {
+        return tenantFacade.getAsyncResult(id);
     }
 
     @Operation(summary = "Get tenants", description = "Gets paginated tenants list with details")

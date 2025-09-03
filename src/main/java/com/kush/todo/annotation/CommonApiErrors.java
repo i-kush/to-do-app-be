@@ -18,6 +18,8 @@ import java.lang.annotation.Target;
              content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
 @ApiResponse(responseCode = "403", description = "Operation is forbidden",
              content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
+@ApiResponse(responseCode = "404", description = "Resource is not found",
+             content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
 @ApiResponse(responseCode = "500", description = "Internal Server Error",
              content = @Content(schema = @Schema(implementation = ErrorsDto.class)))
 public @interface CommonApiErrors {

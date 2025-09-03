@@ -1,14 +1,16 @@
 package com.kush.todo.entity;
 
-import com.kush.todo.dto.Role;
+import com.kush.todo.dto.common.Role;
 import lombok.Builder;
 
 import java.time.Instant;
 import java.util.UUID;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
 
 @Builder
+@Table
 public record AppUser(
         @Id
         UUID id,

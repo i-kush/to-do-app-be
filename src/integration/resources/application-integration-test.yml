@@ -2,10 +2,15 @@ logging:
   config: classpath:logback-spring-local.xml
 
 spring:
+  kafka:
+    consumer:
+      auto-offset-reset: earliest
+      enable-auto-commit: true
+    producer:
+      acks: 1  # Faster for tests
+      retries: 0
   security:
     oauth2:
       resourceserver:
         jwt:
           secret-key: test-secret-key-with-40-symbols-12345678
-  main:
-    lazy-initialization: true
