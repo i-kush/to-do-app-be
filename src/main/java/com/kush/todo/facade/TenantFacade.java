@@ -28,7 +28,6 @@ public class TenantFacade {
 
     @Transactional
     public TenantResponseDto create(TenantRequestDto request) {
-        log.info("Creating...", new Exception());
         //ToDo https://github.com/i-kush/to-do-app-be/issues/23 introduce onboarding
         return tenantService.create(request);
     }
