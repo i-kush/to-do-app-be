@@ -23,6 +23,8 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class AsyncOperationService {
 
+    public static final String ERROR_MESSAGE_OPERATION_NOT_FOUND = "No such operation";
+
     @Qualifier(RedisConfig.CACHE_NAME_ASYNC_OPERATIONS)
     private final Cache cache;
     private final AsyncOperationMapper asyncOperationMapper;
@@ -38,7 +40,7 @@ public class AsyncOperationService {
     @SuppressWarnings("unchecked")
     private <T> AsyncOperationDto<T> getOperation(String key) {
         return Optional.ofNullable(cache.get(key, AsyncOperationDto.class))
-                       .orElseThrow(() -> new NotFoundException("No such operation"));
+                       .orElseThrow(() -> new NotFoundException(ERROR_MESSAGE_OPERATION_NOT_FOUND));
     }
 
     public <T> AsyncOperationQueuedResponseDto queueOperation(UUID tenantId, T request, String topicName) {
