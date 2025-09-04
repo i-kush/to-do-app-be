@@ -1,0 +1,1 @@
+create index if not exists idx_app_user_id_tenant_id on app_user (id, tenant_id);

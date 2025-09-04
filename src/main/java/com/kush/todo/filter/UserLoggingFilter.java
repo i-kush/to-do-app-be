@@ -29,12 +29,21 @@ public class UserLoggingFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         try {
-            if (!RequestUtils.isAllowedEndpoint(request.getRequestURI())) {
-                MDC.put("userId", currentUser.getId().toString());
-            }
+            trySetUserId(request);
             filterChain.doFilter(request, response);
         } finally {
             MDC.clear();
+        }
+    }
+
+    @SuppressWarnings("PMD.EmptyCatchBlock")
+    private void trySetUserId(HttpServletRequest request) {
+        try {
+            if (!RequestUtils.isAllowedEndpoint(request.getRequestURI())) {
+                MDC.put("userId", currentUser.getId().toString());
+            }
+        } catch (IllegalStateException e) {
+            //ignore
         }
     }
 

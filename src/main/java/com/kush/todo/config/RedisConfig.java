@@ -25,6 +25,7 @@ import org.springframework.data.redis.serializer.RedisSerializationContext;
 public class RedisConfig {
 
     public static final String CACHE_NAME_ASYNC_OPERATIONS = "asyncOperations";
+    public static final String CACHE_NAME_USERS = "users";
     public static final Set<String> DEFAULT_CACHE_NAMES = Set.of(CACHE_NAME_ASYNC_OPERATIONS);
 
     @Bean
