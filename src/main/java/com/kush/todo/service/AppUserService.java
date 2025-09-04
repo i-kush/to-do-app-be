@@ -1,5 +1,6 @@
 package com.kush.todo.service;
 
+import com.kush.todo.config.RedisConfig;
 import com.kush.todo.dto.common.CurrentUser;
 import com.kush.todo.dto.common.Permission;
 import com.kush.todo.dto.request.AppUserRequestDto;
@@ -21,6 +22,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -65,6 +68,7 @@ public class AppUserService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = RedisConfig.CACHE_NAME_USERS, key = "#id")
     public AppUserResponseDto findByIdRequired(UUID id) {
         return appUserMapper.toAppUserDto(getRequired(id));
     }
@@ -75,6 +79,7 @@ public class AppUserService {
     }
 
     @Transactional
+    @CacheEvict(value = RedisConfig.CACHE_NAME_USERS, key = "#id")
     public AppUserResponseDto update(UUID id, AppUserRequestDto appUserRequestDto) {
         AppUser currentAppUser = getRequired(id);
         appUserValidator.validateTargetRole(appUserRequestDto, currentUser);
@@ -85,6 +90,7 @@ public class AppUserService {
     }
 
     @Transactional
+    @CacheEvict(value = RedisConfig.CACHE_NAME_USERS, key = "#id")
     public void delete(UUID id) {
         appUserValidator.validateDelete(id, currentUser);
 
@@ -113,6 +119,7 @@ public class AppUserService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @CacheEvict(value = RedisConfig.CACHE_NAME_USERS, key = "#appUser.id")
     public void lockUserIfNeeded(AppUser appUser) {
         boolean isAttemptWithinWindow = Optional.ofNullable(appUser.lastLoginAttemptAt())
                                                 .map(a -> a.isAfter(Instant.now().minus(Duration.ofMinutes(maxLoginAttemptWindowMinutes))))
@@ -136,6 +143,7 @@ public class AppUserService {
     }
 
     @Transactional
+    @CacheEvict(value = RedisConfig.CACHE_NAME_USERS, allEntries = true)
     public void unlockUsers() {
         Set<UUID> ids = appUserRepository.findUserIdsToUnlock();
         if (!CollectionUtils.isEmpty(ids)) {
@@ -145,6 +153,7 @@ public class AppUserService {
     }
 
     @Transactional
+    @CacheEvict(value = RedisConfig.CACHE_NAME_USERS, key = "#id")
     public void unlockUser(UUID id) {
         if (!getRequired(id).isLocked()) {
             throw new IllegalArgumentException(ERROR_MESSAGE_USER_IS_NOT_LOCKED);
@@ -159,6 +168,7 @@ public class AppUserService {
     }
 
     @Transactional
+    @CacheEvict(value = RedisConfig.CACHE_NAME_USERS, allEntries = true)
     public int deleteByTenantId(UUID tenantId) {
         return appUserRepository.deleteByTenantId(tenantId);
     }
