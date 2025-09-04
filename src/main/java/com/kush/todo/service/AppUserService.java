@@ -46,14 +46,14 @@ public class AppUserService {
     private int maxLoginAttemptWindowMinutes;
 
     @Transactional
-    public AppUserResponseDto create(AppUserRequestDto appUserRequestDto) {
-        return create(appUserRequestDto, currentUser.getTenantId());
-    }
-
-    @Transactional
     public AppUserResponseDto createFirstAdmin(UUID tenantId, String adminEmail) {
         AppUserRequestDto appUserRequestDto = appUserMapper.toFirstAdmin(adminEmail);
         return create(appUserRequestDto, tenantId);
+    }
+
+    @Transactional
+    public AppUserResponseDto create(AppUserRequestDto appUserRequestDto) {
+        return create(appUserRequestDto, currentUser.getTenantId());
     }
 
     private AppUserResponseDto create(AppUserRequestDto appUserRequestDto, UUID tenantId) {

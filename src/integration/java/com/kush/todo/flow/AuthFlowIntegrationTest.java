@@ -2,8 +2,8 @@ package com.kush.todo.flow;
 
 import com.kush.todo.BaseIntegrationTest;
 import com.kush.todo.IntegrationTestDataBuilder;
+import com.kush.todo.dto.request.CreateTenantRequestDto;
 import com.kush.todo.dto.request.LoginRequestDto;
-import com.kush.todo.dto.request.UpdateTenantRequestDto;
 import com.kush.todo.dto.response.ErrorDto;
 import com.kush.todo.dto.response.ErrorsDto;
 import com.kush.todo.service.AuthService;
@@ -38,7 +38,7 @@ class AuthFlowIntegrationTest extends BaseIntegrationTest {
     })
     @NullAndEmptySource
     void unauthorized(String token) {
-        UpdateTenantRequestDto tenantRequestDto = IntegrationTestDataBuilder.buildTenantRequestDto();
+        CreateTenantRequestDto tenantRequestDto = IntegrationTestDataBuilder.buildCreateTenantRequestDto();
         ResponseEntity<ErrorsDto> response = restTemplate.postForEntity(BASE_URL_TENANT,
                                                                         IntegrationTestDataBuilder.buildRequest(tenantRequestDto, token),
                                                                         ErrorsDto.class);
@@ -64,7 +64,7 @@ class AuthFlowIntegrationTest extends BaseIntegrationTest {
         errorResponse = restTemplate.postForEntity(BASE_URL_LOGIN, request, ErrorsDto.class);
         assertLockedError(errorResponse);
 
-        UpdateTenantRequestDto tenantRequestDto = IntegrationTestDataBuilder.buildTenantRequestDto();
+        CreateTenantRequestDto tenantRequestDto = IntegrationTestDataBuilder.buildCreateTenantRequestDto();
         ResponseEntity<ErrorsDto> tenantErrorResponse = restTemplate.postForEntity(BASE_URL_TENANT,
                                                                                    IntegrationTestDataBuilder.buildRequest(tenantRequestDto, defaultAccessToken),
                                                                                    ErrorsDto.class);

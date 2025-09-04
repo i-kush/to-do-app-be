@@ -10,6 +10,8 @@ import com.kush.todo.service.AsyncOperationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.UUID;
+
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
@@ -28,5 +30,12 @@ public class KafkaConsumer {
         AsyncOperationEventDto<CreateTenantRequestDto> operation = objectMapper.readValue(message.getPayload(), new TypeReference<>() {
         });
         asyncOperationService.executeOperation(operation, () -> tenantFacade.create(operation.request()));
+    }
+
+    @KafkaListener(topics = "${spring.kafka.topics.offboard-tenant}")
+    public void offboardTenant(Message<String> message) throws JsonProcessingException {
+        AsyncOperationEventDto<UUID> operation = objectMapper.readValue(message.getPayload(), new TypeReference<>() {
+        });
+        asyncOperationService.executeOperation(operation, () -> tenantFacade.delete(operation.request()));
     }
 }

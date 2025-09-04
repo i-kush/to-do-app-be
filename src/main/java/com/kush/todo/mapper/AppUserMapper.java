@@ -15,9 +15,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @Mapper
 public abstract class AppUserMapper extends PageMapper {
 
-    private static final String INITIAL_PASSWORD_TO_CHANGE = "change-me-1";
-    private static final String INITIAL_ADMIN_FIRST_NAME = "admin";
-    private static final String INITIAL_ADMIN_LAST_NAME = "admin";
+    public static final String INITIAL_PASSWORD_TO_CHANGE = "change-me-1";
+    public static final String INITIAL_ADMIN_FIRST_NAME = "admin";
+    public static final String INITIAL_ADMIN_LAST_NAME = "admin";
 
     @Autowired
     protected BCryptPasswordEncoder passwordEncoder;
