@@ -4,7 +4,7 @@ import com.kush.todo.BaseIntegrationTest;
 import com.kush.todo.IntegrationTestDataBuilder;
 import com.kush.todo.dto.async.AsyncOperationDto;
 import com.kush.todo.dto.async.AsyncOperationStatus;
-import com.kush.todo.dto.request.TenantRequestDto;
+import com.kush.todo.dto.request.UpdateTenantRequestDto;
 import com.kush.todo.dto.response.AsyncOperationQueuedResponseDto;
 import com.kush.todo.dto.response.CustomPage;
 import com.kush.todo.dto.response.ErrorDto;
@@ -34,7 +34,7 @@ class TenantControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void create() {
-        TenantRequestDto tenantRequestDto = IntegrationTestDataBuilder.buildTenantRequestDto();
+        UpdateTenantRequestDto tenantRequestDto = IntegrationTestDataBuilder.buildTenantRequestDto();
         ResponseEntity<TenantResponseDto> response = restTemplate.postForEntity(BASE_URL,
                                                                                 IntegrationTestDataBuilder.buildRequest(tenantRequestDto, defaultAccessToken),
                                                                                 TenantResponseDto.class);
@@ -47,7 +47,7 @@ class TenantControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void createWithExistingName() {
-        TenantRequestDto request = IntegrationTestDataBuilder.buildTenantRequestDto();
+        UpdateTenantRequestDto request = IntegrationTestDataBuilder.buildTenantRequestDto();
         ResponseEntity<TenantResponseDto> successfulResponse = restTemplate.postForEntity(BASE_URL,
                                                                                           IntegrationTestDataBuilder.buildRequest(request, defaultAccessToken),
                                                                                           TenantResponseDto.class);
@@ -66,7 +66,7 @@ class TenantControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void createAsync() {
-        TenantRequestDto asyncTenantRequestDto = IntegrationTestDataBuilder.buildTenantRequestDto();
+        UpdateTenantRequestDto asyncTenantRequestDto = IntegrationTestDataBuilder.buildTenantRequestDto();
         ResponseEntity<AsyncOperationQueuedResponseDto> asyncResponse = restTemplate.postForEntity(BASE_URL + "/async/operations",
                                                                                                    IntegrationTestDataBuilder.buildRequest(asyncTenantRequestDto, defaultAccessToken),
                                                                                                    AsyncOperationQueuedResponseDto.class);
@@ -111,7 +111,7 @@ class TenantControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void createAsyncWithExistingName() {
-        TenantRequestDto request = IntegrationTestDataBuilder.buildTenantRequestDto();
+        UpdateTenantRequestDto request = IntegrationTestDataBuilder.buildTenantRequestDto();
         ResponseEntity<TenantResponseDto> successfulResponse = restTemplate.postForEntity(BASE_URL,
                                                                                           IntegrationTestDataBuilder.buildRequest(request, defaultAccessToken),
                                                                                           TenantResponseDto.class);
@@ -160,7 +160,7 @@ class TenantControllerIntegrationTest extends BaseIntegrationTest {
     @NullAndEmptySource
     @ValueSource(strings = {" ", "  ", "11111111111111111111111111111111111111111111111111111"})
     void createWithInvalidName(String name) {
-        TenantRequestDto request = IntegrationTestDataBuilder.buildTenantRequestDto(name);
+        UpdateTenantRequestDto request = IntegrationTestDataBuilder.buildTenantRequestDto(name);
         ResponseEntity<ErrorsDto> response = restTemplate.postForEntity(BASE_URL,
                                                                         IntegrationTestDataBuilder.buildRequest(request, defaultAccessToken),
                                                                         ErrorsDto.class);
@@ -171,7 +171,7 @@ class TenantControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void get() {
-        TenantRequestDto request = IntegrationTestDataBuilder.buildTenantRequestDto();
+        UpdateTenantRequestDto request = IntegrationTestDataBuilder.buildTenantRequestDto();
         ResponseEntity<TenantResponseDto> createResponse = restTemplate.postForEntity(BASE_URL,
                                                                                       IntegrationTestDataBuilder.buildRequest(request, defaultAccessToken),
                                                                                       TenantResponseDto.class);
@@ -207,7 +207,7 @@ class TenantControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getAll() {
-        TenantRequestDto request = IntegrationTestDataBuilder.buildTenantRequestDto();
+        UpdateTenantRequestDto request = IntegrationTestDataBuilder.buildTenantRequestDto();
         restTemplate.postForEntity(BASE_URL, IntegrationTestDataBuilder.buildRequest(request, defaultAccessToken), TenantResponseDto.class);
         ParameterizedTypeReference<CustomPage<TenantResponseDto>> responseType = new ParameterizedTypeReference<>() {
         };
@@ -268,12 +268,12 @@ class TenantControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void update() {
-        TenantRequestDto createRequest = IntegrationTestDataBuilder.buildTenantRequestDto();
+        UpdateTenantRequestDto createRequest = IntegrationTestDataBuilder.buildTenantRequestDto();
         ResponseEntity<TenantResponseDto> createResponse = restTemplate.postForEntity(BASE_URL,
                                                                                       IntegrationTestDataBuilder.buildRequest(createRequest, defaultAccessToken),
                                                                                       TenantResponseDto.class);
 
-        TenantRequestDto updateRequest = IntegrationTestDataBuilder.buildTenantRequestDto();
+        UpdateTenantRequestDto updateRequest = IntegrationTestDataBuilder.buildTenantRequestDto();
         ResponseEntity<TenantResponseDto> updateResponse = restTemplate.exchange(BASE_URL + "/{id}",
                                                                                  HttpMethod.PUT,
                                                                                  IntegrationTestDataBuilder.buildRequest(updateRequest, defaultAccessToken),
@@ -289,13 +289,13 @@ class TenantControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void updateWithExistingName() {
-        TenantRequestDto request1 = IntegrationTestDataBuilder.buildTenantRequestDto();
+        UpdateTenantRequestDto request1 = IntegrationTestDataBuilder.buildTenantRequestDto();
         ResponseEntity<TenantResponseDto> successfulResponse1 = restTemplate.postForEntity(BASE_URL,
                                                                                            IntegrationTestDataBuilder.buildRequest(request1, defaultAccessToken),
                                                                                            TenantResponseDto.class);
         Assertions.assertEquals(HttpStatus.CREATED.value(), successfulResponse1.getStatusCode().value());
 
-        TenantRequestDto request2 = IntegrationTestDataBuilder.buildTenantRequestDto();
+        UpdateTenantRequestDto request2 = IntegrationTestDataBuilder.buildTenantRequestDto();
         ResponseEntity<TenantResponseDto> successfulResponse2 = restTemplate.postForEntity(BASE_URL,
                                                                                            IntegrationTestDataBuilder.buildRequest(request2, defaultAccessToken),
                                                                                            TenantResponseDto.class);
@@ -315,7 +315,7 @@ class TenantControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void delete() {
-        TenantRequestDto request = IntegrationTestDataBuilder.buildTenantRequestDto();
+        UpdateTenantRequestDto request = IntegrationTestDataBuilder.buildTenantRequestDto();
         String id = restTemplate.postForEntity(BASE_URL,
                                                IntegrationTestDataBuilder.buildRequest(request, defaultAccessToken),
                                                TenantResponseDto.class)

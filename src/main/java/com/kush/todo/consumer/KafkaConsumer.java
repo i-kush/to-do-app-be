@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kush.todo.dto.async.AsyncOperationEventDto;
-import com.kush.todo.dto.request.TenantRequestDto;
+import com.kush.todo.dto.request.CreateTenantRequestDto;
 import com.kush.todo.facade.TenantFacade;
 import com.kush.todo.service.AsyncOperationService;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ public class KafkaConsumer {
 
     @KafkaListener(topics = "${spring.kafka.topics.onboard-tenant}")
     public void onboardTenant(Message<String> message) throws JsonProcessingException {
-        AsyncOperationEventDto<TenantRequestDto> operation = objectMapper.readValue(message.getPayload(), new TypeReference<>() {
+        AsyncOperationEventDto<CreateTenantRequestDto> operation = objectMapper.readValue(message.getPayload(), new TypeReference<>() {
         });
         asyncOperationService.executeOperation(operation, () -> tenantFacade.create(operation.request()));
     }

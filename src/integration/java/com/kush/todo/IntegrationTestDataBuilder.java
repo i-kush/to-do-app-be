@@ -3,7 +3,7 @@ package com.kush.todo;
 import com.kush.todo.dto.common.Role;
 import com.kush.todo.dto.request.AppUserRequestDto;
 import com.kush.todo.dto.request.LoginRequestDto;
-import com.kush.todo.dto.request.TenantRequestDto;
+import com.kush.todo.dto.request.UpdateTenantRequestDto;
 import com.kush.todo.entity.AppUser;
 
 import java.time.Instant;
@@ -24,16 +24,16 @@ public final class IntegrationTestDataBuilder {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
 
-    public static TenantRequestDto buildTenantRequestDto() {
-        return TenantRequestDto.builder()
-                               .name(UUID.randomUUID().toString())
-                               .build();
+    public static UpdateTenantRequestDto buildTenantRequestDto() {
+        return UpdateTenantRequestDto.builder()
+                                     .name(UUID.randomUUID().toString())
+                                     .build();
     }
 
-    public static TenantRequestDto buildTenantRequestDto(String name) {
-        return TenantRequestDto.builder()
-                               .name(name)
-                               .build();
+    public static UpdateTenantRequestDto buildTenantRequestDto(String name) {
+        return UpdateTenantRequestDto.builder()
+                                     .name(name)
+                                     .build();
     }
 
     public static AppUserRequestDto buildAppUserRequestDto() {

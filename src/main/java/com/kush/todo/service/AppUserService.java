@@ -47,9 +47,19 @@ public class AppUserService {
 
     @Transactional
     public AppUserResponseDto create(AppUserRequestDto appUserRequestDto) {
+        return create(appUserRequestDto, currentUser.getTenantId());
+    }
+
+    @Transactional
+    public AppUserResponseDto createFirstAdmin(UUID tenantId, String adminEmail) {
+        AppUserRequestDto appUserRequestDto = appUserMapper.toFirstAdmin(adminEmail);
+        return create(appUserRequestDto, tenantId);
+    }
+
+    private AppUserResponseDto create(AppUserRequestDto appUserRequestDto, UUID tenantId) {
         appUserValidator.validateTargetRole(appUserRequestDto, currentUser);
 
-        AppUser appUser = appUserMapper.toAppUser(appUserRequestDto, currentUser.getTenantId());
+        AppUser appUser = appUserMapper.toAppUser(appUserRequestDto, tenantId);
         AppUser createdUser = appUserRepository.save(appUser);
         return appUserMapper.toAppUserDto(createdUser);
     }

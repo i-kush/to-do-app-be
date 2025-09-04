@@ -31,7 +31,7 @@ create table if not exists app_user (
     id                    uuid         not null default uuid_generate_v4(),
     tenant_id             uuid         not null,
     role_id               varchar(20)  not null,
-    username              varchar(15)  not null,
+    username              varchar(50)  not null,
     password_hash         varchar(255) not null,
     email                 varchar(50)  not null,
     firstname             varchar(50)  not null,
@@ -43,8 +43,8 @@ create table if not exists app_user (
     created_at            timestamp    not null,
     updated_at            timestamp    not null,
     constraint pk_user_id primary key (id),
-    constraint unq_user_tenant_id_username unique (username),
-    constraint unq_user_tenant_id_email unique (email),
+    constraint unq_user_username unique (username),
+    constraint unq_user_email unique (email),
     constraint fk_user_tenant_id foreign key (tenant_id) references tenant (id),
     constraint fk_user_role_role_id foreign key (role_id) references role (name)
 );

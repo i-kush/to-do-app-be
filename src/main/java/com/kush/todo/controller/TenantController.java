@@ -1,9 +1,11 @@
 package com.kush.todo.controller;
 
 import com.kush.todo.annotation.CommonApiErrors;
-import com.kush.todo.dto.request.TenantRequestDto;
+import com.kush.todo.dto.request.CreateTenantRequestDto;
+import com.kush.todo.dto.request.UpdateTenantRequestDto;
 import com.kush.todo.dto.response.AsyncOperationQueuedResponseDto;
 import com.kush.todo.dto.async.AsyncOperationDto;
+import com.kush.todo.dto.response.TenantDetailsResponseDto;
 import com.kush.todo.dto.response.CustomPage;
 import com.kush.todo.dto.response.TenantResponseDto;
 import com.kush.todo.facade.TenantFacade;
@@ -51,7 +53,7 @@ public class TenantController {
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAuthority('TENANT_WRITE')")
-    public TenantResponseDto create(@Valid @RequestBody TenantRequestDto tenantDto) {
+    public TenantDetailsResponseDto create(@Valid @RequestBody CreateTenantRequestDto tenantDto) {
         return tenantFacade.create(tenantDto);
     }
 
@@ -73,7 +75,7 @@ public class TenantController {
     @CommonApiErrors
     @PostMapping(value = "async/operations", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('TENANT_WRITE')")
-    public AsyncOperationQueuedResponseDto createAsync(@Valid @RequestBody TenantRequestDto tenantDto) {
+    public AsyncOperationQueuedResponseDto createAsync(@Valid @RequestBody CreateTenantRequestDto tenantDto) {
         return tenantFacade.createAsync(tenantDto);
     }
 
@@ -106,7 +108,7 @@ public class TenantController {
     @CommonApiErrors
     @PutMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('TENANT_WRITE')")
-    public TenantResponseDto update(@NotNull @PathVariable UUID id, @Valid @RequestBody TenantRequestDto tenantDto) {
+    public TenantResponseDto update(@NotNull @PathVariable UUID id, @Valid @RequestBody UpdateTenantRequestDto tenantDto) {
         return tenantService.update(id, tenantDto);
     }
 
