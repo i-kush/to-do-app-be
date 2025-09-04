@@ -51,18 +51,17 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    UserLoggingFilter userLoggingFilter,
                                                    UserStateVerificationFilter userStateVerificationFilter) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(ALLOWED_ENDPOINTS.toArray(new String[]{})).permitAll()
-                        .anyRequest().authenticated()
-                )
-                .addFilterAfter(userStateVerificationFilter, BearerTokenAuthenticationFilter.class)
-                .addFilterAfter(userLoggingFilter, BearerTokenAuthenticationFilter.class)
-                .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtGrantedAuthoritiesConverter()))
-                )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.csrf(AbstractHttpConfigurer::disable)
+            .authorizeHttpRequests(auth -> auth
+                    .requestMatchers(ALLOWED_ENDPOINTS.toArray(new String[]{})).permitAll()
+                    .anyRequest().authenticated()
+            )
+            .addFilterAfter(userStateVerificationFilter, BearerTokenAuthenticationFilter.class)
+            .addFilterAfter(userLoggingFilter, BearerTokenAuthenticationFilter.class)
+            .oauth2ResourceServer(oauth2 -> oauth2
+                    .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtGrantedAuthoritiesConverter()))
+            )
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
     }

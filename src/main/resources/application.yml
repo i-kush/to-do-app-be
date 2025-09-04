@@ -29,6 +29,7 @@ spring:
       group-id: group-id-to-do-app
     topics:
       onboard-tenant: kafka-topic-tenant-onboarding
+      offboard-tenant: kafka-topic-tenant-offboarding
 
   data:
     redis:

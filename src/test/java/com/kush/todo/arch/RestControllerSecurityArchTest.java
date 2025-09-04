@@ -12,7 +12,8 @@ class RestControllerSecurityArchTest {
 
     private static final List<String> EXCLUDE_METHODS_LIST = List.of(
             "com.kush.todo.controller.AppUserController.me()",
-            "com.kush.todo.controller.AuthController.login(com.kush.todo.dto.request.LoginRequestDto)"
+            "com.kush.todo.controller.AuthController.login(com.kush.todo.dto.request.LoginRequestDto)",
+            "com.kush.todo.controller.AsyncController.getOperation(java.util.UUID)"
     );
 
     @Test

@@ -1,6 +1,7 @@
 package com.kush.todo.service;
 
-import com.kush.todo.dto.request.TenantRequestDto;
+import com.kush.todo.dto.request.CreateTenantRequestDto;
+import com.kush.todo.dto.request.UpdateTenantRequestDto;
 import com.kush.todo.dto.response.CustomPage;
 import com.kush.todo.dto.response.TenantResponseDto;
 import com.kush.todo.entity.Tenant;
@@ -28,7 +29,7 @@ public class TenantService {
     private final TenantValidator tenantValidator;
 
     @Transactional
-    public TenantResponseDto create(TenantRequestDto tenantDto) {
+    public TenantResponseDto create(CreateTenantRequestDto tenantDto) {
         Tenant tenant = tenantMapper.toTenant(tenantDto);
         Tenant createdTenant = tenantRepository.save(tenant);
 
@@ -41,7 +42,7 @@ public class TenantService {
     }
 
     @Transactional
-    public TenantResponseDto update(UUID id, TenantRequestDto tenantDto) {
+    public TenantResponseDto update(UUID id, UpdateTenantRequestDto tenantDto) {
         Tenant tenant = tenantMapper.toTenant(getRequired(id), tenantDto);
         Tenant udpatedTenant = tenantRepository.save(tenant);
 
@@ -65,5 +66,9 @@ public class TenantService {
         Page<TenantResponseDto> pages = tenantRepository.findAll(PageRequest.of(page - 1, size))
                                                         .map(tenantMapper::toTenantDto);
         return tenantMapper.toCustomPage(pages);
+    }
+
+    public boolean isSystemTenant(UUID id) {
+        return SYSTEM_TENANT_NAME.equals(getRequired(id).name());
     }
 }

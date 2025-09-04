@@ -1,5 +1,6 @@
 package com.kush.todo.mapper;
 
+import com.kush.todo.dto.common.Role;
 import com.kush.todo.dto.request.AppUserRequestDto;
 import com.kush.todo.dto.response.AppUserResponseDto;
 import com.kush.todo.entity.AppUser;
@@ -13,6 +14,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Mapper
 public abstract class AppUserMapper extends PageMapper {
+
+    public static final String INITIAL_PASSWORD_TO_CHANGE = "change-me-1";
+    public static final String INITIAL_ADMIN_FIRST_NAME = "admin";
+    public static final String INITIAL_ADMIN_LAST_NAME = "admin";
 
     @Autowired
     protected BCryptPasswordEncoder passwordEncoder;
@@ -42,4 +47,15 @@ public abstract class AppUserMapper extends PageMapper {
     public abstract AppUser toAppUser(AppUser appUser, AppUserRequestDto appUserRequestDto);
 
     public abstract AppUserResponseDto toAppUserDto(AppUser appUser);
+
+    public AppUserRequestDto toFirstAdmin(String adminEmail) {
+        return AppUserRequestDto.builder()
+                                .roleId(Role.TENANT_ADMIN)
+                                .email(adminEmail)
+                                .username(adminEmail)
+                                .firstname(INITIAL_ADMIN_FIRST_NAME)
+                                .lastname(INITIAL_ADMIN_LAST_NAME)
+                                .password(INITIAL_PASSWORD_TO_CHANGE)
+                                .build();
+    }
 }

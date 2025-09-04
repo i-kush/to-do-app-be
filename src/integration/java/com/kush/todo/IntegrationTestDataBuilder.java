@@ -2,8 +2,9 @@ package com.kush.todo;
 
 import com.kush.todo.dto.common.Role;
 import com.kush.todo.dto.request.AppUserRequestDto;
+import com.kush.todo.dto.request.CreateTenantRequestDto;
 import com.kush.todo.dto.request.LoginRequestDto;
-import com.kush.todo.dto.request.TenantRequestDto;
+import com.kush.todo.dto.request.UpdateTenantRequestDto;
 import com.kush.todo.entity.AppUser;
 
 import java.time.Instant;
@@ -24,16 +25,31 @@ public final class IntegrationTestDataBuilder {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
 
-    public static TenantRequestDto buildTenantRequestDto() {
-        return TenantRequestDto.builder()
-                               .name(UUID.randomUUID().toString())
-                               .build();
+    public static UpdateTenantRequestDto buildUpdateTenantRequestDto() {
+        return UpdateTenantRequestDto.builder()
+                                     .name(UUID.randomUUID().toString())
+                                     .build();
     }
 
-    public static TenantRequestDto buildTenantRequestDto(String name) {
-        return TenantRequestDto.builder()
-                               .name(name)
-                               .build();
+    public static CreateTenantRequestDto buildCreateTenantRequestDto() {
+        return CreateTenantRequestDto.builder()
+                                     .name(UUID.randomUUID().toString())
+                                     .adminEmail(buildEmail())
+                                     .build();
+    }
+
+    public static CreateTenantRequestDto buildCreateTenantRequestDtoByEmail(String adminEmail) {
+        return CreateTenantRequestDto.builder()
+                                     .name(UUID.randomUUID().toString())
+                                     .adminEmail(adminEmail)
+                                     .build();
+    }
+
+    public static CreateTenantRequestDto buildCreateTenantRequestDtoByName(String name) {
+        return CreateTenantRequestDto.builder()
+                                     .name(name)
+                                     .adminEmail(buildEmail())
+                                     .build();
     }
 
     public static AppUserRequestDto buildAppUserRequestDto() {
@@ -45,7 +61,7 @@ public final class IntegrationTestDataBuilder {
                                 .username(username)
                                 .password("p-" + ThreadLocalRandom.current().nextInt(1_000_000))
                                 .roleId(Role.TENANT_ADMIN)
-                                .email(UUID.randomUUID() + "@email.com")
+                                .email(buildEmail())
                                 .firstname("firstname-" + UUID.randomUUID())
                                 .lastname("lastname-" + UUID.randomUUID())
                                 .build();
@@ -68,7 +84,7 @@ public final class IntegrationTestDataBuilder {
                       .tenantId(tenantId)
                       .passwordHash("p-" + ThreadLocalRandom.current().nextInt(1_000_000))
                       .roleId(Role.TENANT_ADMIN)
-                      .email(UUID.randomUUID() + "@email.com")
+                      .email(buildEmail())
                       .firstname("firstname-" + UUID.randomUUID())
                       .lastname("lastname-" + UUID.randomUUID())
                       .createdAt(Instant.now())
@@ -78,6 +94,10 @@ public final class IntegrationTestDataBuilder {
                       .lastLoginAttemptAt(Instant.now())
                       .isLocked(true)
                       .build();
+    }
+
+    private static String buildEmail() {
+        return UUID.randomUUID() + "@email.com";
     }
 
     public static <T> HttpEntity<T> buildRequest(String accessToken) {

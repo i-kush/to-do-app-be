@@ -46,10 +46,20 @@ public class AppUserService {
     private int maxLoginAttemptWindowMinutes;
 
     @Transactional
+    public AppUserResponseDto createFirstAdmin(UUID tenantId, String adminEmail) {
+        AppUserRequestDto appUserRequestDto = appUserMapper.toFirstAdmin(adminEmail);
+        return create(appUserRequestDto, tenantId);
+    }
+
+    @Transactional
     public AppUserResponseDto create(AppUserRequestDto appUserRequestDto) {
+        return create(appUserRequestDto, currentUser.getTenantId());
+    }
+
+    private AppUserResponseDto create(AppUserRequestDto appUserRequestDto, UUID tenantId) {
         appUserValidator.validateTargetRole(appUserRequestDto, currentUser);
 
-        AppUser appUser = appUserMapper.toAppUser(appUserRequestDto, currentUser.getTenantId());
+        AppUser appUser = appUserMapper.toAppUser(appUserRequestDto, tenantId);
         AppUser createdUser = appUserRepository.save(appUser);
         return appUserMapper.toAppUserDto(createdUser);
     }
@@ -146,5 +156,10 @@ public class AppUserService {
     @Transactional(readOnly = true)
     public boolean isCurrentUserLocked() {
         return appUserRepository.isUserLocked(currentUser.getId(), currentUser.getTenantId());
+    }
+
+    @Transactional
+    public int deleteByTenantId(UUID tenantId) {
+        return appUserRepository.deleteByTenantId(tenantId);
     }
 }
