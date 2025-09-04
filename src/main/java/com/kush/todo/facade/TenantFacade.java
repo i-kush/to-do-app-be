@@ -5,12 +5,14 @@ import com.kush.todo.dto.common.CurrentUser;
 import com.kush.todo.dto.request.CreateTenantRequestDto;
 import com.kush.todo.dto.response.AppUserResponseDto;
 import com.kush.todo.dto.response.AsyncOperationQueuedResponseDto;
+import com.kush.todo.dto.response.TenantDeleteResponseDto;
 import com.kush.todo.dto.response.TenantDetailsResponseDto;
 import com.kush.todo.dto.response.TenantResponseDto;
 import com.kush.todo.mapper.TenantMapper;
 import com.kush.todo.service.AppUserService;
 import com.kush.todo.service.AsyncOperationService;
 import com.kush.todo.service.TenantService;
+import com.kush.todo.validator.TenantValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,10 +45,17 @@ public class TenantFacade {
     }
 
     @Transactional
-    public boolean delete(UUID id) {
-        //ToDo implement as part of https://github.com/i-kush/to-do-app-be/issues/34
+    public TenantDeleteResponseDto delete(UUID id) {
+        log.warn("Starting tenant {} offboarding", id);
+        if (tenantService.isSystemTenant(id)) {
+            throw new IllegalArgumentException(TenantValidator.ERROR_MESSAGE_CANT_DELETE_TENANT);
+        }
+
+        int usersDeletedCount = appUserService.deleteByTenantId(id);
         tenantService.delete(id);
-        return false;
+        log.info("Successfully finished tenant '{}'", id);
+
+        return tenantMapper.toTenantDeleteResponseDto(usersDeletedCount, id);
     }
 
     public AsyncOperationQueuedResponseDto createAsync(CreateTenantRequestDto tenantRequestDto) {

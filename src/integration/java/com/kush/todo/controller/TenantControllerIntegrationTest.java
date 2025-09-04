@@ -12,11 +12,12 @@ import com.kush.todo.dto.response.AsyncOperationQueuedResponseDto;
 import com.kush.todo.dto.response.CustomPage;
 import com.kush.todo.dto.response.ErrorDto;
 import com.kush.todo.dto.response.ErrorsDto;
+import com.kush.todo.dto.response.TenantDeleteResponseDto;
 import com.kush.todo.dto.response.TenantDetailsResponseDto;
 import com.kush.todo.dto.response.TenantResponseDto;
 import com.kush.todo.mapper.AppUserMapper;
+import com.kush.todo.validator.TenantValidator;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -358,7 +359,6 @@ class TenantControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @Disabled("Will be enabled once offboarding is implemented in https://github.com/i-kush/to-do-app-be/issues/34")
     void delete() {
         CreateTenantRequestDto request = IntegrationTestDataBuilder.buildCreateTenantRequestDto();
         String id = restTemplate.postForEntity(BASE_TENANT_URL,
@@ -368,14 +368,17 @@ class TenantControllerIntegrationTest extends BaseIntegrationTest {
                                 .tenant()
                                 .id()
                                 .toString();
-        ResponseEntity<Void> deleteResponse = restTemplate.exchange(BASE_TENANT_URL + "/{id}",
-                                                                    HttpMethod.DELETE,
-                                                                    IntegrationTestDataBuilder.buildRequest(defaultAccessToken),
-                                                                    Void.class,
-                                                                    id);
+        ResponseEntity<TenantDeleteResponseDto> deleteResponse = restTemplate.exchange(BASE_TENANT_URL + "/{id}",
+                                                                                       HttpMethod.DELETE,
+                                                                                       IntegrationTestDataBuilder.buildRequest(defaultAccessToken),
+                                                                                       TenantDeleteResponseDto.class,
+                                                                                       id);
 
         Assertions.assertEquals(HttpStatus.OK.value(), deleteResponse.getStatusCode().value());
-        Assertions.assertNull(deleteResponse.getBody());
+        TenantDeleteResponseDto deleteResponseBody = deleteResponse.getBody();
+        Assertions.assertNotNull(deleteResponseBody);
+        Assertions.assertEquals(id, deleteResponseBody.tenantId().toString());
+        Assertions.assertTrue(deleteResponseBody.usersDeleted() > 0);
 
         ResponseEntity<ErrorsDto> response = restTemplate.exchange(BASE_TENANT_URL + "/{id}",
                                                                    HttpMethod.DELETE,
@@ -384,6 +387,113 @@ class TenantControllerIntegrationTest extends BaseIntegrationTest {
                                                                    id);
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatusCode().value());
+    }
+
+    @Test
+    void deleteAsync() {
+        CreateTenantRequestDto request = IntegrationTestDataBuilder.buildCreateTenantRequestDto();
+        String id = restTemplate.postForEntity(BASE_TENANT_URL,
+                                               IntegrationTestDataBuilder.buildRequest(request, defaultAccessToken),
+                                               TenantDetailsResponseDto.class)
+                                .getBody()
+                                .tenant()
+                                .id()
+                                .toString();
+
+
+        ResponseEntity<AsyncOperationQueuedResponseDto> asyncResponse = restTemplate.exchange(BASE_TENANT_URL + "/{id}/async",
+                                                                                              HttpMethod.DELETE,
+                                                                                              IntegrationTestDataBuilder.buildRequest(defaultAccessToken),
+                                                                                              AsyncOperationQueuedResponseDto.class,
+                                                                                              id);
+
+        Assertions.assertEquals(HttpStatus.OK.value(), asyncResponse.getStatusCode().value());
+        Assertions.assertNotNull(asyncResponse.getBody());
+
+        UUID operationId = asyncResponse.getBody().id();
+        Assertions.assertNotNull(operationId);
+
+        ParameterizedTypeReference<AsyncOperationDto<TenantDeleteResponseDto>> responseType = new ParameterizedTypeReference<>() {
+        };
+        ResponseEntity<AsyncOperationDto<TenantDeleteResponseDto>> asyncResponseResult = null;
+        for (int i = 0; i < 5; i++) {
+            asyncResponseResult = restTemplate.exchange(BASE_ASYNC_URL + "/{id}",
+                                                        HttpMethod.GET,
+                                                        IntegrationTestDataBuilder.buildRequest(defaultAccessToken),
+                                                        responseType,
+                                                        operationId);
+            Assertions.assertEquals(HttpStatus.OK.value(), asyncResponseResult.getStatusCode().value());
+            AsyncOperationDto<TenantDeleteResponseDto> asyncResponseResultBody = asyncResponseResult.getBody();
+            Assertions.assertNotNull(asyncResponseResultBody);
+            if (asyncResponseResultBody.status() == AsyncOperationStatus.SUCCESS) {
+                break;
+            }
+            pause(2);
+        }
+
+        Assertions.assertNotNull(asyncResponseResult);
+        Assertions.assertEquals(HttpStatus.OK.value(), asyncResponseResult.getStatusCode().value());
+        AsyncOperationDto<TenantDeleteResponseDto> asyncResponseResultBody = asyncResponseResult.getBody();
+        Assertions.assertNotNull(asyncResponseResultBody);
+        Assertions.assertEquals(operationId, asyncResponseResultBody.id());
+        Assertions.assertEquals(defaultTenantId, asyncResponseResultBody.tenantId());
+        Assertions.assertEquals(AsyncOperationStatus.SUCCESS, asyncResponseResultBody.status());
+
+        TenantDeleteResponseDto asyncTenantResponseDto = asyncResponseResultBody.result();
+
+        Assertions.assertNotNull(asyncTenantResponseDto);
+        Assertions.assertEquals(id, asyncTenantResponseDto.tenantId().toString());
+        Assertions.assertTrue(asyncTenantResponseDto.usersDeleted() > 0);
+
+        ResponseEntity<ErrorsDto> response = restTemplate.exchange(BASE_TENANT_URL + "/{id}",
+                                                                   HttpMethod.DELETE,
+                                                                   IntegrationTestDataBuilder.buildRequest(defaultAccessToken),
+                                                                   ErrorsDto.class,
+                                                                   id);
+
+        Assertions.assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatusCode().value());
+    }
+
+    @Test
+    void deleteAsyncNotFound() {
+        String notFoundId = UUID.randomUUID().toString();
+        ResponseEntity<AsyncOperationQueuedResponseDto> asyncResponse = restTemplate.exchange(BASE_TENANT_URL + "/{id}/async",
+                                                                                              HttpMethod.DELETE,
+                                                                                              IntegrationTestDataBuilder.buildRequest(defaultAccessToken),
+                                                                                              AsyncOperationQueuedResponseDto.class,
+                                                                                              notFoundId);
+
+        Assertions.assertEquals(HttpStatus.OK.value(), asyncResponse.getStatusCode().value());
+        Assertions.assertNotNull(asyncResponse.getBody());
+
+        UUID operationId = asyncResponse.getBody().id();
+        Assertions.assertNotNull(operationId);
+
+        ParameterizedTypeReference<AsyncOperationDto<TenantDeleteResponseDto>> responseType = new ParameterizedTypeReference<>() {
+        };
+        ResponseEntity<AsyncOperationDto<TenantDeleteResponseDto>> asyncResponseResult = null;
+        for (int i = 0; i < 5; i++) {
+            asyncResponseResult = restTemplate.exchange(BASE_ASYNC_URL + "/{id}",
+                                                        HttpMethod.GET,
+                                                        IntegrationTestDataBuilder.buildRequest(defaultAccessToken),
+                                                        responseType,
+                                                        operationId);
+            Assertions.assertEquals(HttpStatus.OK.value(), asyncResponseResult.getStatusCode().value());
+            AsyncOperationDto<TenantDeleteResponseDto> asyncResponseResultBody = asyncResponseResult.getBody();
+            Assertions.assertNotNull(asyncResponseResultBody);
+            if (asyncResponseResultBody.status() == AsyncOperationStatus.SUCCESS) {
+                break;
+            }
+            pause(2);
+        }
+
+        Assertions.assertNotNull(asyncResponseResult);
+        Assertions.assertEquals(HttpStatus.OK.value(), asyncResponseResult.getStatusCode().value());
+        AsyncOperationDto<TenantDeleteResponseDto> asyncResponseResultBody = asyncResponseResult.getBody();
+        Assertions.assertNotNull(asyncResponseResultBody);
+        Assertions.assertEquals(operationId, asyncResponseResultBody.id());
+        Assertions.assertEquals(defaultTenantId, asyncResponseResultBody.tenantId());
+        Assertions.assertEquals(AsyncOperationStatus.ERROR, asyncResponseResultBody.status());
     }
 
     @Test
@@ -413,6 +523,6 @@ class TenantControllerIntegrationTest extends BaseIntegrationTest {
         Assertions.assertNotNull(response.getBody());
         List<ErrorDto> errors = response.getBody().errors();
         Assertions.assertFalse(CollectionUtils.isEmpty(errors));
-        Assertions.assertEquals(String.format("Tenant '%s' cannot be deleted", systemTenantId), errors.getFirst().message());
+        Assertions.assertEquals(TenantValidator.ERROR_MESSAGE_CANT_DELETE_TENANT, errors.getFirst().message());
     }
 }

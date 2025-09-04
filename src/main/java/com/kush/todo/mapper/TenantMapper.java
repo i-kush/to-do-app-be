@@ -3,6 +3,7 @@ package com.kush.todo.mapper;
 import com.kush.todo.dto.request.CreateTenantRequestDto;
 import com.kush.todo.dto.request.UpdateTenantRequestDto;
 import com.kush.todo.dto.response.AppUserResponseDto;
+import com.kush.todo.dto.response.TenantDeleteResponseDto;
 import com.kush.todo.dto.response.TenantDetailsResponseDto;
 import com.kush.todo.dto.response.TenantResponseDto;
 import com.kush.todo.entity.Tenant;
@@ -10,6 +11,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import java.util.Set;
+import java.util.UUID;
 
 @Mapper
 public abstract class TenantMapper extends PageMapper {
@@ -34,4 +36,6 @@ public abstract class TenantMapper extends PageMapper {
 
     public abstract TenantDetailsResponseDto toTenantDetailsResponseDto(TenantResponseDto tenant,
                                                                         Set<AppUserResponseDto> admins);
+
+    public abstract TenantDeleteResponseDto toTenantDeleteResponseDto(int usersDeleted, UUID tenantId);
 }

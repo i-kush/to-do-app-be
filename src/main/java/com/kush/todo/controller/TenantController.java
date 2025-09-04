@@ -5,6 +5,7 @@ import com.kush.todo.dto.request.CreateTenantRequestDto;
 import com.kush.todo.dto.request.UpdateTenantRequestDto;
 import com.kush.todo.dto.response.AsyncOperationQueuedResponseDto;
 import com.kush.todo.dto.response.CustomPage;
+import com.kush.todo.dto.response.TenantDeleteResponseDto;
 import com.kush.todo.dto.response.TenantDetailsResponseDto;
 import com.kush.todo.dto.response.TenantResponseDto;
 import com.kush.todo.facade.TenantFacade;
@@ -107,8 +108,8 @@ public class TenantController {
     @CommonApiErrors
     @DeleteMapping("{id}")
     @PreAuthorize("hasAuthority('TENANT_WRITE')")
-    public void delete(@NotNull @PathVariable UUID id) {
-        tenantFacade.delete(id);
+    public TenantDeleteResponseDto delete(@NotNull @PathVariable UUID id) {
+        return tenantFacade.delete(id);
     }
 
     @Operation(summary = "Delete tenant async", description = "Deletes tenant by ID in the async mode")

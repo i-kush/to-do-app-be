@@ -157,4 +157,9 @@ public class AppUserService {
     public boolean isCurrentUserLocked() {
         return appUserRepository.isUserLocked(currentUser.getId(), currentUser.getTenantId());
     }
+
+    @Transactional
+    public int deleteByTenantId(UUID tenantId) {
+        return appUserRepository.deleteByTenantId(tenantId);
+    }
 }

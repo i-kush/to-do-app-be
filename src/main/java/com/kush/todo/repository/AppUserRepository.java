@@ -101,4 +101,8 @@ public interface AppUserRepository extends TenantAwareRepository<AppUser, UUID> 
 
     @Query("select is_locked from app_user where id = :id and tenant_id = :tenantId")
     boolean isUserLocked(UUID id, UUID tenantId);
+
+    @Modifying
+    @Query("delete from app_user where tenant_id = :tenantId")
+    int deleteByTenantId(UUID tenantId);
 }

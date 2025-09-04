@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 class TenantValidatorTest extends BaseTest {
 
-    private TenantValidator validator = new TenantValidator();
+    private final TenantValidator validator = new TenantValidator();
 
     @Test
     void validateTenantDeletionSuccess() {
@@ -21,6 +21,6 @@ class TenantValidatorTest extends BaseTest {
         Tenant tenant = TestDataBuilder.buildTenant(TenantService.SYSTEM_TENANT_NAME);
         IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class,
                                                                      () -> validator.validateTenantDeletion(tenant));
-        Assertions.assertTrue(exception.getMessage().contains(tenant.id().toString()));
+        Assertions.assertEquals(TenantValidator.ERROR_MESSAGE_CANT_DELETE_TENANT, exception.getMessage());
     }
 }

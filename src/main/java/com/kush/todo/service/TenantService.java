@@ -67,4 +67,8 @@ public class TenantService {
                                                         .map(tenantMapper::toTenantDto);
         return tenantMapper.toCustomPage(pages);
     }
+
+    public boolean isSystemTenant(UUID id) {
+        return SYSTEM_TENANT_NAME.equals(getRequired(id).name());
+    }
 }
