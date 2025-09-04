@@ -16,7 +16,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 
-@SuppressWarnings("PMD.CouplingBetweenObjects")
 public final class IntegrationTestDataBuilder {
 
     public static final String TEST_PASSWORD = "password";

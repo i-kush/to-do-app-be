@@ -35,6 +35,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 
+@SuppressWarnings("PMD.CouplingBetweenObjects")
 class TenantControllerIntegrationTest extends BaseIntegrationTest {
 
     public static final String BASE_TENANT_URL = "/api/tenants";

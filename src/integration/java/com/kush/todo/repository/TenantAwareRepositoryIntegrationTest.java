@@ -11,6 +11,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+@SuppressWarnings("unchecked")
 class TenantAwareRepositoryIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
