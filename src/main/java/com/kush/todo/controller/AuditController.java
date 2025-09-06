@@ -1,6 +1,7 @@
 package com.kush.todo.controller;
 
 import com.kush.todo.annotation.CommonApiErrors;
+import com.kush.todo.dto.common.CurrentUser;
 import com.kush.todo.dto.response.AuditResponseDto;
 import com.kush.todo.dto.response.CustomPage;
 import com.kush.todo.service.AuditService;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuditController {
 
     private final AuditService auditService;
+    private final CurrentUser currentUser;
 
     @Operation(summary = "Find my audit entries", description = "Gets paginated audit entries for the logged in user")
     @ApiResponses(value = {
@@ -35,7 +37,7 @@ public class AuditController {
     @GetMapping(value = "/me", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('TENANT_READ')")
     public CustomPage<AuditResponseDto> findAllMine(@Min(1) @RequestParam int page, @Min(1) @Max(200) @RequestParam int size) {
-        return auditService.findAllMine(page, size);
+        return auditService.findAllByUserId(currentUser.getId(), page, size);
     }
 
     @Operation(summary = "Find all audit entries", description = "Gets paginated audit entries")

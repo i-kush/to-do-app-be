@@ -2,6 +2,7 @@ logging:
   level:
     com.kush.todo: INFO
     org.apache.kafka: WARN
+    org.springframework.data.convert.CustomConversions: ERROR
 
 server:
   port: 8080
@@ -52,3 +53,9 @@ todo:
     max-attempts-window-minutes: 3
   job:
     user-unlocking: 5m
+
+executor:
+  async:
+    core-size: 20
+    max-size: 40
+    queue-capacity: 200
