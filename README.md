@@ -21,6 +21,7 @@ The purpose of the application is mostly demo, since it's aggregating most of th
 | `Spring Data JDBC`  | Plain spring data repositories are used mixed with the native queries                                                       |
 | `Spring Security`   | JWT encoding/decoding is delegated to spring as well as common `401`/`403` handling                                         |
 | `Spring Actuator`   | Running on a separate port to simplify business and infra endpoint routing on env - [link](localhost:8081/actuator)         |
+| `Spring AOP`        | One of the purposes - audit log recording in `@Async` mode                                                                  |
 | `Spring Web`        |                                                                                                                             |
 | `Spring Validation` |                                                                                                                             |
 | `Spring OAuth2`     | Resource server                                                                                                             |

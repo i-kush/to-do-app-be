@@ -1,6 +1,9 @@
 package com.kush.todo.controller;
 
+import com.kush.todo.annotation.Auditable;
 import com.kush.todo.annotation.CommonApiErrors;
+import com.kush.todo.dto.common.AuditActionType;
+import com.kush.todo.dto.common.AuditTargetType;
 import com.kush.todo.dto.common.CurrentUser;
 import com.kush.todo.dto.request.AppUserRequestDto;
 import com.kush.todo.dto.response.AppUserResponseDto;
@@ -70,6 +73,7 @@ public class AppUserController {
     @CommonApiErrors
     @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('USER_READ')")
+    @Auditable(actionType = AuditActionType.READ, targetType = AuditTargetType.USER)
     public AppUserResponseDto get(@NotNull @PathVariable UUID id) {
         return appUserService.findByIdRequired(id);
     }

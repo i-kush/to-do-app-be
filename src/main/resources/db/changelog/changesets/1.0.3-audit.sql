@@ -2,7 +2,7 @@
 create table if not exists audit (
     id            uuid        not null default uuid_generate_v4(),
     initiator_id  uuid        not null,
-    target_id     uuid        not null,
+    target_id     uuid,
     target_type   varchar(20) not null,
     action_type   varchar(20) not null,
     action_result varchar(10) not null,
