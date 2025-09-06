@@ -17,6 +17,7 @@ import org.springframework.data.relational.core.mapping.Table;
 public record Audit(
         @Id
         UUID id,
+        UUID tenantId,
         UUID initiatorId,
         UUID targetId,
         AuditTargetType targetType,

@@ -16,9 +16,15 @@ import java.util.UUID;
 @Mapper
 public abstract class AuditMapper extends PageMapper {
 
-    public Audit toAudit(UUID initiatorId, UUID targetId, Auditable auditable, AuditActionResult actionResult, Throwable e) {
+    public Audit toAudit(UUID tenantId,
+                         UUID initiatorId,
+                         UUID targetId,
+                         Auditable auditable,
+                         AuditActionResult actionResult,
+                         Throwable e) {
         return Audit.builder()
                     .initiatorId(initiatorId)
+                    .tenantId(tenantId)
                     .targetId(targetId)
                     .targetType(auditable.targetType())
                     .actionType(auditable.actionType())

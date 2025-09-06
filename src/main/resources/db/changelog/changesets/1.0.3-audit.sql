@@ -1,6 +1,7 @@
 -- No FKs since it contains historical data and referenced records could be already deleted
 create table if not exists audit (
     id            uuid        not null default uuid_generate_v4(),
+    tenant_id     uuid        not null,
     initiator_id  uuid        not null,
     target_id     uuid,
     target_type   varchar(20) not null,

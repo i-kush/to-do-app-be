@@ -1,7 +1,7 @@
 package com.kush.todo.filter;
 
 import com.kush.todo.dto.common.CurrentUser;
-import com.kush.todo.util.RequestUtils;
+import com.kush.todo.util.RequestUtilsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,6 +21,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class UserLoggingFilter extends OncePerRequestFilter {
 
     private final CurrentUser currentUser;
+    private final RequestUtilsService requestUtilsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -39,7 +40,7 @@ public class UserLoggingFilter extends OncePerRequestFilter {
     @SuppressWarnings("PMD.EmptyCatchBlock")
     private void trySetUserId(HttpServletRequest request) {
         try {
-            if (!RequestUtils.isAllowedEndpoint(request.getRequestURI())) {
+            if (!requestUtilsService.isAllowedEndpoint(request.getRequestURI())) {
                 MDC.put("userId", currentUser.getId().toString());
             }
         } catch (IllegalStateException e) {

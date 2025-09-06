@@ -8,12 +8,14 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
 
-class RequestUtilsTest {
+class RequestUtilsServiceTest {
+
+    private final RequestUtilsService requestUtilsService = new RequestUtilsService();
 
     @ParameterizedTest
     @MethodSource("getIsAllowedEndpointParams")
     void isAllowedEndpoint(String endpoint, boolean expected) {
-        boolean isAllowed = Assertions.assertDoesNotThrow(() -> RequestUtils.isAllowedEndpoint(endpoint));
+        boolean isAllowed = Assertions.assertDoesNotThrow(() -> requestUtilsService.isAllowedEndpoint(endpoint));
         Assertions.assertEquals(expected, isAllowed);
     }
 
