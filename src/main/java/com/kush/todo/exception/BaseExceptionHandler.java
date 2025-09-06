@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @ControllerAdvice
 @Slf4j
@@ -61,6 +62,12 @@ public class BaseExceptionHandler {
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorsDto> handle(NotFoundException e) {
         log.warn("Not found", e);
+        return new ResponseEntity<>(new ErrorsDto(new ErrorDto(e.getMessage())), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ErrorsDto> handle(NoResourceFoundException e) {
+        log.warn("No static resource found", e);
         return new ResponseEntity<>(new ErrorsDto(new ErrorDto(e.getMessage())), HttpStatus.NOT_FOUND);
     }
 

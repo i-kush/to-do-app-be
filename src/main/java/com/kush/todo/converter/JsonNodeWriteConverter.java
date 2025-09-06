@@ -1,11 +1,11 @@
 package com.kush.todo.converter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.postgresql.util.PGobject;
 
-import java.io.IOException;
 import java.sql.SQLException;
 
 import org.springframework.core.convert.converter.Converter;
@@ -15,6 +15,7 @@ import org.springframework.data.convert.WritingConverter;
 @RequiredArgsConstructor
 public class JsonNodeWriteConverter implements Converter<JsonNode, PGobject> {
 
+    public static final String ERROR_MESSAGE_PATTERN_JSON = "Failed to write JSON '%s'";
     public static final String TYPE_JSON_B = "jsonb";
 
     private final ObjectMapper objectMapper;
@@ -27,10 +28,8 @@ public class JsonNodeWriteConverter implements Converter<JsonNode, PGobject> {
             result.setValue(source == null ? null : objectMapper.writeValueAsString(source));
 
             return result;
-        } catch (IOException e) {
-            throw new IllegalArgumentException(String.format("Failed to write JSON '%s'", source), e);
-        } catch (SQLException e) {
-            throw new IllegalStateException(String.format("Error during SQL 'jsonb' value setting for value %s", source), e);
+        } catch (JsonProcessingException | SQLException e) {
+            throw new IllegalArgumentException(String.format(ERROR_MESSAGE_PATTERN_JSON, source), e);
         }
     }
 }

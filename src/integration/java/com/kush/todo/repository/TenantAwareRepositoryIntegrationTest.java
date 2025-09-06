@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Collections;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Sort;
 class TenantAwareRepositoryIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
+    @Qualifier("appUserRepository") // we don't car actually what repo will be injected, it just should have this base interface
     private TenantAwareRepository tenantAwareRepository;
 
     @Test

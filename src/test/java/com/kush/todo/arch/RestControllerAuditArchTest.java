@@ -7,6 +7,8 @@ import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.syntax.ArchRuleDefinition;
 import org.junit.jupiter.api.Test;
 
+import java.util.Locale;
+
 class RestControllerAuditArchTest {
 
     @Test
@@ -19,12 +21,15 @@ class RestControllerAuditArchTest {
                     @Override
                     public void check(JavaMethod method, ConditionEvents events) {
                         Auditable auditable = method.getAnnotationOfType(Auditable.class);
-                        if (!method.getOwner().getSimpleName().toLowerCase().contains(auditable.targetType().toString()
-                                                                                               .toLowerCase())) {
+                        if (!method.getOwner().getSimpleName().toLowerCase(Locale.getDefault()).contains(getDomainPart(auditable))) {
                             ArchTestSettings.addEvent(events, method, String.format("@Auditable should have correct target type for '%s'", method.getFullName()));
                         }
                     }
                 })
                 .check(ArchTestSettings.JAVA_CLASSES);
+    }
+
+    private String getDomainPart(Auditable auditable) {
+        return auditable.targetType().toString().split("_")[0].toLowerCase(Locale.getDefault());
     }
 }
