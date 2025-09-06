@@ -28,35 +28,32 @@ public class AuditService {
 
     @Transactional
     @Async(AsyncConfig.THREAD_POOL_ASYNC)
-    public void create(UUID initiatorId, UUID targetId, Auditable auditable) {
-        create(initiatorId, targetId, auditable, AuditActionResult.SUCCESS, null);
+    public void create(UUID tenantId, UUID initiatorId, UUID targetId, Auditable auditable) {
+        create(tenantId, initiatorId, targetId, auditable, AuditActionResult.SUCCESS, null);
     }
 
     @Transactional
     @Async(AsyncConfig.THREAD_POOL_ASYNC)
-    public void create(UUID initiatorId, UUID targetId, Auditable auditable, Throwable e) {
-        create(initiatorId, targetId, auditable, AuditActionResult.FAILURE, e);
+    public void create(UUID tenantId, UUID initiatorId, UUID targetId, Auditable auditable, Throwable e) {
+        create(tenantId, initiatorId, targetId, auditable, AuditActionResult.FAILURE, e);
     }
 
-    private void create(UUID initiatorId, UUID targetId, Auditable auditable, AuditActionResult actionResult, Throwable e) {
+    private void create(UUID tenantId,
+                        UUID initiatorId,
+                        UUID targetId,
+                        Auditable auditable,
+                        AuditActionResult actionResult,
+                        Throwable e) {
         try {
-            log.info("Create audit for targetId={}", targetId);
-            auditRepository.save(auditMapper.toAudit(initiatorId, targetId, auditable, actionResult, e));
+            auditRepository.save(auditMapper.toAudit(tenantId, initiatorId, targetId, auditable, actionResult, e));
         } catch (RuntimeException ex) {
             log.error("Cannot create audit record", ex);
         }
     }
 
     @Transactional(readOnly = true)
-    public CustomPage<AuditResponseDto> findAllByUserId(UUID userId, int page, int size) {
-        Page<AuditResponseDto> pages = auditRepository.findAllByInitiatorId(userId, PageRequest.of(page - 1, size))
-                                                      .map(auditMapper::toAuditDto);
-        return auditMapper.toCustomPage(pages);
-    }
-
-    @Transactional(readOnly = true)
-    public CustomPage<AuditResponseDto> findAll(int page, int size) {
-        Page<AuditResponseDto> pages = auditRepository.findAll(PageRequest.of(page - 1, size))
+    public CustomPage<AuditResponseDto> findAll(UUID tenantId, int page, int size) {
+        Page<AuditResponseDto> pages = auditRepository.findAllByTenantId(PageRequest.of(page - 1, size), tenantId)
                                                       .map(auditMapper::toAuditDto);
         return auditMapper.toCustomPage(pages);
     }

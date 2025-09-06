@@ -8,6 +8,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Component;
@@ -26,16 +27,20 @@ public class AuditAspect {
 
         try {
             Object result = pjp.proceed();
-            auditService.create(currentUser.getId(), targetId, audit);
+            auditService.create(currentUser.getTenantId(), currentUser.getId(), targetId, audit);
             return result;
         } catch (Throwable e) {
-            auditService.create(currentUser.getId(), targetId, audit, e);
+            auditService.create(currentUser.getTenantId(), currentUser.getId(), targetId, audit, e);
             throw e;
         }
     }
 
     private UUID tryGetTargetId(Object[] args) {
-        //ToDo add actual target ID extraction
-        return UUID.randomUUID();
+        return Optional.ofNullable(args)
+                       .filter(a -> a.length > 0)
+                       .map(a -> a[0])
+                       .filter(UUID.class::isInstance)
+                       .map(UUID.class::cast)
+                       .orElse(null);
     }
 }

@@ -52,6 +52,7 @@ public class AppUserController {
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAuthority('USER_WRITE')")
+    @Auditable(actionType = AuditActionType.CREATE, targetType = AuditTargetType.USER)
     public AppUserResponseDto create(@Valid @RequestBody AppUserRequestDto userDto) {
         return appUserService.create(userDto);
     }
@@ -62,6 +63,7 @@ public class AppUserController {
     })
     @CommonApiErrors
     @GetMapping(value = "me", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Auditable(actionType = AuditActionType.READ, targetType = AuditTargetType.USER)
     public AppUserResponseDto me() {
         return appUserService.findByIdRequired(currentUser.getId());
     }
@@ -85,6 +87,7 @@ public class AppUserController {
     @CommonApiErrors
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('USER_READ')")
+    @Auditable(actionType = AuditActionType.READ, targetType = AuditTargetType.USER)
     public CustomPage<AppUserResponseDto> getAll(@Min(1) @RequestParam int page, @Min(1) @Max(200) @RequestParam int size) {
         return appUserService.findAll(page, size);
     }
@@ -96,6 +99,7 @@ public class AppUserController {
     @CommonApiErrors
     @PutMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('USER_WRITE')")
+    @Auditable(actionType = AuditActionType.UPDATE, targetType = AuditTargetType.USER)
     public AppUserResponseDto update(@NotNull @PathVariable UUID id, @Valid @RequestBody AppUserRequestDto userDto) {
         return appUserService.update(id, userDto);
     }
@@ -107,6 +111,7 @@ public class AppUserController {
     @CommonApiErrors
     @DeleteMapping("{id}")
     @PreAuthorize("hasAuthority('USER_WRITE')")
+    @Auditable(actionType = AuditActionType.DELETE, targetType = AuditTargetType.USER)
     public void delete(@NotNull @PathVariable UUID id) {
         appUserService.delete(id);
     }
@@ -118,6 +123,7 @@ public class AppUserController {
     @CommonApiErrors
     @PostMapping("{id}/unlock")
     @PreAuthorize("hasAuthority('USER_WRITE')")
+    @Auditable(actionType = AuditActionType.UPDATE, targetType = AuditTargetType.USER)
     public void unlock(@NotNull @PathVariable UUID id) {
         appUserService.unlockUser(id);
     }

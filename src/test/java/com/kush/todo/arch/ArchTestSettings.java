@@ -3,6 +3,8 @@ package com.kush.todo.arch;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
+import com.tngtech.archunit.lang.ConditionEvents;
+import com.tngtech.archunit.lang.SimpleConditionEvent;
 
 import java.util.Collection;
 import java.util.regex.Pattern;
@@ -23,5 +25,9 @@ public final class ArchTestSettings {
         return collection.stream()
                          .map(Pattern::quote)
                          .collect(Collectors.joining("|"));
+    }
+
+    public static void addEvent(ConditionEvents events, Object targetViolation, String message) {
+        events.add(SimpleConditionEvent.violated(targetViolation, message));
     }
 }

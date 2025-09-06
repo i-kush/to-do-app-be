@@ -12,6 +12,7 @@ import java.util.UUID;
 @Builder
 public record AuditResponseDto(
         UUID id,
+        UUID tenantId,
         UUID initiatorId,
         UUID targetId,
         AuditTargetType targetType,

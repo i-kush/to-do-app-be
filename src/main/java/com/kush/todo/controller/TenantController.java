@@ -1,6 +1,9 @@
 package com.kush.todo.controller;
 
+import com.kush.todo.annotation.Auditable;
 import com.kush.todo.annotation.CommonApiErrors;
+import com.kush.todo.dto.common.AuditActionType;
+import com.kush.todo.dto.common.AuditTargetType;
 import com.kush.todo.dto.request.CreateTenantRequestDto;
 import com.kush.todo.dto.request.UpdateTenantRequestDto;
 import com.kush.todo.dto.response.AsyncOperationQueuedResponseDto;
@@ -53,6 +56,7 @@ public class TenantController {
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAuthority('TENANT_WRITE')")
+    @Auditable(actionType = AuditActionType.CREATE, targetType = AuditTargetType.TENANT)
     public TenantDetailsResponseDto create(@Valid @RequestBody CreateTenantRequestDto tenantDto) {
         return tenantFacade.create(tenantDto);
     }
@@ -64,6 +68,7 @@ public class TenantController {
     @CommonApiErrors
     @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('TENANT_READ')")
+    @Auditable(actionType = AuditActionType.READ, targetType = AuditTargetType.TENANT)
     public TenantResponseDto get(@NotNull @PathVariable UUID id) {
         return tenantService.findByIdRequired(id);
     }
@@ -75,6 +80,7 @@ public class TenantController {
     @CommonApiErrors
     @PostMapping(value = "async", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('TENANT_WRITE')")
+    @Auditable(actionType = AuditActionType.CREATE, targetType = AuditTargetType.TENANT_ASYNC)
     public AsyncOperationQueuedResponseDto createAsync(@Valid @RequestBody CreateTenantRequestDto tenantDto) {
         return tenantFacade.createAsync(tenantDto);
     }
@@ -86,6 +92,7 @@ public class TenantController {
     @CommonApiErrors
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('TENANT_READ')")
+    @Auditable(actionType = AuditActionType.READ, targetType = AuditTargetType.TENANT)
     public CustomPage<TenantResponseDto> getAll(@Min(1) @RequestParam int page, @Min(1) @Max(200) @RequestParam int size) {
         return tenantService.findAll(page, size);
     }
@@ -97,6 +104,7 @@ public class TenantController {
     @CommonApiErrors
     @PutMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('TENANT_WRITE')")
+    @Auditable(actionType = AuditActionType.UPDATE, targetType = AuditTargetType.TENANT)
     public TenantResponseDto update(@NotNull @PathVariable UUID id, @Valid @RequestBody UpdateTenantRequestDto tenantDto) {
         return tenantService.update(id, tenantDto);
     }
@@ -108,6 +116,7 @@ public class TenantController {
     @CommonApiErrors
     @DeleteMapping("{id}")
     @PreAuthorize("hasAuthority('TENANT_WRITE')")
+    @Auditable(actionType = AuditActionType.DELETE, targetType = AuditTargetType.TENANT)
     public TenantDeleteResponseDto delete(@NotNull @PathVariable UUID id) {
         return tenantFacade.delete(id);
     }
@@ -119,6 +128,7 @@ public class TenantController {
     @CommonApiErrors
     @DeleteMapping("{id}/async")
     @PreAuthorize("hasAuthority('TENANT_WRITE')")
+    @Auditable(actionType = AuditActionType.DELETE, targetType = AuditTargetType.TENANT_ASYNC)
     public AsyncOperationQueuedResponseDto deleteAsync(@NotNull @PathVariable UUID id) {
         return tenantFacade.deleteAsync(id);
     }

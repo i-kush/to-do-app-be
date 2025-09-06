@@ -1,7 +1,10 @@
 package com.kush.todo.controller;
 
+import com.kush.todo.annotation.Auditable;
 import com.kush.todo.annotation.CommonApiErrors;
 import com.kush.todo.dto.async.AsyncOperationDto;
+import com.kush.todo.dto.common.AuditActionType;
+import com.kush.todo.dto.common.AuditTargetType;
 import com.kush.todo.dto.common.CurrentUser;
 import com.kush.todo.service.AsyncOperationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("api/async/operations")
 @RequiredArgsConstructor
 @Tag(name = "operations")
-public class AsyncController {
+public class AsyncOperationController {
 
     private final AsyncOperationService asyncOperationService;
     private final CurrentUser currentUser;
@@ -34,6 +37,7 @@ public class AsyncController {
     })
     @CommonApiErrors
     @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Auditable(actionType = AuditActionType.READ, targetType = AuditTargetType.OPERATION)
     public <T> AsyncOperationDto<T> getOperation(@NotNull @PathVariable UUID id) {
         return asyncOperationService.getOperation(id, currentUser.getTenantId());
     }
