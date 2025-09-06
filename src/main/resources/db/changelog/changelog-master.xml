@@ -39,4 +39,15 @@
                      splitStatements="false"/>
         </rollback>
     </changeSet>
+    <changeSet author="Igor Kushnir"
+               id="audit">
+        <sqlFile path="changesets/1.0.3-audit.sql"
+                 relativeToChangelogFile="true"
+                 splitStatements="false"/>
+        <rollback>
+            <sqlFile path="changesets/rollback/1.0.3-audit-rollback.sql"
+                     relativeToChangelogFile="true"
+                     splitStatements="false"/>
+        </rollback>
+    </changeSet>
 </databaseChangeLog>
