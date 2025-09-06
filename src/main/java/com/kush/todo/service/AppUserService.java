@@ -164,7 +164,8 @@ public class AppUserService {
 
     @Transactional(readOnly = true)
     public boolean isCurrentUserLocked() {
-        return appUserRepository.isUserLocked(currentUser.getId(), currentUser.getTenantId());
+        return appUserRepository.isUserLocked(currentUser.getId(), currentUser.getTenantId())
+                                .orElse(true);
     }
 
     @Transactional
