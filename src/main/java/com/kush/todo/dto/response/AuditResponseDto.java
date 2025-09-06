@@ -1,5 +1,6 @@
 package com.kush.todo.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.kush.todo.dto.common.AuditActionResult;
 import com.kush.todo.dto.common.AuditActionType;
@@ -21,6 +22,7 @@ public record AuditResponseDto(
         Instant createdAt,
         String spanId,
         String traceId,
+        @JsonInclude(JsonInclude.Include.NON_NULL)
         JsonNode details
 ) {
 }

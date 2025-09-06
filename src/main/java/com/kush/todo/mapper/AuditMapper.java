@@ -21,7 +21,7 @@ public abstract class AuditMapper extends PageMapper {
                          UUID targetId,
                          Auditable auditable,
                          AuditActionResult actionResult,
-                         Throwable e) {
+                         Exception e) {
         return Audit.builder()
                     .initiatorId(initiatorId)
                     .tenantId(tenantId)
@@ -36,7 +36,7 @@ public abstract class AuditMapper extends PageMapper {
                     .build();
     }
 
-    private JsonNode toAuditDetails(Throwable e) {
+    private JsonNode toAuditDetails(Exception e) {
         if (e == null) {
             return null;
         }

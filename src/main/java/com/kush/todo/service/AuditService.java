@@ -34,7 +34,7 @@ public class AuditService {
 
     @Transactional
     @Async(AsyncConfig.THREAD_POOL_ASYNC)
-    public void create(UUID tenantId, UUID initiatorId, UUID targetId, Auditable auditable, Throwable e) {
+    public void create(UUID tenantId, UUID initiatorId, UUID targetId, Auditable auditable, Exception e) {
         create(tenantId, initiatorId, targetId, auditable, AuditActionResult.FAILURE, e);
     }
 
@@ -43,7 +43,7 @@ public class AuditService {
                         UUID targetId,
                         Auditable auditable,
                         AuditActionResult actionResult,
-                        Throwable e) {
+                        Exception e) {
         try {
             auditRepository.save(auditMapper.toAudit(tenantId, initiatorId, targetId, auditable, actionResult, e));
         } catch (RuntimeException ex) {

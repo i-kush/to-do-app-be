@@ -29,7 +29,7 @@ public class AuditAspect {
             Object result = pjp.proceed();
             auditService.create(currentUser.getTenantId(), currentUser.getId(), targetId, audit);
             return result;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             auditService.create(currentUser.getTenantId(), currentUser.getId(), targetId, audit, e);
             throw e;
         }

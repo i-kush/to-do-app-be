@@ -1,9 +1,13 @@
 package com.kush.todo;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kush.todo.converter.JsonNodeWriteConverter;
 import com.kush.todo.dto.common.CurrentUser;
 import com.kush.todo.dto.common.Role;
 import com.kush.todo.entity.Tenant;
+import org.postgresql.util.PGobject;
 
+import java.sql.SQLException;
 import java.time.Instant;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -15,6 +19,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 
 public final class TestDataBuilder {
 
+    public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     public static final UUID DEFAULT_TENANT_ID = UUID.randomUUID();
     public static final String DEFAULT_JWT = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlN2M2NDZlMC01Y2I0LTQxYzctYjEyMy1mZDUzN2NkYmY5MjIiLCJyb2xlIjoiR0xPQkFMX0FETUlOIiwic2NvcGUiOiJSRUFEIFdSSVRFIiwiZXhwIjoxNzU2Mzk2MTQ0LCJpYXQiOjE3NTYzOTU4NDQsInRlbmFudCI6ImViMWE1NjFmLTczZTItNDk0Ni05MzdiLTEwMzlmYTRhZWQ3NiIsImVtYWlsIjoic3lzdGVtLWFkbWluQGt1c2gtdG8tZG8uY29tIiwidXNlcm5hbWUiOiJnbG9iYWwtYWRtaW4ifQ.1NgDV_F41hRItVWguOE1nEG2H8ewyySBJrlHIwksBec";
 
@@ -60,5 +65,18 @@ public final class TestDataBuilder {
                           .email(String.format("e%s@test.com", UUID.randomUUID()))
                           .role(Role.USER)
                           .build();
+    }
+
+    public static PGobject newPgObject(String value) {
+        try {
+            PGobject empty = new PGobject();
+
+            empty.setType(JsonNodeWriteConverter.TYPE_JSON_B);
+            empty.setValue(value);
+
+            return empty;
+        } catch (SQLException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 }
