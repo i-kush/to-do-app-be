@@ -41,7 +41,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"testasdf111\"\n}",
+							"raw": "{\n    \"name\": \"test\",\n    \"adminEmail\": \"test@email.com\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -92,7 +92,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"nfew12\",\n    \"adminEmail\": \"testasdf1112@email.com\"\n}",
+							"raw": "{\n    \"name\": \"test\",\n    \"adminEmail\": \"test@email.com\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -168,11 +168,6 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							},
-							{
 								"key": "Authorization",
 								"value": "Bearer {{access-token}}",
 								"type": "text"
@@ -192,7 +187,7 @@
 					"response": []
 				},
 				{
-					"name": "getAll",
+					"name": "get all",
 					"event": [
 						{
 							"listen": "test",
@@ -210,11 +205,6 @@
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							},
 							{
 								"key": "Authorization",
 								"value": "Bearer {{access-token}}",
@@ -709,7 +699,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    // \"username\": \"tenant-admin\",\n    // \"password\": \"password\",\n    \"username\": \"global-admin\",\n    \"password\": \"change-me\"\n}",
+							"raw": "{\n    // \"username\": \"tenant-admin\",\n    // \"password\": \"password\"\n    \"username\": \"global-admin\",\n    \"password\": \"change-me\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -771,6 +761,56 @@
 								"async",
 								"operations",
 								"{{async-operation-id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "audit",
+			"item": [
+				{
+					"name": "get all",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access-token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{to-do-app-host}}/audit?page=1&size=1",
+							"host": [
+								"{{to-do-app-host}}"
+							],
+							"path": [
+								"audit"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "size",
+									"value": "1"
+								}
 							]
 						}
 					},
