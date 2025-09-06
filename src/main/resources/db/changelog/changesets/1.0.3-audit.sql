@@ -15,5 +15,6 @@ create table if not exists audit (
 );
 
 create index idx_audit_initiator_id on audit (initiator_id);
+create index idx_audit_tenant_id on audit (tenant_id);
 create index idx_audit_target_id_target_type on audit (target_id, target_type);
 create index idx_audit_created_at on audit (created_at);
