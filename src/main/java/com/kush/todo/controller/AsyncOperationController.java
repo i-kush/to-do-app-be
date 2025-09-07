@@ -32,12 +32,10 @@ public class AsyncOperationController {
     private final CurrentUser currentUser;
 
     @Operation(summary = "Get async result by operation ID", description = "Gets async operation result by ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved async operation"),
-    })
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "Successfully retrieved async operation"))
     @CommonApiErrors
-    @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Auditable(actionType = AuditActionType.READ, targetType = AuditTargetType.OPERATION)
+    @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public <T> AsyncOperationDto<T> getOperation(@NotNull @PathVariable UUID id) {
         return asyncOperationService.getOperation(id, currentUser.getTenantId());
     }

@@ -2,6 +2,7 @@ package com.kush.todo.controller;
 
 import com.kush.todo.annotation.Auditable;
 import com.kush.todo.annotation.CommonApiErrors;
+import com.kush.todo.constant.MetricsConstants;
 import com.kush.todo.dto.common.AuditActionType;
 import com.kush.todo.dto.common.AuditTargetType;
 import com.kush.todo.dto.common.CurrentUser;
@@ -9,6 +10,8 @@ import com.kush.todo.dto.request.AppUserRequestDto;
 import com.kush.todo.dto.response.AppUserResponseDto;
 import com.kush.todo.dto.response.CustomPage;
 import com.kush.todo.service.AppUserService;
+import io.micrometer.core.annotation.Counted;
+import io.micrometer.core.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -45,85 +48,106 @@ public class AppUserController {
     private final CurrentUser currentUser;
 
     @Operation(summary = "Create user", description = "Creates a user")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Successfully created user"),
-    })
+    @ApiResponses(value = @ApiResponse(responseCode = "201", description = "Successfully created user"))
     @CommonApiErrors
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.CREATED)
+    @Timed(value = MetricsConstants.TIMER_ENDPOINT,
+           extraTags = {MetricsConstants.TAG_DOMAIN_NAME, MetricsConstants.TAG_DOMAIN_USER, MetricsConstants.TAG_OPERATION_NAME, MetricsConstants.TAG_OPERATION_CREATE})
+    @Counted(value = MetricsConstants.COUNT_ENDPOINT_ERROR,
+             extraTags = {MetricsConstants.TAG_DOMAIN_NAME, MetricsConstants.TAG_DOMAIN_USER, MetricsConstants.TAG_OPERATION_NAME, MetricsConstants.TAG_OPERATION_CREATE},
+             recordFailuresOnly = true)
     @PreAuthorize("hasAuthority('USER_WRITE')")
     @Auditable(actionType = AuditActionType.CREATE, targetType = AuditTargetType.USER)
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
     public AppUserResponseDto create(@Valid @RequestBody AppUserRequestDto userDto) {
         return appUserService.create(userDto);
     }
 
     @Operation(summary = "Get logged in user", description = "Gets logged in user details")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved user"),
-    })
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "Successfully retrieved user"))
     @CommonApiErrors
-    @GetMapping(value = "me", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed(value = MetricsConstants.TIMER_ENDPOINT,
+           extraTags = {MetricsConstants.TAG_DOMAIN_NAME, MetricsConstants.TAG_DOMAIN_USER, MetricsConstants.TAG_OPERATION_NAME, MetricsConstants.TAG_OPERATION_READ})
+    @Counted(value = MetricsConstants.COUNT_ENDPOINT_ERROR,
+             extraTags = {MetricsConstants.TAG_DOMAIN_NAME, MetricsConstants.TAG_DOMAIN_USER, MetricsConstants.TAG_OPERATION_NAME, MetricsConstants.TAG_OPERATION_READ},
+             recordFailuresOnly = true)
     @Auditable(actionType = AuditActionType.READ, targetType = AuditTargetType.USER)
+    @GetMapping(value = "me", produces = MediaType.APPLICATION_JSON_VALUE)
     public AppUserResponseDto me() {
         return appUserService.findByIdRequired(currentUser.getId());
     }
 
     @Operation(summary = "Get user by ID", description = "Gets user details by ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved user"),
-    })
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "Successfully retrieved user"))
     @CommonApiErrors
-    @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed(value = MetricsConstants.TIMER_ENDPOINT,
+           extraTags = {MetricsConstants.TAG_DOMAIN_NAME, MetricsConstants.TAG_DOMAIN_USER, MetricsConstants.TAG_OPERATION_NAME, MetricsConstants.TAG_OPERATION_READ})
+    @Counted(value = MetricsConstants.COUNT_ENDPOINT_ERROR,
+             extraTags = {MetricsConstants.TAG_DOMAIN_NAME, MetricsConstants.TAG_DOMAIN_USER, MetricsConstants.TAG_OPERATION_NAME, MetricsConstants.TAG_OPERATION_READ},
+             recordFailuresOnly = true)
     @PreAuthorize("hasAuthority('USER_READ')")
     @Auditable(actionType = AuditActionType.READ, targetType = AuditTargetType.USER)
+    @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public AppUserResponseDto get(@NotNull @PathVariable UUID id) {
         return appUserService.findByIdRequired(id);
     }
 
     @Operation(summary = "Get users", description = "Gets paginated users list with details")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved paginated users"),
-    })
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "Successfully retrieved paginated users"))
     @CommonApiErrors
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed(value = MetricsConstants.TIMER_ENDPOINT,
+           extraTags = {MetricsConstants.TAG_DOMAIN_NAME, MetricsConstants.TAG_DOMAIN_USER, MetricsConstants.TAG_OPERATION_NAME, MetricsConstants.TAG_OPERATION_READ})
+    @Counted(value = MetricsConstants.COUNT_ENDPOINT_ERROR,
+             extraTags = {MetricsConstants.TAG_DOMAIN_NAME, MetricsConstants.TAG_DOMAIN_USER, MetricsConstants.TAG_OPERATION_NAME, MetricsConstants.TAG_OPERATION_READ},
+             recordFailuresOnly = true)
     @PreAuthorize("hasAuthority('USER_READ')")
     @Auditable(actionType = AuditActionType.READ, targetType = AuditTargetType.USER)
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public CustomPage<AppUserResponseDto> getAll(@Min(1) @RequestParam int page, @Min(1) @Max(200) @RequestParam int size) {
         return appUserService.findAll(page, size);
     }
 
     @Operation(summary = "Update user by ID", description = "Updates user details by ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully updated user"),
-    })
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "Successfully updated user"))
     @CommonApiErrors
-    @PutMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Timed(value = MetricsConstants.TIMER_ENDPOINT,
+           extraTags = {MetricsConstants.TAG_DOMAIN_NAME, MetricsConstants.TAG_DOMAIN_USER, MetricsConstants.TAG_OPERATION_NAME, MetricsConstants.TAG_OPERATION_UPDATE})
+    @Counted(value = MetricsConstants.COUNT_ENDPOINT_ERROR,
+             extraTags = {MetricsConstants.TAG_DOMAIN_NAME, MetricsConstants.TAG_DOMAIN_USER, MetricsConstants.TAG_OPERATION_NAME, MetricsConstants.TAG_OPERATION_UPDATE},
+             recordFailuresOnly = true)
     @PreAuthorize("hasAuthority('USER_WRITE')")
     @Auditable(actionType = AuditActionType.UPDATE, targetType = AuditTargetType.USER)
+    @PutMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public AppUserResponseDto update(@NotNull @PathVariable UUID id, @Valid @RequestBody AppUserRequestDto userDto) {
         return appUserService.update(id, userDto);
     }
 
     @Operation(summary = "Delete user by ID", description = "Deletes user by ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully deleted user"),
-    })
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "Successfully deleted user"))
     @CommonApiErrors
-    @DeleteMapping("{id}")
+    @Timed(value = MetricsConstants.TIMER_ENDPOINT,
+           extraTags = {MetricsConstants.TAG_DOMAIN_NAME, MetricsConstants.TAG_DOMAIN_USER, MetricsConstants.TAG_OPERATION_NAME, MetricsConstants.TAG_OPERATION_DELETE})
+    @Counted(value = MetricsConstants.COUNT_ENDPOINT_ERROR,
+             extraTags = {MetricsConstants.TAG_DOMAIN_NAME, MetricsConstants.TAG_DOMAIN_USER, MetricsConstants.TAG_OPERATION_NAME, MetricsConstants.TAG_OPERATION_DELETE},
+             recordFailuresOnly = true)
     @PreAuthorize("hasAuthority('USER_WRITE')")
     @Auditable(actionType = AuditActionType.DELETE, targetType = AuditTargetType.USER)
+    @DeleteMapping("{id}")
     public void delete(@NotNull @PathVariable UUID id) {
         appUserService.delete(id);
     }
 
     @Operation(summary = "Unlock user", description = "Unlocks a user")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Unlocks user by ID"),
-    })
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "Unlocks user by ID"))
     @CommonApiErrors
-    @PostMapping("{id}/unlock")
+    @Timed(value = MetricsConstants.TIMER_ENDPOINT,
+           extraTags = {MetricsConstants.TAG_DOMAIN_NAME, MetricsConstants.TAG_DOMAIN_USER, MetricsConstants.TAG_OPERATION_NAME, MetricsConstants.TAG_OPERATION_UPDATE})
+    @Counted(value = MetricsConstants.COUNT_ENDPOINT_ERROR,
+             extraTags = {MetricsConstants.TAG_DOMAIN_NAME, MetricsConstants.TAG_DOMAIN_USER, MetricsConstants.TAG_OPERATION_NAME, MetricsConstants.TAG_OPERATION_UPDATE},
+             recordFailuresOnly = true)
     @PreAuthorize("hasAuthority('USER_WRITE')")
     @Auditable(actionType = AuditActionType.UPDATE, targetType = AuditTargetType.USER)
+    @PostMapping("{id}/unlock")
     public void unlock(@NotNull @PathVariable UUID id) {
         appUserService.unlockUser(id);
     }

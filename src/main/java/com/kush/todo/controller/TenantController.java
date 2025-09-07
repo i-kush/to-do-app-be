@@ -49,86 +49,72 @@ public class TenantController {
     private final TenantFacade tenantFacade;
 
     @Operation(summary = "Create tenant", description = "Creates a tenant with the specific settings")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Successfully created tenant"),
-    })
+    @ApiResponses(value = @ApiResponse(responseCode = "201", description = "Successfully created tenant"))
     @CommonApiErrors
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAuthority('TENANT_WRITE')")
     @Auditable(actionType = AuditActionType.CREATE, targetType = AuditTargetType.TENANT)
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
     public TenantDetailsResponseDto create(@Valid @RequestBody CreateTenantRequestDto tenantDto) {
         return tenantFacade.create(tenantDto);
     }
 
     @Operation(summary = "Get tenant by ID", description = "Gets tenant details by ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved tenant"),
-    })
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "Successfully retrieved tenant"))
     @CommonApiErrors
-    @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('TENANT_READ')")
     @Auditable(actionType = AuditActionType.READ, targetType = AuditTargetType.TENANT)
+    @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public TenantResponseDto get(@NotNull @PathVariable UUID id) {
         return tenantService.findByIdRequired(id);
     }
 
     @Operation(summary = "Create tenant async", description = "Creates a tenant with the specific settings in the async mode")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Async tenant creation launched successfully"),
-    })
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "Async tenant creation launched successfully"))
     @CommonApiErrors
-    @PostMapping(value = "async", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('TENANT_WRITE')")
     @Auditable(actionType = AuditActionType.CREATE, targetType = AuditTargetType.TENANT_ASYNC)
+    @PostMapping(value = "async", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public AsyncOperationQueuedResponseDto createAsync(@Valid @RequestBody CreateTenantRequestDto tenantDto) {
         return tenantFacade.createAsync(tenantDto);
     }
 
     @Operation(summary = "Get tenants", description = "Gets paginated tenants list with details")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved paginated tenants"),
-    })
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "Successfully retrieved paginated tenants"))
     @CommonApiErrors
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('TENANT_READ')")
     @Auditable(actionType = AuditActionType.READ, targetType = AuditTargetType.TENANT)
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public CustomPage<TenantResponseDto> getAll(@Min(1) @RequestParam int page, @Min(1) @Max(200) @RequestParam int size) {
         return tenantService.findAll(page, size);
     }
 
     @Operation(summary = "Update tenant by ID", description = "Updates tenant details by ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully updated tenant"),
-    })
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "Successfully updated tenant"))
     @CommonApiErrors
-    @PutMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('TENANT_WRITE')")
     @Auditable(actionType = AuditActionType.UPDATE, targetType = AuditTargetType.TENANT)
+    @PutMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public TenantResponseDto update(@NotNull @PathVariable UUID id, @Valid @RequestBody UpdateTenantRequestDto tenantDto) {
         return tenantService.update(id, tenantDto);
     }
 
     @Operation(summary = "Delete tenant by ID", description = "Deletes tenant by ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully deleted tenant"),
-    })
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "Successfully deleted tenant"))
     @CommonApiErrors
-    @DeleteMapping("{id}")
     @PreAuthorize("hasAuthority('TENANT_WRITE')")
     @Auditable(actionType = AuditActionType.DELETE, targetType = AuditTargetType.TENANT)
+    @DeleteMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public TenantDeleteResponseDto delete(@NotNull @PathVariable UUID id) {
         return tenantFacade.delete(id);
     }
 
     @Operation(summary = "Delete tenant async", description = "Deletes tenant by ID in the async mode")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Async tenant deletion launched successfully"),
-    })
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "Async tenant deletion launched successfully"))
     @CommonApiErrors
-    @DeleteMapping("{id}/async")
     @PreAuthorize("hasAuthority('TENANT_WRITE')")
     @Auditable(actionType = AuditActionType.DELETE, targetType = AuditTargetType.TENANT_ASYNC)
+    @DeleteMapping(value = "{id}/async", produces = MediaType.APPLICATION_JSON_VALUE)
     public AsyncOperationQueuedResponseDto deleteAsync(@NotNull @PathVariable UUID id) {
         return tenantFacade.deleteAsync(id);
     }

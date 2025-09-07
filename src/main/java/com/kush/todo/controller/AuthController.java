@@ -26,9 +26,7 @@ public class AuthController {
     private final AuthService authService;
 
     @Operation(summary = "User login", description = "Generates an access token for further communication with a system")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful login and access token generation"),
-    })
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "Successful login and access token generation"))
     @CommonApiErrors
     @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
     public LoginResponseDto login(@Valid @RequestBody LoginRequestDto request) {

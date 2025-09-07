@@ -1,33 +1,18 @@
-logging:
-  level:
-    com.kush.todo: INFO
-    org.apache.kafka: WARN
-    org.springframework.data.convert.CustomConversions: ERROR
-
 server:
   port: 8080
   http2:
     enabled: true
 
-management:
-  server:
-    port: 8081
-  endpoints:
-    web:
-      exposure:
-        include: health,metrics
-  endpoint:
-    health:
-      show-details: ALWAYS
-
 spring:
+  application:
+    name: to-do-be-app
   kafka:
     template:
       observation-enabled: true
     listener:
       observation-enabled: true
     consumer:
-      group-id: group-id-to-do-app
+      group-id: group-id-${spring.application.name}
     topics:
       onboard-tenant: kafka-topic-tenant-onboarding
       offboard-tenant: kafka-topic-tenant-offboarding
@@ -47,15 +32,37 @@ spring:
   liquibase:
     change-log: classpath:/db/changelog/changelog-master.xml
 
+management:
+  server:
+    port: 8081
+  observations:
+    annotations:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics
+  endpoint:
+    health:
+      show-details: ALWAYS
+  metrics:
+    tags:
+      app: ${spring.application.name}
+
+logging:
+  level:
+    com.kush.todo: INFO
+    org.apache.kafka: WARN
+    org.springframework.data.convert.CustomConversions: ERROR
+
 todo:
   login:
     max-attempts: 5
     max-attempts-window-minutes: 3
   job:
     user-unlocking: 5m
-
-executor:
-  async:
-    core-size: 20
-    max-size: 40
-    queue-capacity: 200
+  executor:
+    async:
+      core-size: 20
+      max-size: 40
+      queue-capacity: 200

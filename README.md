@@ -15,25 +15,25 @@ The purpose of the application is mostly demo, since it's aggregating most of th
 
 ## Stack
 
-| Tech                | Comment                                                                                                                     |
-|---------------------|-----------------------------------------------------------------------------------------------------------------------------|
-| `Spring Boot `      |                                                                                                                             |
-| `Spring Data JDBC`  | Plain spring data repositories are used mixed with the native queries                                                       |
-| `Spring Security`   | JWT encoding/decoding is delegated to spring as well as common `401`/`403` handling                                         |
-| `Spring Actuator`   | Running on a separate port to simplify business and infra endpoint routing on env - [link](localhost:8081/actuator)         |
-| `Spring AOP`        | One of the purposes - audit log recording in `@Async` mode                                                                  |
-| `Spring Web`        |                                                                                                                             |
-| `Spring Validation` |                                                                                                                             |
-| `Spring OAuth2`     | Resource server                                                                                                             |
-| `Spring Kafka`      | Events are going through the Kafka as part of async processing, usually result is written to Redis                          |
-| `Liquibase`         |                                                                                                                             |
-| `PostgreSQL`        |                                                                                                                             |
-| `Redis`             | Used for both async results temp storing and spring `@Cachable` serving with dynamic generic Jackson mapping for the values |
-| `Micrometer`        | `spanId` and `traceId` are used for all communication patterns (both async and sync) and logging                            |
-| `ArchUnit`          |                                                                                                                             |
-| `Spring Data JDBC`  | Plain spring data repositories are used mixed with the native queries                                                       |
-| `Swagger`           | [Link](http://localhost:8080/swagger-ui/index.html)                                                                         |
-| `Logback`           | For non-local run JSON-logging is enabled, it will respects all MDC vars, including both custom ones and from libs          |
+| Tech                | Comment                                                                                                                                                                                                            |
+|---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `Spring Boot `      |                                                                                                                                                                                                                    |
+| `Spring Data JDBC`  | Plain spring data repositories are used mixed with the native queries                                                                                                                                              |
+| `Spring Security`   | JWT encoding/decoding is delegated to spring as well as common `401`/`403` handling                                                                                                                                |
+| `Spring Actuator`   | Running on a separate port to simplify business and infra endpoint routing on env - [actuator root](localhost:8081/actuator), [metrics](localhost:8081/actuator/metrics), [health](localhost:8081/actuator/health) |
+| `Spring AOP`        | One of the purposes - audit log recording in `@Async` mode                                                                                                                                                         |
+| `Spring Web`        |                                                                                                                                                                                                                    |
+| `Spring Validation` |                                                                                                                                                                                                                    |
+| `Spring OAuth2`     | Resource server                                                                                                                                                                                                    |
+| `Spring Kafka`      | Events are going through the Kafka as part of async processing, usually result is written to Redis                                                                                                                 |
+| `Liquibase`         |                                                                                                                                                                                                                    |
+| `PostgreSQL`        |                                                                                                                                                                                                                    |
+| `Redis`             | Used for both async results temp storing and spring `@Cachable` serving with dynamic generic Jackson mapping for the values                                                                                        |
+| `Micrometer`        | `spanId` and `traceId` are used for all communication patterns (both async and sync) and logging                                                                                                                   |
+| `ArchUnit`          |                                                                                                                                                                                                                    |
+| `Spring Data JDBC`  | Plain spring data repositories are used mixed with the native queries                                                                                                                                              |
+| `Swagger`           | [Link](http://localhost:8080/swagger-ui/index.html)                                                                                                                                                                |
+| `Logback`           | For non-local run JSON-logging is enabled, it will respects all MDC vars, including both custom ones and from libs                                                                                                 |
 
 ## Build
 
@@ -60,7 +60,7 @@ The purpose of the application is mostly demo, since it's aggregating most of th
 - `SPRING_KAFKA_BOOTSTRAP_SERVERS` - actual kafka bootstrap server URL with port
 - `SPRING_DATA_REDIS_HOST` - Redis host
 - `SPRING_DATA_REDIS_PORT` - Redis host
-- `SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_SECRET_KEY` - secret key to use for the JWT signature 
-- `SPRING_DATASOURCE_URL` - database JDBC URL with database name path variable 
-- `SPRING_DATASOURCE_USERNAME` - database username 
+- `SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_SECRET_KEY` - secret key to use for the JWT signature
+- `SPRING_DATASOURCE_URL` - database JDBC URL with database name path variable
+- `SPRING_DATASOURCE_USERNAME` - database username
 - `SPRING_DATASOURCE_PASSWORD` - database password 
