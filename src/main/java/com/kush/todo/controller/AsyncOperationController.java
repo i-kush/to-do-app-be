@@ -36,6 +36,7 @@ public class AsyncOperationController {
     @CommonApiErrors
     @Auditable(actionType = AuditActionType.READ, targetType = AuditTargetType.OPERATION)
     @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Auditable(actionType = AuditActionType.READ, targetType = AuditTargetType.OPERATION)
     public <T> AsyncOperationDto<T> getOperation(@NotNull @PathVariable UUID id) {
         return asyncOperationService.getOperation(id, currentUser.getTenantId());
     }
