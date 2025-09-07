@@ -2,11 +2,14 @@ package com.kush.todo.controller;
 
 import com.kush.todo.annotation.Auditable;
 import com.kush.todo.annotation.CommonApiErrors;
+import com.kush.todo.constant.MetricsConstants;
 import com.kush.todo.dto.async.AsyncOperationDto;
 import com.kush.todo.dto.common.AuditActionType;
 import com.kush.todo.dto.common.AuditTargetType;
 import com.kush.todo.dto.common.CurrentUser;
 import com.kush.todo.service.AsyncOperationService;
+import io.micrometer.core.annotation.Counted;
+import io.micrometer.core.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -34,6 +37,11 @@ public class AsyncOperationController {
     @Operation(summary = "Get async result by operation ID", description = "Gets async operation result by ID")
     @ApiResponses(value = @ApiResponse(responseCode = "200", description = "Successfully retrieved async operation"))
     @CommonApiErrors
+    @Timed(value = MetricsConstants.TIMER_ENDPOINT,
+           extraTags = {MetricsConstants.TAG_DOMAIN_NAME, MetricsConstants.TAG_DOMAIN_OPERATION, MetricsConstants.TAG_OPERATION_NAME, MetricsConstants.TAG_OPERATION_READ})
+    @Counted(value = MetricsConstants.COUNT_ENDPOINT_ERROR,
+             extraTags = {MetricsConstants.TAG_DOMAIN_NAME, MetricsConstants.TAG_DOMAIN_OPERATION, MetricsConstants.TAG_OPERATION_NAME, MetricsConstants.TAG_OPERATION_READ},
+             recordFailuresOnly = true)
     @Auditable(actionType = AuditActionType.READ, targetType = AuditTargetType.OPERATION)
     @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public <T> AsyncOperationDto<T> getOperation(@NotNull @PathVariable UUID id) {

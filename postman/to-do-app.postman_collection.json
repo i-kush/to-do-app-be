@@ -644,6 +644,30 @@
 					"response": []
 				},
 				{
+					"name": "metrics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{to-do-app-actuator-host}}/actuator/metrics",
+							"host": [
+								"{{to-do-app-actuator-host}}"
+							],
+							"path": [
+								"actuator",
+								"metrics"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "health",
 					"request": {
 						"method": "GET",

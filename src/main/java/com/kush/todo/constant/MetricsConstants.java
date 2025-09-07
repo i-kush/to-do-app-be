@@ -7,6 +7,7 @@ public final class MetricsConstants {
     public static final String TAG_DOMAIN_NAME = "domain";
     public static final String TAG_OPERATION_NAME = "operation";
     public static final String TAG_DOMAIN_USER = "user";
+    public static final String TAG_DOMAIN_AUTH = "auth";
     public static final String TAG_DOMAIN_TENANT = "tenant";
     public static final String TAG_DOMAIN_PROJECT = "project";
     public static final String TAG_DOMAIN_TASK = "task";
@@ -15,6 +16,7 @@ public final class MetricsConstants {
     public static final String TAG_OPERATION_READ = "read";
     public static final String TAG_OPERATION_UPDATE = "update";
     public static final String TAG_OPERATION_DELETE = "delete";
+    public static final String TAG_OPERATION_AUTH = "login";
 
     private MetricsConstants() {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
