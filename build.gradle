@@ -122,6 +122,7 @@ tasks.named("jacocoTestReport") {
                     "com/kush/todo/dto/**",
                     "com/kush/todo/entity/**",
                     "com/kush/todo/mapper/**",
+                    "com/kush/todo/constant/**",
                     "com/kush/todo/exception/**",
                     "com/kush/todo/config/**",
                     "com/kush/todo/ToDoApplication.class"

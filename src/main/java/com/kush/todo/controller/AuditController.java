@@ -30,12 +30,10 @@ public class AuditController {
     private final CurrentUser currentUser;
 
     @Operation(summary = "Find all audit entries", description = "Gets paginated audit entries")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved paginated audit entries"),
-    })
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "Successfully retrieved paginated audit entries"))
     @CommonApiErrors
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('TENANT_READ')")
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public CustomPage<AuditResponseDto> findAll(@Min(1) @RequestParam int page, @Min(1) @Max(200) @RequestParam int size) {
         return auditService.findAll(currentUser.getTenantId(), page, size);
     }

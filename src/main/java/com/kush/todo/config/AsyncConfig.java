@@ -13,9 +13,9 @@ public class AsyncConfig {
     public static final String THREAD_POOL_ASYNC = "asyncThreadPoolExecutor";
 
     @Bean(THREAD_POOL_ASYNC)
-    public Executor asyncAuditExecutor(@Value("${executor.async.core-size}") int corePoolSize,
-                                       @Value("${executor.async.max-size}") int maxPoolSize,
-                                       @Value("${executor.async.queue-capacity}") int queueCapacity) {
+    public Executor asyncAuditExecutor(@Value("${todo.executor.async.core-size}") int corePoolSize,
+                                       @Value("${todo.executor.async.max-size}") int maxPoolSize,
+                                       @Value("${todo.executor.async.queue-capacity}") int queueCapacity) {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
 
         executor.setCorePoolSize(corePoolSize);
