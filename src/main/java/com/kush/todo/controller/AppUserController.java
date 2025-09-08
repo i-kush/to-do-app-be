@@ -59,8 +59,8 @@ public class AppUserController {
     @Auditable(actionType = AuditActionType.CREATE, targetType = AuditTargetType.USER)
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public AppUserResponseDto create(@Valid @RequestBody AppUserRequestDto userDto) {
-        return appUserService.create(userDto);
+    public AppUserResponseDto create(@Valid @RequestBody AppUserRequestDto request) {
+        return appUserService.create(request);
     }
 
     @Operation(summary = "Get logged in user", description = "Gets logged in user details")
@@ -118,8 +118,8 @@ public class AppUserController {
     @PreAuthorize("hasAuthority('USER_WRITE')")
     @Auditable(actionType = AuditActionType.UPDATE, targetType = AuditTargetType.USER)
     @PutMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public AppUserResponseDto update(@NotNull @PathVariable UUID id, @Valid @RequestBody AppUserRequestDto userDto) {
-        return appUserService.update(id, userDto);
+    public AppUserResponseDto update(@NotNull @PathVariable UUID id, @Valid @RequestBody AppUserRequestDto request) {
+        return appUserService.update(id, request);
     }
 
     @Operation(summary = "Delete user by ID", description = "Deletes user by ID")

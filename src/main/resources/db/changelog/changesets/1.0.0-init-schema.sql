@@ -54,11 +54,12 @@ create table if not exists project (
     tenant_id   uuid         not null,
     name        varchar(50)  not null,
     description varchar(255) not null,
-    status      varchar(10)  not null,
+    status      varchar(20)  not null,
     created_at  timestamp    not null,
     updated_at  timestamp    not null,
     constraint pk_project_id primary key (id),
-    constraint fk_project_tenant_id foreign key (tenant_id) references tenant (id)
+    constraint fk_project_tenant_id foreign key (tenant_id) references tenant (id),
+    constraint unq_project_tenant_id_name unique (tenant_id, name)
 );
 
 create table if not exists task (

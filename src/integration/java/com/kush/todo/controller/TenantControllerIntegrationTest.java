@@ -2,6 +2,7 @@ package com.kush.todo.controller;
 
 import com.kush.todo.BaseIntegrationTest;
 import com.kush.todo.IntegrationTestDataBuilder;
+import com.kush.todo.constant.Messages;
 import com.kush.todo.dto.async.AsyncOperationDto;
 import com.kush.todo.dto.async.AsyncOperationStatus;
 import com.kush.todo.dto.common.Role;
@@ -247,7 +248,7 @@ class TenantControllerIntegrationTest extends BaseIntegrationTest {
         Assertions.assertNotNull(response.getBody());
         List<ErrorDto> errors = response.getBody().errors();
         Assertions.assertFalse(CollectionUtils.isEmpty(errors));
-        Assertions.assertEquals(String.format("No tenant with id '%s'", absentId), errors.getFirst().message());
+        Assertions.assertEquals(String.format(Messages.PATTERN_NOT_FOUND, absentId), errors.getFirst().message());
     }
 
     @Test
@@ -509,7 +510,7 @@ class TenantControllerIntegrationTest extends BaseIntegrationTest {
         Assertions.assertNotNull(response.getBody());
         List<ErrorDto> errors = response.getBody().errors();
         Assertions.assertFalse(CollectionUtils.isEmpty(errors));
-        Assertions.assertEquals(String.format("No tenant with id '%s'", absentId), errors.getFirst().message());
+        Assertions.assertEquals(String.format(Messages.PATTERN_NOT_FOUND, absentId), errors.getFirst().message());
     }
 
     @Test

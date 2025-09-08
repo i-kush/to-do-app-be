@@ -1,10 +1,13 @@
 package com.kush.todo.repository;
 
 import com.kush.todo.BaseIntegrationTest;
+import com.kush.todo.constant.Messages;
+import com.kush.todo.exception.NotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -87,5 +90,14 @@ class TenantAwareRepositoryIntegrationTest extends BaseIntegrationTest {
     void deleteAllForbidden() {
         Assertions.assertThrows(UnsupportedOperationException.class,
                                 () -> tenantAwareRepository.deleteAll());
+    }
+
+    @Test
+    void findByIdAndTenantIdNotFound() {
+        ParameterizedTypeReference<UUID> id = new ParameterizedTypeReference<>() {
+        };
+        NotFoundException actual = Assertions.assertThrows(NotFoundException.class,
+                                                           () -> tenantAwareRepository.findByIdAndTenantIdRequired(id, defaultTenantId));
+        Assertions.assertEquals(String.format(Messages.PATTERN_NOT_FOUND, id), actual.getMessage());
     }
 }

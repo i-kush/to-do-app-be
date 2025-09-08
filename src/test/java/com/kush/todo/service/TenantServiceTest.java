@@ -1,6 +1,7 @@
 package com.kush.todo.service;
 
 import com.kush.todo.BaseTest;
+import com.kush.todo.constant.Messages;
 import com.kush.todo.exception.NotFoundException;
 import com.kush.todo.repository.TenantRepository;
 import org.junit.jupiter.api.Assertions;
@@ -28,7 +29,7 @@ class TenantServiceTest extends BaseTest {
         NotFoundException exception = Assertions.assertThrows(NotFoundException.class,
                                                               () -> tenantService.findByIdRequired(id));
 
-        Assertions.assertEquals(String.format("No tenant with id '%s'", id), exception.getMessage());
+        Assertions.assertEquals(String.format(Messages.PATTERN_NOT_FOUND, id), exception.getMessage());
     }
 
     @Test
@@ -39,6 +40,6 @@ class TenantServiceTest extends BaseTest {
         NotFoundException exception = Assertions.assertThrows(NotFoundException.class,
                                                               () -> tenantService.delete(id));
 
-        Assertions.assertEquals(String.format("No tenant with id '%s'", id), exception.getMessage());
+        Assertions.assertEquals(String.format(Messages.PATTERN_NOT_FOUND, id), exception.getMessage());
     }
 }

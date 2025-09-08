@@ -1,9 +1,11 @@
 package com.kush.todo;
 
+import com.kush.todo.dto.ProjectStatus;
 import com.kush.todo.dto.common.Role;
 import com.kush.todo.dto.request.AppUserRequestDto;
 import com.kush.todo.dto.request.CreateTenantRequestDto;
 import com.kush.todo.dto.request.LoginRequestDto;
+import com.kush.todo.dto.request.ProjectRequestDto;
 import com.kush.todo.dto.request.UpdateTenantRequestDto;
 import com.kush.todo.entity.AppUser;
 
@@ -126,5 +128,17 @@ public final class IntegrationTestDataBuilder {
                               .username(username)
                               .password(password)
                               .build();
+    }
+
+    public static ProjectRequestDto buildProjectRequestDto() {
+        return buildProjectRequestDtoByName("Project " + UUID.randomUUID());
+    }
+
+    public static ProjectRequestDto buildProjectRequestDtoByName(String name) {
+        return ProjectRequestDto.builder()
+                                .name(name)
+                                .description("Project description" + UUID.randomUUID())
+                                .status(ProjectStatus.OPEN)
+                                .build();
     }
 }

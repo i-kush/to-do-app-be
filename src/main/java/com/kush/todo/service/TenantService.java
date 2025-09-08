@@ -1,5 +1,6 @@
 package com.kush.todo.service;
 
+import com.kush.todo.constant.Messages;
 import com.kush.todo.dto.request.CreateTenantRequestDto;
 import com.kush.todo.dto.request.UpdateTenantRequestDto;
 import com.kush.todo.dto.response.CustomPage;
@@ -29,11 +30,9 @@ public class TenantService {
     private final TenantValidator tenantValidator;
 
     @Transactional
-    public TenantResponseDto create(CreateTenantRequestDto tenantDto) {
-        Tenant tenant = tenantMapper.toTenant(tenantDto);
-        Tenant createdTenant = tenantRepository.save(tenant);
-
-        return tenantMapper.toTenantDto(createdTenant);
+    public TenantResponseDto create(CreateTenantRequestDto request) {
+        Tenant tenant = tenantMapper.toTenant(request);
+        return tenantMapper.toTenantDto(tenantRepository.save(tenant));
     }
 
     @Transactional(readOnly = true)
@@ -42,11 +41,9 @@ public class TenantService {
     }
 
     @Transactional
-    public TenantResponseDto update(UUID id, UpdateTenantRequestDto tenantDto) {
-        Tenant tenant = tenantMapper.toTenant(getRequired(id), tenantDto);
-        Tenant udpatedTenant = tenantRepository.save(tenant);
-
-        return tenantMapper.toTenantDto(udpatedTenant);
+    public TenantResponseDto update(UUID id, UpdateTenantRequestDto request) {
+        Tenant tenant = tenantMapper.toTenant(getRequired(id), request);
+        return tenantMapper.toTenantDto(tenantRepository.save(tenant));
     }
 
     @Transactional
@@ -58,7 +55,7 @@ public class TenantService {
     private Tenant getRequired(UUID id) {
         return tenantRepository
                 .findById(id)
-                .orElseThrow(() -> new NotFoundException(String.format("No tenant with id '%s'", id)));
+                .orElseThrow(() -> new NotFoundException(String.format(Messages.PATTERN_NOT_FOUND, id)));
     }
 
     @Transactional(readOnly = true)

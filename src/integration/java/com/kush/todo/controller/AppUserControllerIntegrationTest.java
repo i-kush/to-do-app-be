@@ -2,6 +2,7 @@ package com.kush.todo.controller;
 
 import com.kush.todo.BaseIntegrationTest;
 import com.kush.todo.IntegrationTestDataBuilder;
+import com.kush.todo.constant.Messages;
 import com.kush.todo.dto.common.Role;
 import com.kush.todo.dto.request.AppUserRequestDto;
 import com.kush.todo.dto.request.LoginRequestDto;
@@ -142,7 +143,7 @@ class AppUserControllerIntegrationTest extends BaseIntegrationTest {
         Assertions.assertNotNull(response.getBody());
         List<ErrorDto> errors = response.getBody().errors();
         Assertions.assertFalse(CollectionUtils.isEmpty(errors));
-        Assertions.assertEquals(String.format(AppUserService.ERROR_MESSAGE_PATTER_NOT_FOUND, absentId), errors.getFirst().message());
+        Assertions.assertEquals(String.format(Messages.PATTERN_NOT_FOUND, absentId), errors.getFirst().message());
     }
 
     @Test
@@ -182,7 +183,7 @@ class AppUserControllerIntegrationTest extends BaseIntegrationTest {
 
     @ParameterizedTest
     @MethodSource("getAllWIthInvalidPageArgs")
-    void getAllWIthInvalidPage(int page, int size, String message) {
+    void getAllUsersWIthInvalidPage(int page, int size, String message) {
         ResponseEntity<ErrorsDto> response = restTemplate.exchange(BASE_URL_USERS + "?page={page}&size={size}",
                                                                    HttpMethod.GET,
                                                                    IntegrationTestDataBuilder.buildRequest(defaultAccessToken),
@@ -290,7 +291,7 @@ class AppUserControllerIntegrationTest extends BaseIntegrationTest {
         Assertions.assertNotNull(response.getBody());
         List<ErrorDto> errors = response.getBody().errors();
         Assertions.assertFalse(CollectionUtils.isEmpty(errors));
-        Assertions.assertEquals(String.format(AppUserService.ERROR_MESSAGE_PATTER_NOT_FOUND, absentId), errors.getFirst().message());
+        Assertions.assertEquals(String.format(Messages.PATTERN_NOT_FOUND, absentId), errors.getFirst().message());
     }
 
     @Test
