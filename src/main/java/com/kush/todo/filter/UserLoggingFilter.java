@@ -1,7 +1,7 @@
 package com.kush.todo.filter;
 
 import com.kush.todo.dto.common.CurrentUser;
-import com.kush.todo.util.RequestUtilsService;
+import com.kush.todo.service.RequestUtilsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -2,7 +2,7 @@ package com.kush.todo.filter;
 
 import com.kush.todo.BaseTest;
 import com.kush.todo.dto.common.CurrentUser;
-import com.kush.todo.util.RequestUtilsService;
+import com.kush.todo.service.RequestUtilsService;
 import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

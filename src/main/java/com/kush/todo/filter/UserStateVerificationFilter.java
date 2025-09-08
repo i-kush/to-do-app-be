@@ -5,7 +5,7 @@ import com.kush.todo.constant.CommonErrorMessages;
 import com.kush.todo.dto.response.ErrorDto;
 import com.kush.todo.dto.response.ErrorsDto;
 import com.kush.todo.service.AppUserService;
-import com.kush.todo.util.RequestUtilsService;
+import com.kush.todo.service.RequestUtilsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
