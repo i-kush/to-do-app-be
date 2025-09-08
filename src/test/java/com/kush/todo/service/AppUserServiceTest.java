@@ -2,7 +2,7 @@ package com.kush.todo.service;
 
 import com.kush.todo.BaseTest;
 import com.kush.todo.TestDataBuilder;
-import com.kush.todo.constant.Messages;
+import com.kush.todo.constant.CommonErrorMessages;
 import com.kush.todo.dto.common.CurrentUser;
 import com.kush.todo.exception.NotFoundException;
 import com.kush.todo.mapper.AppUserMapper;
@@ -47,6 +47,6 @@ class AppUserServiceTest extends BaseTest {
         NotFoundException exception = Assertions.assertThrows(NotFoundException.class,
                                                               () -> appUserService.delete(id));
 
-        Assertions.assertEquals(String.format(Messages.PATTERN_NOT_FOUND, id), exception.getMessage());
+        Assertions.assertEquals(String.format(CommonErrorMessages.PATTERN_NOT_FOUND, id), exception.getMessage());
     }
 }

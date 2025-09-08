@@ -1,7 +1,7 @@
 package com.kush.todo.service;
 
 import com.kush.todo.config.RedisConfig;
-import com.kush.todo.constant.Messages;
+import com.kush.todo.constant.CommonErrorMessages;
 import com.kush.todo.dto.common.CurrentUser;
 import com.kush.todo.dto.common.Permission;
 import com.kush.todo.dto.request.AppUserRequestDto;
@@ -92,7 +92,7 @@ public class AppUserService {
         appUserValidator.validateDelete(id, currentUser);
 
         if (!appUserRepository.existsByIdAndTenantId(id, currentUser.getTenantId())) {
-            throw new NotFoundException(String.format(Messages.PATTERN_NOT_FOUND, id));
+            throw new NotFoundException(String.format(CommonErrorMessages.PATTERN_NOT_FOUND, id));
         }
         appUserRepository.deleteByIdAndTenantId(id, currentUser.getTenantId());
     }

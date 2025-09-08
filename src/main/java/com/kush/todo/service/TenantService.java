@@ -1,6 +1,6 @@
 package com.kush.todo.service;
 
-import com.kush.todo.constant.Messages;
+import com.kush.todo.constant.CommonErrorMessages;
 import com.kush.todo.dto.request.CreateTenantRequestDto;
 import com.kush.todo.dto.request.UpdateTenantRequestDto;
 import com.kush.todo.dto.response.CustomPage;
@@ -55,7 +55,7 @@ public class TenantService {
     private Tenant getRequired(UUID id) {
         return tenantRepository
                 .findById(id)
-                .orElseThrow(() -> new NotFoundException(String.format(Messages.PATTERN_NOT_FOUND, id)));
+                .orElseThrow(() -> new NotFoundException(String.format(CommonErrorMessages.PATTERN_NOT_FOUND, id)));
     }
 
     @Transactional(readOnly = true)

@@ -1,7 +1,7 @@
 package com.kush.todo.repository;
 
 import com.kush.todo.BaseIntegrationTest;
-import com.kush.todo.constant.Messages;
+import com.kush.todo.constant.CommonErrorMessages;
 import com.kush.todo.exception.NotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -98,6 +98,6 @@ class TenantAwareRepositoryIntegrationTest extends BaseIntegrationTest {
         };
         NotFoundException actual = Assertions.assertThrows(NotFoundException.class,
                                                            () -> tenantAwareRepository.findByIdAndTenantIdRequired(id, defaultTenantId));
-        Assertions.assertEquals(String.format(Messages.PATTERN_NOT_FOUND, id), actual.getMessage());
+        Assertions.assertEquals(String.format(CommonErrorMessages.PATTERN_NOT_FOUND, id), actual.getMessage());
     }
 }

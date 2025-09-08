@@ -2,7 +2,7 @@ package com.kush.todo.controller;
 
 import com.kush.todo.BaseIntegrationTest;
 import com.kush.todo.IntegrationTestDataBuilder;
-import com.kush.todo.constant.Messages;
+import com.kush.todo.constant.CommonErrorMessages;
 import com.kush.todo.dto.common.Role;
 import com.kush.todo.dto.request.AppUserRequestDto;
 import com.kush.todo.dto.request.LoginRequestDto;
@@ -12,7 +12,6 @@ import com.kush.todo.dto.response.ErrorDto;
 import com.kush.todo.dto.response.ErrorsDto;
 import com.kush.todo.dto.response.LoginResponseDto;
 import com.kush.todo.service.AppUserService;
-import com.kush.todo.service.AuthService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -143,7 +142,7 @@ class AppUserControllerIntegrationTest extends BaseIntegrationTest {
         Assertions.assertNotNull(response.getBody());
         List<ErrorDto> errors = response.getBody().errors();
         Assertions.assertFalse(CollectionUtils.isEmpty(errors));
-        Assertions.assertEquals(String.format(Messages.PATTERN_NOT_FOUND, absentId), errors.getFirst().message());
+        Assertions.assertEquals(String.format(CommonErrorMessages.PATTERN_NOT_FOUND, absentId), errors.getFirst().message());
     }
 
     @Test
@@ -291,7 +290,7 @@ class AppUserControllerIntegrationTest extends BaseIntegrationTest {
         Assertions.assertNotNull(response.getBody());
         List<ErrorDto> errors = response.getBody().errors();
         Assertions.assertFalse(CollectionUtils.isEmpty(errors));
-        Assertions.assertEquals(String.format(Messages.PATTERN_NOT_FOUND, absentId), errors.getFirst().message());
+        Assertions.assertEquals(String.format(CommonErrorMessages.PATTERN_NOT_FOUND, absentId), errors.getFirst().message());
     }
 
     @Test
@@ -322,7 +321,7 @@ class AppUserControllerIntegrationTest extends BaseIntegrationTest {
             List<ErrorDto> errors = errorResponse.getBody().errors();
             Assertions.assertFalse(CollectionUtils.isEmpty(errors));
             Assertions.assertEquals(1, errors.size());
-            Assertions.assertEquals(AuthService.ERROR_MESSAGE_INVALID_CREDS, errors.getFirst().message());
+            Assertions.assertEquals(CommonErrorMessages.USER_INVALID_CREDS, errors.getFirst().message());
         }
 
         errorResponse = restTemplate.postForEntity(BASE_URL_AUTH, invalidMainUserLoginRequest, ErrorsDto.class);
@@ -331,7 +330,7 @@ class AppUserControllerIntegrationTest extends BaseIntegrationTest {
         List<ErrorDto> errors = errorResponse.getBody().errors();
         Assertions.assertFalse(CollectionUtils.isEmpty(errors));
         Assertions.assertEquals(1, errors.size());
-        Assertions.assertEquals(AuthService.ERROR_MESSAGE_USER_LOCKED, errors.getFirst().message());
+        Assertions.assertEquals(CommonErrorMessages.USER_LOCKED, errors.getFirst().message());
 
         //verifying user is locked
         ResponseEntity<AppUserResponseDto> lockedUserGetResponse = restTemplate.exchange(BASE_URL_USERS + "/{id}",
