@@ -57,4 +57,12 @@ public class ProjectService {
                                                           .map(projectMapper::toProjectResponseDto);
         return projectMapper.toCustomPage(pages);
     }
+
+    @Transactional(readOnly = true)
+    public CustomPage<ProjectResponseDto> findAll(int page, int size, String key) {
+        Page<ProjectResponseDto> pages = projectRepository
+                .findAllLike(PageRequest.of(page - 1, size), currentUser.getTenantId(), key)
+                .map(projectMapper::toProjectResponseDto);
+        return projectMapper.toCustomPage(pages);
+    }
 }

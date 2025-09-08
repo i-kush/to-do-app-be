@@ -17,7 +17,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;
@@ -87,6 +89,23 @@ public class ProjectController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public CustomPage<ProjectResponseDto> getAll(@Min(1) @RequestParam int page, @Min(1) @Max(200) @RequestParam int size) {
         return projectService.findAll(page, size);
+    }
+
+    @Operation(summary = "Search projects", description = "Gets found paginated projects list with details")
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "Successfully retrieved found paginated projects"))
+    @CommonApiErrors
+    @Timed(value = MetricsConstants.TIMER_ENDPOINT,
+           extraTags = {MetricsConstants.TAG_DOMAIN_NAME, MetricsConstants.TAG_DOMAIN_PROJECT, MetricsConstants.TAG_OPERATION_NAME, MetricsConstants.TAG_OPERATION_READ})
+    @Counted(value = MetricsConstants.COUNT_ENDPOINT_ERROR,
+             extraTags = {MetricsConstants.TAG_DOMAIN_NAME, MetricsConstants.TAG_DOMAIN_PROJECT, MetricsConstants.TAG_OPERATION_NAME, MetricsConstants.TAG_OPERATION_READ},
+             recordFailuresOnly = true)
+    @PreAuthorize("hasAuthority('PROJECT_READ')")
+    @Auditable(actionType = AuditActionType.READ, targetType = AuditTargetType.PROJECT)
+    @GetMapping(value = "search", produces = MediaType.APPLICATION_JSON_VALUE)
+    public CustomPage<ProjectResponseDto> search(@Min(1) @RequestParam int page,
+                                                 @Min(1) @Max(200) @RequestParam int size,
+                                                 @NotEmpty @Size(min = 3, max = 30) String key) {
+        return projectService.findAll(page, size, key);
     }
 
     @Operation(summary = "Update project by ID", description = "Updates project details by ID")
