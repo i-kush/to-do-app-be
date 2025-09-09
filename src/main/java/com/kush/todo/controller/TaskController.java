@@ -3,6 +3,7 @@ package com.kush.todo.controller;
 import com.kush.todo.annotation.Auditable;
 import com.kush.todo.annotation.CommonApiErrors;
 import com.kush.todo.constant.MetricsConstants;
+import com.kush.todo.dto.TaskStatus;
 import com.kush.todo.dto.common.AuditActionType;
 import com.kush.todo.dto.common.AuditTargetType;
 import com.kush.todo.dto.request.TaskRequestDto;
@@ -126,6 +127,23 @@ public class TaskController {
                                       @NotNull @PathVariable UUID taskId,
                                       @Valid @RequestBody TaskRequestDto request) {
         return projectFacade.updateTask(projectId, taskId, request);
+    }
+
+    @Operation(summary = "Set task status by ID", description = "Sets task status by ID")
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "Successfully updated task status"))
+    @CommonApiErrors
+    @Timed(value = MetricsConstants.TIMER_ENDPOINT,
+           extraTags = {MetricsConstants.TAG_DOMAIN_NAME, MetricsConstants.TAG_DOMAIN_TASK, MetricsConstants.TAG_OPERATION_NAME, MetricsConstants.TAG_OPERATION_UPDATE})
+    @Counted(value = MetricsConstants.COUNT_ENDPOINT_ERROR,
+             extraTags = {MetricsConstants.TAG_DOMAIN_NAME, MetricsConstants.TAG_DOMAIN_TASK, MetricsConstants.TAG_OPERATION_NAME, MetricsConstants.TAG_OPERATION_UPDATE},
+             recordFailuresOnly = true)
+    @PreAuthorize("hasAuthority('TASK_WRITE')")
+    @Auditable(actionType = AuditActionType.UPDATE, targetType = AuditTargetType.TASK)
+    @PutMapping(value = "{projectId}/tasks/{taskId}/status/{status}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public void updateTaskStatus(@NotNull @PathVariable UUID projectId,
+                                 @NotNull @PathVariable UUID taskId,
+                                 @NotNull @PathVariable TaskStatus status) {
+        projectFacade.setTaskStatus(projectId, taskId, status);
     }
 
     @Operation(summary = "Delete task by ID", description = "Deletes task by ID")

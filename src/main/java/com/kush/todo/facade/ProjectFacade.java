@@ -1,5 +1,7 @@
 package com.kush.todo.facade;
 
+import com.kush.todo.dto.ProjectStatus;
+import com.kush.todo.dto.TaskStatus;
 import com.kush.todo.dto.request.ProjectRequestDto;
 import com.kush.todo.dto.request.TaskRequestDto;
 import com.kush.todo.dto.response.CustomPage;
@@ -49,6 +51,11 @@ public class ProjectFacade {
     }
 
     @Transactional
+    public void setStatus(UUID id, ProjectStatus status) {
+        projectService.setStatus(id, status);
+    }
+
+    @Transactional
     public void delete(UUID id) {
         taskService.deleteByProjectId(id);
         projectService.delete(id);
@@ -79,6 +86,12 @@ public class ProjectFacade {
     public TaskResponseDto updateTask(UUID projectId, UUID taskId, TaskRequestDto request) {
         verifyTaskManagement(projectId, request);
         return taskService.update(projectId, taskId, request);
+    }
+
+    @Transactional
+    public void setTaskStatus(UUID projectId, UUID taskId, TaskStatus status) {
+        projectService.verifyExists(projectId);
+        taskService.setStatus(projectId, taskId, status);
     }
 
     @Transactional

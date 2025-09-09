@@ -3,6 +3,7 @@ package com.kush.todo.controller;
 import com.kush.todo.annotation.Auditable;
 import com.kush.todo.annotation.CommonApiErrors;
 import com.kush.todo.constant.MetricsConstants;
+import com.kush.todo.dto.ProjectStatus;
 import com.kush.todo.dto.common.AuditActionType;
 import com.kush.todo.dto.common.AuditTargetType;
 import com.kush.todo.dto.request.ProjectRequestDto;
@@ -121,6 +122,21 @@ public class ProjectController {
     @PutMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ProjectResponseDto update(@NotNull @PathVariable UUID id, @Valid @RequestBody ProjectRequestDto request) {
         return projectFacade.update(id, request);
+    }
+
+    @Operation(summary = "Set project status by ID", description = "Sets project status by ID")
+    @ApiResponses(value = @ApiResponse(responseCode = "200", description = "Successfully updated project status"))
+    @CommonApiErrors
+    @Timed(value = MetricsConstants.TIMER_ENDPOINT,
+           extraTags = {MetricsConstants.TAG_DOMAIN_NAME, MetricsConstants.TAG_DOMAIN_PROJECT, MetricsConstants.TAG_OPERATION_NAME, MetricsConstants.TAG_OPERATION_UPDATE})
+    @Counted(value = MetricsConstants.COUNT_ENDPOINT_ERROR,
+             extraTags = {MetricsConstants.TAG_DOMAIN_NAME, MetricsConstants.TAG_DOMAIN_PROJECT, MetricsConstants.TAG_OPERATION_NAME, MetricsConstants.TAG_OPERATION_UPDATE},
+             recordFailuresOnly = true)
+    @PreAuthorize("hasAuthority('PROJECT_WRITE')")
+    @Auditable(actionType = AuditActionType.UPDATE, targetType = AuditTargetType.PROJECT)
+    @PutMapping(value = "{id}/status/{status}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public void updateStatus(@NotNull @PathVariable UUID id, @NotNull @PathVariable ProjectStatus status) {
+        projectFacade.setStatus(id, status);
     }
 
     @Operation(summary = "Delete project by ID", description = "Deletes project by ID")

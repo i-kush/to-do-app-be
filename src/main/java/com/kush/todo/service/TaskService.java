@@ -1,6 +1,7 @@
 package com.kush.todo.service;
 
 import com.kush.todo.constant.CommonErrorMessages;
+import com.kush.todo.dto.TaskStatus;
 import com.kush.todo.dto.common.CurrentUser;
 import com.kush.todo.dto.request.TaskRequestDto;
 import com.kush.todo.dto.response.CustomPage;
@@ -41,6 +42,12 @@ public class TaskService {
     public TaskResponseDto update(UUID projectId, UUID taskId, TaskRequestDto request) {
         Task task = taskMapper.toTask(projectId, taskRepository.findByIdAndTenantIdAndProjectIdRequired(taskId, currentUser.getTenantId(), projectId), request);
         return taskMapper.toTaskResponseDto(taskRepository.save(task));
+    }
+
+    @Transactional
+    public void setStatus(UUID projectId, UUID taskId, TaskStatus status) {
+        verifyExists(taskId, projectId);
+        taskRepository.setStatus(taskId, projectId, currentUser.getTenantId(), status);
     }
 
     @Transactional(readOnly = true)

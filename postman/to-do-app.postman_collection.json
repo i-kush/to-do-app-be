@@ -713,6 +713,49 @@
 					"response": []
 				},
 				{
+					"name": "update status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access-token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{to-do-app-host}}/projects/{{created-project-id}}/status/done",
+							"host": [
+								"{{to-do-app-host}}"
+							],
+							"path": [
+								"projects",
+								"{{created-project-id}}",
+								"status",
+								"done"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "get",
 					"event": [
 						{
@@ -970,6 +1013,51 @@
 								"{{created-project-id}}",
 								"tasks",
 								"{{created-task-id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access-token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{to-do-app-host}}/projects/{{created-project-id}}/tasks/{{created-task-id}}/status/done",
+							"host": [
+								"{{to-do-app-host}}"
+							],
+							"path": [
+								"projects",
+								"{{created-project-id}}",
+								"tasks",
+								"{{created-task-id}}",
+								"status",
+								"done"
 							]
 						}
 					},

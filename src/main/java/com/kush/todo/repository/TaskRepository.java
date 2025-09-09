@@ -1,6 +1,7 @@
 package com.kush.todo.repository;
 
 import com.kush.todo.constant.CommonErrorMessages;
+import com.kush.todo.dto.TaskStatus;
 import com.kush.todo.entity.Task;
 import com.kush.todo.exception.NotFoundException;
 
@@ -25,6 +26,10 @@ public interface TaskRepository extends TenantAwareRepository<Task, UUID> {
     @Modifying
     @Query("delete from task t where t.id = :id and t.project_id = :projectId and t.tenant_id = :tenantId")
     void deleteByIdAndProjectIdAndTenantId(UUID id, UUID projectId, UUID tenantId);
+
+    @Modifying
+    @Query("update task set status = :status where id = :id and project_id = :projectId and tenant_id = :tenantId")
+    void setStatus(UUID id, UUID projectId, UUID tenantId, TaskStatus status);
 
     Page<Task> findAllByTenantIdAndProjectIdAndNameIgnoreCaseLike(Pageable pageable, UUID tenantId, UUID projectId, String exactKey);
 
