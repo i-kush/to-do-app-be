@@ -9,10 +9,10 @@ import lombok.Builder;
 @Builder
 public record ProjectRequestDto(
         @NotBlank
-        @Size(min = 1, max = 50)
+        @Size(min = 1, max = 100)
         String name,
         @NotBlank
-        @Size(min = 1, max = 100)
+        @Size(min = 1, max = 200)
         String description,
         @NotNull
         ProjectStatus status

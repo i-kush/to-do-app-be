@@ -52,7 +52,7 @@ create table if not exists app_user (
 create table if not exists project (
     id          uuid         not null default uuid_generate_v4(),
     tenant_id   uuid         not null,
-    name        varchar(50)  not null,
+    name        varchar(100)  not null,
     description varchar(255) not null,
     status      varchar(20)  not null,
     created_at  timestamp    not null,

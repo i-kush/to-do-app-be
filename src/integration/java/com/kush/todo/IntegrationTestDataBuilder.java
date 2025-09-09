@@ -131,10 +131,10 @@ public final class IntegrationTestDataBuilder {
     }
 
     public static ProjectRequestDto buildProjectRequestDto() {
-        return buildProjectRequestDtoByName("Project " + UUID.randomUUID());
+        return buildProjectRequestDto("Project " + UUID.randomUUID());
     }
 
-    public static ProjectRequestDto buildProjectRequestDtoByName(String name) {
+    public static ProjectRequestDto buildProjectRequestDto(String name) {
         return ProjectRequestDto.builder()
                                 .name(name)
                                 .description("Project description" + UUID.randomUUID())

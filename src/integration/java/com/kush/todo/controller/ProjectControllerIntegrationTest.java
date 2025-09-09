@@ -16,6 +16,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -73,13 +74,29 @@ class ProjectControllerIntegrationTest extends BaseIntegrationTest {
 
     @ParameterizedTest
     @NullAndEmptySource
-    @ValueSource(strings = {" ", "  ", "11111111111111111111111111111111111111111111111111111"})
+    @ValueSource(strings = {" ", "  ", "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"})
     void createWithInvalidName(String name) {
-        ProjectRequestDto request = IntegrationTestDataBuilder.buildProjectRequestDtoByName(name);
+        ProjectRequestDto request = IntegrationTestDataBuilder.buildProjectRequestDto(name);
         ResponseEntity<ErrorsDto> response = restTemplate.postForEntity(
                 BASE_PROJECT_URL,
                 IntegrationTestDataBuilder.buildRequest(request, defaultAccessToken),
                 ErrorsDto.class
+        );
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode().value());
+        Assertions.assertNotNull(response.getBody());
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {" ", "  ", "1", "111111111111111111111111111111111111"})
+    void searchWithInvalidKey(String key) {
+        ResponseEntity<ErrorsDto> response = restTemplate.exchange(
+                BASE_PROJECT_URL + "/search?page=1&size=10&key={key}",
+                HttpMethod.GET,
+                IntegrationTestDataBuilder.buildRequest(defaultAccessToken),
+                ErrorsDto.class,
+                key
         );
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode().value());
@@ -139,8 +156,43 @@ class ProjectControllerIntegrationTest extends BaseIntegrationTest {
         CustomPage<ProjectResponseDto> getAllResponseBody = getAllResponse.getBody();
         Assertions.assertNotNull(getAllResponseBody);
         Assertions.assertFalse(CollectionUtils.isEmpty(getAllResponseBody.items()));
-        Assertions.assertTrue(getAllResponseBody.totalPages() >= 1);
-        Assertions.assertTrue(getAllResponseBody.totalElements() >= 1);
+        Assertions.assertEquals(1, getAllResponseBody.totalPages());
+        Assertions.assertEquals(1, getAllResponseBody.totalElements());
+    }
+
+    @Test
+    void search() {
+        String key = "UniquE-NamE-ParT";
+        restTemplate.postForEntity(
+                BASE_PROJECT_URL,
+                IntegrationTestDataBuilder.buildRequest(IntegrationTestDataBuilder.buildProjectRequestDto(key.toLowerCase(Locale.getDefault()) + UUID.randomUUID()), defaultAccessToken),
+                ProjectResponseDto.class);
+        restTemplate.postForEntity(
+                BASE_PROJECT_URL,
+                IntegrationTestDataBuilder.buildRequest(IntegrationTestDataBuilder.buildProjectRequestDto(key.toUpperCase(Locale.getDefault()) + UUID.randomUUID()), defaultAccessToken),
+                ProjectResponseDto.class);
+        restTemplate.postForEntity(
+                BASE_PROJECT_URL,
+                IntegrationTestDataBuilder.buildRequest(IntegrationTestDataBuilder.buildProjectRequestDto(), defaultAccessToken),
+                ProjectResponseDto.class);
+
+        ParameterizedTypeReference<CustomPage<ProjectResponseDto>> responseType = new ParameterizedTypeReference<>() {
+        };
+        ResponseEntity<CustomPage<ProjectResponseDto>> searchAllResponce = restTemplate.exchange(BASE_PROJECT_URL + "/search?page=1&size=10&key={key}",
+                                                                                                 HttpMethod.GET,
+                                                                                                 IntegrationTestDataBuilder.buildRequest(defaultAccessToken),
+                                                                                                 responseType,
+                                                                                                 key);
+
+        Assertions.assertEquals(HttpStatus.OK.value(), searchAllResponce.getStatusCode().value());
+        CustomPage<ProjectResponseDto> searchAllResponseBody = searchAllResponce.getBody();
+        Assertions.assertNotNull(searchAllResponseBody);
+        List<ProjectResponseDto> items = searchAllResponseBody.items();
+        Assertions.assertFalse(CollectionUtils.isEmpty(items));
+        Assertions.assertEquals(1, searchAllResponseBody.totalPages());
+        Assertions.assertEquals(2, searchAllResponseBody.totalElements());
+        items.forEach(item -> Assertions.assertTrue(
+                item.name().toLowerCase(Locale.getDefault()).contains(key.toLowerCase(Locale.getDefault()))));
     }
 
     @ParameterizedTest
