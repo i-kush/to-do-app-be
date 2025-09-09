@@ -714,6 +714,20 @@
 				},
 				{
 					"name": "get",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code < 300) {",
+									"    pm.environment.set(\"created-project-id\", String(pm.response.json().id));",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
 						"header": [
@@ -742,6 +756,49 @@
 					"response": []
 				},
 				{
+					"name": "search",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access-token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{to-do-app-host}}/projects/search?page=1&size=1&key=test",
+							"host": [
+								"{{to-do-app-host}}"
+							],
+							"path": [
+								"projects",
+								"search"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "size",
+									"value": "1"
+								},
+								{
+									"key": "key",
+									"value": "test"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "get all",
 					"request": {
 						"method": "GET",
@@ -758,12 +815,267 @@
 							}
 						],
 						"url": {
-							"raw": "{{to-do-app-host}}/projects?page=1&size=1",
+							"raw": "{{to-do-app-host}}/projects?page=1&size=2",
 							"host": [
 								"{{to-do-app-host}}"
 							],
 							"path": [
 								"projects"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "size",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access-token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{to-do-app-host}}/projects/{{created-project-id}}",
+							"host": [
+								"{{to-do-app-host}}"
+							],
+							"path": [
+								"projects",
+								"{{created-project-id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "tasks",
+			"item": [
+				{
+					"name": "create",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code < 300) {",
+									"    pm.environment.set(\"created-task-id\", String(pm.response.json().id));",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access-token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"my-task\",\n    \"description\": \"Wowow, this is my task!\",\n    \"status\": \"OPEN\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{to-do-app-host}}/projects/{{created-project-id}}/tasks",
+							"host": [
+								"{{to-do-app-host}}"
+							],
+							"path": [
+								"projects",
+								"{{created-project-id}}",
+								"tasks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access-token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"my-task-updated\",\n    \"description\": \"Updated description\",\n    \"status\": \"IN_PROGRESS\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{to-do-app-host}}/projects/{{created-project-id}}/tasks/{{created-task-id}}",
+							"host": [
+								"{{to-do-app-host}}"
+							],
+							"path": [
+								"projects",
+								"{{created-project-id}}",
+								"tasks",
+								"{{created-task-id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access-token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{to-do-app-host}}/projects/{{created-project-id}}/tasks/{{created-task-id}}",
+							"host": [
+								"{{to-do-app-host}}"
+							],
+							"path": [
+								"projects",
+								"{{created-project-id}}",
+								"tasks",
+								"{{created-task-id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access-token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{to-do-app-host}}/projects/{{created-project-id}}/tasks/search?page=1&size=1&key=task",
+							"host": [
+								"{{to-do-app-host}}"
+							],
+							"path": [
+								"projects",
+								"{{created-project-id}}",
+								"tasks",
+								"search"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "size",
+									"value": "1"
+								},
+								{
+									"key": "key",
+									"value": "task"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access-token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{to-do-app-host}}/projects/{{created-project-id}}/tasks?page=1&size=1",
+							"host": [
+								"{{to-do-app-host}}"
+							],
+							"path": [
+								"projects",
+								"{{created-project-id}}",
+								"tasks"
 							],
 							"query": [
 								{
@@ -796,13 +1108,15 @@
 							}
 						],
 						"url": {
-							"raw": "{{to-do-app-host}}/projects/{{created-project-id}}",
+							"raw": "{{to-do-app-host}}/projects/{{created-project-id}}/tasks/{{created-task-id}}",
 							"host": [
 								"{{to-do-app-host}}"
 							],
 							"path": [
 								"projects",
-								"{{created-project-id}}"
+								"{{created-project-id}}",
+								"tasks",
+								"{{created-task-id}}"
 							]
 						}
 					},

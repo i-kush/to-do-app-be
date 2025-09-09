@@ -90,10 +90,7 @@ public class AppUserService {
     @CacheEvict(value = RedisConfig.CACHE_NAME_USERS, key = "#id")
     public void delete(UUID id) {
         appUserValidator.validateDelete(id, currentUser);
-
-        if (!appUserRepository.existsByIdAndTenantId(id, currentUser.getTenantId())) {
-            throw new NotFoundException(String.format(CommonErrorMessages.PATTERN_NOT_FOUND, id));
-        }
+        verifyExists(id);
         appUserRepository.deleteByIdAndTenantId(id, currentUser.getTenantId());
     }
 
@@ -163,5 +160,12 @@ public class AppUserService {
     @CacheEvict(value = RedisConfig.CACHE_NAME_USERS, allEntries = true)
     public int deleteByTenantId(UUID tenantId) {
         return appUserRepository.deleteByTenantId(tenantId);
+    }
+
+    @Transactional(readOnly = true)
+    public void verifyExists(UUID id) {
+        if (!appUserRepository.existsByIdAndTenantId(id, currentUser.getTenantId())) {
+            throw new NotFoundException(String.format(CommonErrorMessages.PATTERN_NOT_FOUND, id));
+        }
     }
 }

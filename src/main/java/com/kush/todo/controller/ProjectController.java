@@ -8,7 +8,7 @@ import com.kush.todo.dto.common.AuditTargetType;
 import com.kush.todo.dto.request.ProjectRequestDto;
 import com.kush.todo.dto.response.CustomPage;
 import com.kush.todo.dto.response.ProjectResponseDto;
-import com.kush.todo.service.ProjectService;
+import com.kush.todo.facade.ProjectFacade;
 import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,7 +43,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ProjectController {
 
-    private final ProjectService projectService;
+    private final ProjectFacade projectFacade;
 
     @Operation(summary = "Create project", description = "Creates a project")
     @ApiResponses(value = @ApiResponse(responseCode = "201", description = "Successfully created project"))
@@ -58,7 +58,7 @@ public class ProjectController {
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public ProjectResponseDto create(@Valid @RequestBody ProjectRequestDto request) {
-        return projectService.create(request);
+        return projectFacade.create(request);
     }
 
     @Operation(summary = "Get project by ID", description = "Gets project details by ID")
@@ -73,7 +73,7 @@ public class ProjectController {
     @Auditable(actionType = AuditActionType.READ, targetType = AuditTargetType.PROJECT)
     @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ProjectResponseDto get(@NotNull @PathVariable UUID id) {
-        return projectService.findByIdRequired(id);
+        return projectFacade.findProjectById(id);
     }
 
     @Operation(summary = "Get projects", description = "Gets paginated projects list with details")
@@ -88,7 +88,7 @@ public class ProjectController {
     @Auditable(actionType = AuditActionType.READ, targetType = AuditTargetType.PROJECT)
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public CustomPage<ProjectResponseDto> getAll(@Min(1) @RequestParam int page, @Min(1) @Max(200) @RequestParam int size) {
-        return projectService.findAll(page, size);
+        return projectFacade.findAll(page, size);
     }
 
     @Operation(summary = "Search projects", description = "Gets found paginated projects list with details")
@@ -105,7 +105,7 @@ public class ProjectController {
     public CustomPage<ProjectResponseDto> search(@Min(1) @RequestParam int page,
                                                  @Min(1) @Max(200) @RequestParam int size,
                                                  @NotEmpty @Size(min = 3, max = 30) String key) {
-        return projectService.findAll(page, size, key);
+        return projectFacade.findAll(page, size, key);
     }
 
     @Operation(summary = "Update project by ID", description = "Updates project details by ID")
@@ -120,7 +120,7 @@ public class ProjectController {
     @Auditable(actionType = AuditActionType.UPDATE, targetType = AuditTargetType.PROJECT)
     @PutMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ProjectResponseDto update(@NotNull @PathVariable UUID id, @Valid @RequestBody ProjectRequestDto request) {
-        return projectService.update(id, request);
+        return projectFacade.update(id, request);
     }
 
     @Operation(summary = "Delete project by ID", description = "Deletes project by ID")
@@ -135,6 +135,6 @@ public class ProjectController {
     @Auditable(actionType = AuditActionType.DELETE, targetType = AuditTargetType.PROJECT)
     @DeleteMapping("{id}")
     public void delete(@NotNull @PathVariable UUID id) {
-        projectService.delete(id);
+        projectFacade.delete(id);
     }
 }

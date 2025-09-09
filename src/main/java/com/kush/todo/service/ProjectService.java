@@ -45,9 +45,7 @@ public class ProjectService {
 
     @Transactional
     public void delete(UUID id) {
-        if (!projectRepository.existsByIdAndTenantId(id, currentUser.getTenantId())) {
-            throw new NotFoundException(String.format(CommonErrorMessages.PATTERN_NOT_FOUND, id));
-        }
+        verifyExists(id);
         projectRepository.deleteByIdAndTenantId(id, currentUser.getTenantId());
     }
 
@@ -64,5 +62,12 @@ public class ProjectService {
                 .findAllLike(PageRequest.of(page - 1, size), currentUser.getTenantId(), key)
                 .map(projectMapper::toProjectResponseDto);
         return projectMapper.toCustomPage(pages);
+    }
+
+    @Transactional(readOnly = true)
+    public void verifyExists(UUID id) {
+        if (!projectRepository.existsByIdAndTenantId(id, currentUser.getTenantId())) {
+            throw new NotFoundException(String.format(CommonErrorMessages.PATTERN_NOT_FOUND, id));
+        }
     }
 }
