@@ -1,2 +1,0 @@
-create extension if not exists pg_trgm;
-create index idx_project_name_trgm on project using gin (upper(name) gin_trgm_ops); --trigram index for 'like' searches, see 'ProjectRepository.findAllByTenantIdAndNameIgnoreCaseLike'

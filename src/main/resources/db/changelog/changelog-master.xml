@@ -50,16 +50,4 @@
                      splitStatements="false"/>
         </rollback>
     </changeSet>
-
-    <changeSet author="Igor Kushnir"
-               id="add-project-index">
-        <sqlFile path="changesets/1.0.4-add-project-index.sql"
-                 relativeToChangelogFile="true"
-                 splitStatements="false"/>
-        <rollback>
-            <sqlFile path="changesets/rollback/1.0.4-add-project-index-rollback.sql"
-                     relativeToChangelogFile="true"
-                     splitStatements="false"/>
-        </rollback>
-    </changeSet>
 </databaseChangeLog>
