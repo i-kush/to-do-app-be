@@ -52,27 +52,29 @@ create table if not exists app_user (
 create table if not exists project (
     id          uuid         not null default uuid_generate_v4(),
     tenant_id   uuid         not null,
-    name        varchar(50)  not null,
+    name        varchar(100) not null,
     description varchar(255) not null,
-    status      varchar(10)  not null,
+    status      varchar(20)  not null,
     created_at  timestamp    not null,
     updated_at  timestamp    not null,
     constraint pk_project_id primary key (id),
-    constraint fk_project_tenant_id foreign key (tenant_id) references tenant (id)
+    constraint fk_project_tenant_id foreign key (tenant_id) references tenant (id),
+    constraint unq_project_tenant_id_name unique (tenant_id, name)
 );
 
 create table if not exists task (
     id               uuid         not null default uuid_generate_v4(),
     tenant_id        uuid         not null,
     project_id       uuid         not null,
-    name             varchar(50)  not null,
+    name             varchar(100) not null,
     description      varchar(255) not null,
     assigned_user_id uuid,
-    status           varchar(10)  not null,
+    status           varchar(20)  not null,
     created_at       timestamp    not null,
     updated_at       timestamp    not null,
     constraint pk_task_id primary key (id),
     constraint fk_task_tenant_id foreign key (tenant_id) references tenant (id),
     constraint fk_task_user_id foreign key (assigned_user_id) references app_user (id),
-    constraint fk_task_project_id foreign key (project_id) references project (id)
+    constraint fk_task_project_id foreign key (project_id) references project (id),
+    constraint unq_task_tenant_id_project_id_name unique (tenant_id, project_id, name)
 );

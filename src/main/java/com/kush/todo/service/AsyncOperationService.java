@@ -1,6 +1,7 @@
 package com.kush.todo.service;
 
 import com.kush.todo.config.RedisConfig;
+import com.kush.todo.constant.CommonErrorMessages;
 import com.kush.todo.dto.async.AsyncOperationDto;
 import com.kush.todo.dto.async.AsyncOperationEventDto;
 import com.kush.todo.dto.response.AsyncOperationQueuedResponseDto;
@@ -23,8 +24,6 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class AsyncOperationService {
 
-    public static final String ERROR_MESSAGE_OPERATION_NOT_FOUND = "No such operation";
-
     @Qualifier(RedisConfig.CACHE_NAME_ASYNC_OPERATIONS)
     private final Cache cache;
     private final AsyncOperationMapper asyncOperationMapper;
@@ -40,7 +39,7 @@ public class AsyncOperationService {
     @SuppressWarnings("unchecked")
     private <T> AsyncOperationDto<T> getOperation(String key) {
         return Optional.ofNullable(cache.get(key, AsyncOperationDto.class))
-                       .orElseThrow(() -> new NotFoundException(ERROR_MESSAGE_OPERATION_NOT_FOUND));
+                       .orElseThrow(() -> new NotFoundException(String.format(CommonErrorMessages.PATTERN_NOT_FOUND, key)));
     }
 
     public <T> AsyncOperationQueuedResponseDto queueOperation(UUID tenantId, T request, String topicName) {
@@ -69,7 +68,7 @@ public class AsyncOperationService {
         cache.put(key, asyncOperation);
     }
 
-    private String toKey(UUID operationId, UUID tenantId) {
+    String toKey(UUID operationId, UUID tenantId) {
         return String.format("%s_%s", tenantId, operationId);
     }
 }

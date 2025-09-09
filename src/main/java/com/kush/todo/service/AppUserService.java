@@ -1,6 +1,7 @@
 package com.kush.todo.service;
 
 import com.kush.todo.config.RedisConfig;
+import com.kush.todo.constant.CommonErrorMessages;
 import com.kush.todo.dto.common.CurrentUser;
 import com.kush.todo.dto.common.Permission;
 import com.kush.todo.dto.request.AppUserRequestDto;
@@ -37,7 +38,6 @@ import org.springframework.util.CollectionUtils;
 public class AppUserService {
 
     public static final String ERROR_MESSAGE_USER_IS_NOT_LOCKED = "User is not locked";
-    public static final String ERROR_MESSAGE_PATTER_NOT_FOUND = "No user with id '%s'";
 
     private final AppUserRepository appUserRepository;
     private final AppUserMapper appUserMapper;
@@ -50,27 +50,25 @@ public class AppUserService {
 
     @Transactional
     public AppUserResponseDto createFirstAdmin(UUID tenantId, String adminEmail) {
-        AppUserRequestDto appUserRequestDto = appUserMapper.toFirstAdmin(adminEmail);
-        return create(appUserRequestDto, tenantId);
+        return create(appUserMapper.toFirstAdmin(adminEmail), tenantId);
     }
 
     @Transactional
-    public AppUserResponseDto create(AppUserRequestDto appUserRequestDto) {
-        return create(appUserRequestDto, currentUser.getTenantId());
+    public AppUserResponseDto create(AppUserRequestDto request) {
+        return create(request, currentUser.getTenantId());
     }
 
-    private AppUserResponseDto create(AppUserRequestDto appUserRequestDto, UUID tenantId) {
-        appUserValidator.validateTargetRole(appUserRequestDto, currentUser);
+    private AppUserResponseDto create(AppUserRequestDto request, UUID tenantId) {
+        appUserValidator.validateTargetRole(request, currentUser);
+        AppUser appUser = appUserMapper.toAppUser(request, tenantId);
 
-        AppUser appUser = appUserMapper.toAppUser(appUserRequestDto, tenantId);
-        AppUser createdUser = appUserRepository.save(appUser);
-        return appUserMapper.toAppUserDto(createdUser);
+        return appUserMapper.toAppUserDto(appUserRepository.save(appUser));
     }
 
     @Transactional(readOnly = true)
     @Cacheable(value = RedisConfig.CACHE_NAME_USERS, key = "#id")
     public AppUserResponseDto findByIdRequired(UUID id) {
-        return appUserMapper.toAppUserDto(getRequired(id));
+        return appUserMapper.toAppUserDto(appUserRepository.findByIdAndTenantIdRequired(id, currentUser.getTenantId()));
     }
 
     @Transactional(readOnly = true)
@@ -80,30 +78,20 @@ public class AppUserService {
 
     @Transactional
     @CacheEvict(value = RedisConfig.CACHE_NAME_USERS, key = "#id")
-    public AppUserResponseDto update(UUID id, AppUserRequestDto appUserRequestDto) {
-        AppUser currentAppUser = getRequired(id);
-        appUserValidator.validateTargetRole(appUserRequestDto, currentUser);
+    public AppUserResponseDto update(UUID id, AppUserRequestDto request) {
+        AppUser currentAppUser = appUserRepository.findByIdAndTenantIdRequired(id, currentUser.getTenantId());
+        appUserValidator.validateTargetRole(request, currentUser);
+        AppUser appUser = appUserMapper.toAppUser(currentAppUser, request);
 
-        AppUser appUserToUpdate = appUserMapper.toAppUser(currentAppUser, appUserRequestDto);
-        AppUser updatedAppUser = appUserRepository.save(appUserToUpdate);
-        return appUserMapper.toAppUserDto(updatedAppUser);
+        return appUserMapper.toAppUserDto(appUserRepository.save(appUser));
     }
 
     @Transactional
     @CacheEvict(value = RedisConfig.CACHE_NAME_USERS, key = "#id")
     public void delete(UUID id) {
         appUserValidator.validateDelete(id, currentUser);
-
-        if (!appUserRepository.existsByIdAndTenantId(id, currentUser.getTenantId())) {
-            throw new NotFoundException(String.format(ERROR_MESSAGE_PATTER_NOT_FOUND, id));
-        }
+        verifyExists(id);
         appUserRepository.deleteByIdAndTenantId(id, currentUser.getTenantId());
-    }
-
-    private AppUser getRequired(UUID id) {
-        return appUserRepository
-                .findByIdAndTenantId(id, currentUser.getTenantId())
-                .orElseThrow(() -> new NotFoundException(String.format(ERROR_MESSAGE_PATTER_NOT_FOUND, id)));
     }
 
     @Transactional(readOnly = true)
@@ -155,7 +143,7 @@ public class AppUserService {
     @Transactional
     @CacheEvict(value = RedisConfig.CACHE_NAME_USERS, key = "#id")
     public void unlockUser(UUID id) {
-        if (!getRequired(id).isLocked()) {
+        if (!appUserRepository.findByIdAndTenantIdRequired(id, currentUser.getTenantId()).isLocked()) {
             throw new IllegalArgumentException(ERROR_MESSAGE_USER_IS_NOT_LOCKED);
         }
 
@@ -172,5 +160,12 @@ public class AppUserService {
     @CacheEvict(value = RedisConfig.CACHE_NAME_USERS, allEntries = true)
     public int deleteByTenantId(UUID tenantId) {
         return appUserRepository.deleteByTenantId(tenantId);
+    }
+
+    @Transactional(readOnly = true)
+    public void verifyExists(UUID id) {
+        if (!appUserRepository.existsByIdAndTenantId(id, currentUser.getTenantId())) {
+            throw new NotFoundException(String.format(CommonErrorMessages.PATTERN_NOT_FOUND, id));
+        }
     }
 }

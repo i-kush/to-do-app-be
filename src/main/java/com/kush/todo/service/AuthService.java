@@ -1,5 +1,6 @@
 package com.kush.todo.service;
 
+import com.kush.todo.constant.CommonErrorMessages;
 import com.kush.todo.dto.request.LoginRequestDto;
 import com.kush.todo.dto.response.LoginResponseDto;
 import com.kush.todo.entity.AppUser;
@@ -24,8 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthService {
 
     public static final JwsHeader JWS_HEADER = JwsHeader.with(MacAlgorithm.HS256).build();
-    public static final String ERROR_MESSAGE_USER_LOCKED = "User is locked";
-    public static final String ERROR_MESSAGE_INVALID_CREDS = "Invalid username or password";
 
     private final JwtEncoder jwtEncoder;
     private final AppUserService appUserService;
@@ -38,14 +37,14 @@ public class AuthService {
     @Transactional
     public LoginResponseDto login(LoginRequestDto request) {
         AppUser user = appUserService.findByUsername(request.username())
-                                     .orElseThrow(() -> new UnauthorizedException(ERROR_MESSAGE_INVALID_CREDS));
+                                     .orElseThrow(() -> new UnauthorizedException(CommonErrorMessages.USER_INVALID_CREDS));
         if (user.isLocked()) {
-            throw new UnauthorizedException(ERROR_MESSAGE_USER_LOCKED);
+            throw new UnauthorizedException(CommonErrorMessages.USER_LOCKED);
         }
 
         if (!passwordEncoder.matches(request.password(), user.passwordHash())) {
             appUserService.lockUserIfNeeded(user);
-            throw new UnauthorizedException(ERROR_MESSAGE_INVALID_CREDS);
+            throw new UnauthorizedException(CommonErrorMessages.USER_INVALID_CREDS);
         } else if (user.loginAttempts() != null) {
             appUserService.nullifyLoginAttempts(user);
         }

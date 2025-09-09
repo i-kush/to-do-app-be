@@ -1,4 +1,4 @@
-package com.kush.todo.util;
+package com.kush.todo.service;
 
 import com.kush.todo.config.SecurityConfig;
 import org.junit.jupiter.api.Assertions;

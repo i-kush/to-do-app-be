@@ -1,9 +1,13 @@
 package com.kush.todo;
 
+import com.kush.todo.dto.ProjectStatus;
+import com.kush.todo.dto.TaskStatus;
 import com.kush.todo.dto.common.Role;
 import com.kush.todo.dto.request.AppUserRequestDto;
 import com.kush.todo.dto.request.CreateTenantRequestDto;
 import com.kush.todo.dto.request.LoginRequestDto;
+import com.kush.todo.dto.request.ProjectRequestDto;
+import com.kush.todo.dto.request.TaskRequestDto;
 import com.kush.todo.dto.request.UpdateTenantRequestDto;
 import com.kush.todo.entity.AppUser;
 
@@ -126,5 +130,38 @@ public final class IntegrationTestDataBuilder {
                               .username(username)
                               .password(password)
                               .build();
+    }
+
+    public static ProjectRequestDto buildProjectRequestDto() {
+        return buildProjectRequestDto("Project " + UUID.randomUUID());
+    }
+
+    public static ProjectRequestDto buildProjectRequestDto(String name) {
+        return ProjectRequestDto.builder()
+                                .name(name)
+                                .description("Project description" + UUID.randomUUID())
+                                .status(ProjectStatus.OPEN)
+                                .build();
+    }
+
+    public static TaskRequestDto buildTaskRequestDto() {
+        return buildTaskRequestDto("Task " + UUID.randomUUID());
+    }
+
+    public static TaskRequestDto buildTaskRequestDto(UUID userId) {
+        return buildTaskRequestDto("Task " + UUID.randomUUID(), userId);
+    }
+
+    public static TaskRequestDto buildTaskRequestDto(String name) {
+        return buildTaskRequestDto(name, null);
+    }
+
+    public static TaskRequestDto buildTaskRequestDto(String name, UUID userId) {
+        return TaskRequestDto.builder()
+                             .name(name)
+                             .assignedUserId(userId)
+                             .description("Task description" + UUID.randomUUID())
+                             .status(TaskStatus.OPEN)
+                             .build();
     }
 }

@@ -2,11 +2,11 @@ package com.kush.todo.flow;
 
 import com.kush.todo.BaseIntegrationTest;
 import com.kush.todo.IntegrationTestDataBuilder;
+import com.kush.todo.constant.CommonErrorMessages;
 import com.kush.todo.dto.request.CreateTenantRequestDto;
 import com.kush.todo.dto.request.LoginRequestDto;
 import com.kush.todo.dto.response.ErrorDto;
 import com.kush.todo.dto.response.ErrorsDto;
-import com.kush.todo.service.AuthService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -58,7 +58,7 @@ class AuthFlowIntegrationTest extends BaseIntegrationTest {
             List<ErrorDto> errors = errorResponse.getBody().errors();
             Assertions.assertFalse(CollectionUtils.isEmpty(errors));
             Assertions.assertEquals(1, errors.size());
-            Assertions.assertEquals(AuthService.ERROR_MESSAGE_INVALID_CREDS, errors.getFirst().message());
+            Assertions.assertEquals(CommonErrorMessages.USER_INVALID_CREDS, errors.getFirst().message());
         }
 
         errorResponse = restTemplate.postForEntity(BASE_URL_LOGIN, request, ErrorsDto.class);
@@ -77,6 +77,6 @@ class AuthFlowIntegrationTest extends BaseIntegrationTest {
         List<ErrorDto> errors = errorResponse.getBody().errors();
         Assertions.assertFalse(CollectionUtils.isEmpty(errors));
         Assertions.assertEquals(1, errors.size());
-        Assertions.assertEquals(AuthService.ERROR_MESSAGE_USER_LOCKED, errors.getFirst().message());
+        Assertions.assertEquals(CommonErrorMessages.USER_LOCKED, errors.getFirst().message());
     }
 }

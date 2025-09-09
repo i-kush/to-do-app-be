@@ -1,6 +1,7 @@
 package com.kush.todo.service;
 
 import com.kush.todo.BaseIntegrationTest;
+import com.kush.todo.constant.CommonErrorMessages;
 import com.kush.todo.dto.async.AsyncOperationDto;
 import com.kush.todo.dto.async.AsyncOperationEventDto;
 import com.kush.todo.dto.async.AsyncOperationStatus;
@@ -39,8 +40,10 @@ class AsyncOperationServiceIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getOperationNotFound() {
-        NotFoundException actual = Assertions.assertThrows(NotFoundException.class, () -> asyncOperationService.getOperation(UUID.randomUUID(), defaultTenantId));
-        Assertions.assertEquals(AsyncOperationService.ERROR_MESSAGE_OPERATION_NOT_FOUND, actual.getMessage());
+        UUID operationId = UUID.randomUUID();
+        String key = asyncOperationService.toKey(operationId, defaultTenantId);
+        NotFoundException actual = Assertions.assertThrows(NotFoundException.class, () -> asyncOperationService.getOperation(operationId, defaultTenantId));
+        Assertions.assertEquals(String.format(CommonErrorMessages.PATTERN_NOT_FOUND, key), actual.getMessage());
     }
 
     @Test

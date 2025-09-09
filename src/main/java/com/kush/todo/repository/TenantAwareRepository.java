@@ -1,5 +1,8 @@
 package com.kush.todo.repository;
 
+import com.kush.todo.constant.CommonErrorMessages;
+import com.kush.todo.exception.NotFoundException;
+
 import java.util.Optional;
 import java.util.UUID;
 
@@ -71,6 +74,11 @@ public interface TenantAwareRepository<T, ID> extends CrudRepository<T, ID>, Pag
     Page<T> findAllByTenantId(Pageable pageable, UUID tenantId);
 
     Optional<T> findByIdAndTenantId(ID id, UUID tenantId);
+
+    default T findByIdAndTenantIdRequired(ID id, UUID tenantId) {
+        return findByIdAndTenantId(id, tenantId)
+                .orElseThrow(() -> new NotFoundException(String.format(CommonErrorMessages.PATTERN_NOT_FOUND, id)));
+    }
 
     boolean existsByIdAndTenantId(ID id, UUID tenantId);
 
