@@ -2,6 +2,7 @@ package com.kush.todo.controller;
 
 import com.kush.todo.BaseIntegrationTest;
 import com.kush.todo.IntegrationTestDataBuilder;
+import com.kush.todo.dto.ProjectStatus;
 import com.kush.todo.dto.request.ProjectRequestDto;
 import com.kush.todo.dto.response.CustomPage;
 import com.kush.todo.dto.response.ErrorDto;
@@ -240,6 +241,39 @@ class ProjectControllerIntegrationTest extends BaseIntegrationTest {
         Assertions.assertNotNull(updateResponse.getBody().id());
         Assertions.assertEquals(updateRequest.name(), updateResponse.getBody().name());
         Assertions.assertNotEquals(createRequest.name(), updateResponse.getBody().name());
+    }
+
+    @Test
+    void setStatus() {
+        ProjectRequestDto createRequest = IntegrationTestDataBuilder.buildProjectRequestDto();
+        ResponseEntity<ProjectResponseDto> createResponse = restTemplate.postForEntity(BASE_PROJECT_URL,
+                                                                                       IntegrationTestDataBuilder.buildRequest(createRequest, defaultAccessToken),
+                                                                                       ProjectResponseDto.class);
+        UUID id = createResponse.getBody().id();
+        ProjectStatus status = ProjectStatus.DONE;
+
+        ProjectRequestDto updateRequest = IntegrationTestDataBuilder.buildProjectRequestDto();
+        ResponseEntity<ProjectResponseDto> updateResponse = restTemplate.exchange(BASE_PROJECT_URL + "/{id}/status/{status}",
+                                                                                  HttpMethod.PUT,
+                                                                                  IntegrationTestDataBuilder.buildRequest(updateRequest, defaultAccessToken),
+                                                                                  ProjectResponseDto.class,
+                                                                                  id,
+                                                                                  status.name().toLowerCase(Locale.getDefault()));
+
+        Assertions.assertEquals(HttpStatus.OK.value(), updateResponse.getStatusCode().value());
+        Assertions.assertNull(updateResponse.getBody());
+
+        ResponseEntity<ProjectResponseDto> getResponse = restTemplate.exchange(BASE_PROJECT_URL + "/{id}",
+                                                                               HttpMethod.GET,
+                                                                               IntegrationTestDataBuilder.buildRequest(defaultAccessToken),
+                                                                               ProjectResponseDto.class,
+                                                                               id);
+
+        Assertions.assertEquals(HttpStatus.OK.value(), getResponse.getStatusCode().value());
+        ProjectResponseDto getResponseBody = getResponse.getBody();
+        Assertions.assertNotNull(getResponseBody);
+        Assertions.assertEquals(id, getResponseBody.id());
+        Assertions.assertEquals(status, getResponseBody.status());
     }
 
     @Test

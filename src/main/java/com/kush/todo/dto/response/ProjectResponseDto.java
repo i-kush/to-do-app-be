@@ -1,5 +1,6 @@
 package com.kush.todo.dto.response;
 
+import com.kush.todo.dto.ProjectStatus;
 import lombok.Builder;
 
 import java.time.Instant;
@@ -11,7 +12,7 @@ public record ProjectResponseDto(
         UUID tenantId,
         String name,
         String description,
-        String status,
+        ProjectStatus status,
         Instant createdAt,
         Instant updatedAt
 ) {

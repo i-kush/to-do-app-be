@@ -2,6 +2,7 @@ package com.kush.todo.controller;
 
 import com.kush.todo.BaseIntegrationTest;
 import com.kush.todo.IntegrationTestDataBuilder;
+import com.kush.todo.dto.TaskStatus;
 import com.kush.todo.dto.request.ProjectRequestDto;
 import com.kush.todo.dto.request.TaskRequestDto;
 import com.kush.todo.dto.response.CustomPage;
@@ -95,13 +96,12 @@ class TaskControllerIntegrationTest extends BaseIntegrationTest {
                                                              TaskResponseDto.class,
                                                              projectId).getBody();
 
-        ResponseEntity<TaskResponseDto> getResponse = restTemplate.exchange(
-                BASE_PROJECT_URL + "/{projectId}/tasks/{taskId}",
-                HttpMethod.GET,
-                IntegrationTestDataBuilder.buildRequest(defaultAccessToken),
-                TaskResponseDto.class,
-                projectId,
-                created.id());
+        ResponseEntity<TaskResponseDto> getResponse = restTemplate.exchange(BASE_PROJECT_URL + "/{projectId}/tasks/{taskId}",
+                                                                            HttpMethod.GET,
+                                                                            IntegrationTestDataBuilder.buildRequest(defaultAccessToken),
+                                                                            TaskResponseDto.class,
+                                                                            projectId,
+                                                                            created.id());
 
         Assertions.assertEquals(HttpStatus.OK.value(), getResponse.getStatusCode().value());
         assertTask(getResponse.getBody(), request, projectId);
@@ -246,6 +246,44 @@ class TaskControllerIntegrationTest extends BaseIntegrationTest {
         Assertions.assertNotNull(updateResponse.getBody().id());
         Assertions.assertEquals(updateRequest.name(), updateResponse.getBody().name());
         Assertions.assertNotEquals(createRequest.name(), updateResponse.getBody().name());
+    }
+
+    @Test
+    void setTaskStatus() {
+        UUID projectId = getProjectId();
+        TaskRequestDto createRequest = IntegrationTestDataBuilder.buildTaskRequestDto();
+        UUID updateId = restTemplate.postForEntity(BASE_PROJECT_URL + "/{projectId}/tasks",
+                                                   IntegrationTestDataBuilder.buildRequest(createRequest, defaultAccessToken),
+                                                   TaskResponseDto.class,
+                                                   projectId)
+                                    .getBody()
+                                    .id();
+
+        TaskStatus status = TaskStatus.DONE;
+        TaskRequestDto updateRequest = IntegrationTestDataBuilder.buildTaskRequestDto();
+        ResponseEntity<TaskResponseDto> updateResponse = restTemplate.exchange(BASE_PROJECT_URL + "/{projectId}/tasks/{updateId}/status/{status}",
+                                                                               HttpMethod.PUT,
+                                                                               IntegrationTestDataBuilder.buildRequest(updateRequest, defaultAccessToken),
+                                                                               TaskResponseDto.class,
+                                                                               projectId,
+                                                                               updateId,
+                                                                               status.name().toLowerCase(Locale.getDefault()));
+
+        Assertions.assertEquals(HttpStatus.OK.value(), updateResponse.getStatusCode().value());
+        Assertions.assertNull(updateResponse.getBody());
+
+        ResponseEntity<TaskResponseDto> getResponse = restTemplate.exchange(BASE_PROJECT_URL + "/{projectId}/tasks/{updateId}",
+                                                                            HttpMethod.GET,
+                                                                            IntegrationTestDataBuilder.buildRequest(defaultAccessToken),
+                                                                            TaskResponseDto.class,
+                                                                            projectId,
+                                                                            updateId);
+
+        Assertions.assertEquals(HttpStatus.OK.value(), getResponse.getStatusCode().value());
+        TaskResponseDto getResponseBody = getResponse.getBody();
+        Assertions.assertNotNull(getResponseBody);
+        Assertions.assertEquals(updateId, getResponseBody.id());
+        Assertions.assertEquals(status, getResponseBody.status());
     }
 
     @Test
