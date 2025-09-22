@@ -4,9 +4,9 @@ import com.github.spotbugs.snom.SpotBugsTask
 
 plugins {
     id "java"
-    id "org.springframework.boot" version "3.4.6"
+    id "org.springframework.boot" version "3.5.6"
     id "io.spring.dependency-management" version "1.1.7"
-    id "com.github.spotbugs" version "6.2.5"
+    id "com.github.spotbugs" version "6.4.2"
     id "checkstyle"
     id "pmd"
     id "jacoco"
@@ -16,7 +16,7 @@ group = "com.kush.todo"
 version = "0.0.1-SNAPSHOT"
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
@@ -136,20 +136,20 @@ tasks.named("jacocoTestReport") {
 }
 
 checkstyle {
-    toolVersion = "10.17.0"
+    toolVersion = "11.0.1"
     configFile = file("config/checkstyle-rules.xml")
     ignoreFailures = false
 }
 
 pmd {
-    toolVersion = "7.0.0"
+    toolVersion = "7.17.0"
     ruleSets = []
     ruleSetFiles = files("config/pmd-rules.xml")
     ignoreFailures = false
 }
 
 spotbugs {
-    toolVersion = "4.8.4"
+    toolVersion = "4.9.4"
     effort = Effort.MAX
     reportLevel = Confidence.valueOf("LOW") //A workaround to overcome build warning to to plugin issues
     ignoreFailures = false

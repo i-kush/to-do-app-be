@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21-jre
+FROM azul/zulu-openjdk-alpine:25-jre-headless-latest
 
 WORKDIR /app
 COPY ./build/libs/to-do-app-be-*-SNAPSHOT.jar ./app.jar

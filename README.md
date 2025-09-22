@@ -10,7 +10,7 @@ The purpose of the application is mostly demo, since it's aggregating most of th
 ## Requirements
 
 - for simple local run `docker` and `docker-compose` should be installed
-- for development Java 21
+- for development Java 25
 - Gradle is optional for development, since there is gradle wrapper
 
 ## Stack
