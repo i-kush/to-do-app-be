@@ -55,8 +55,9 @@ class ProjectControllerIntegrationTest extends BaseIntegrationTest {
         Assertions.assertNotNull(response.updatedAt());
     }
 
+
     @Test
-    void createWithExistingName() {
+    public void createWithExistingName() {
         ProjectRequestDto request = IntegrationTestDataBuilder.buildProjectRequestDto();
         restTemplate.postForEntity(BASE_PROJECT_URL,
                                    IntegrationTestDataBuilder.buildRequest(request, defaultAccessToken),
