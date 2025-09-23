@@ -3,6 +3,7 @@ package com.kush.todo.config;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -33,8 +34,10 @@ public class AsyncConfig {
     @SuppressWarnings("PMD.CloseResource") //False positive - spring boot by default invokes destroy methods 'close' and 'shutdown' if available
     @Bean(THREAD_POOL_VIRTUAL_ASYNC)
     public Executor asyncVirtualExecutor() {
-        ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
+        ThreadFactory factory = Thread.ofVirtual()
+                                      .name("async-virtual-")
+                                      .factory();
+        ExecutorService executor = Executors.newThreadPerTaskExecutor(factory);
         return task -> executor.execute(new ContextAwareTaskDecorator().decorate(task));
     }
-
 }
