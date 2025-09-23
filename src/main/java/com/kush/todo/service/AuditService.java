@@ -27,13 +27,13 @@ public class AuditService {
     private final AuditMapper auditMapper;
 
     @Transactional
-    @Async(AsyncConfig.THREAD_POOL_ASYNC)
+    @Async(AsyncConfig.THREAD_POOL_VIRTUAL_ASYNC)
     public void create(UUID tenantId, UUID initiatorId, UUID targetId, Auditable auditable) {
         create(tenantId, initiatorId, targetId, auditable, AuditActionResult.SUCCESS, null);
     }
 
     @Transactional
-    @Async(AsyncConfig.THREAD_POOL_ASYNC)
+    @Async(AsyncConfig.THREAD_POOL_VIRTUAL_ASYNC)
     public void create(UUID tenantId, UUID initiatorId, UUID targetId, Auditable auditable, Exception e) {
         create(tenantId, initiatorId, targetId, auditable, AuditActionResult.FAILURE, e);
     }
