@@ -24,11 +24,6 @@ repositories {
     mavenCentral()
 }
 
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
-}
 ext {
     mapStructVersion = "1.6.3"
     springDocVersion = "2.8.11"
