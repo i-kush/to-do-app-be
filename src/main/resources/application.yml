@@ -6,6 +6,9 @@ server:
 spring:
   application:
     name: to-do-be-app
+  threads:
+    virtual:
+      enabled: true
   kafka:
     template:
       observation-enabled: true
