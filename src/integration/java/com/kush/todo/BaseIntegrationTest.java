@@ -6,10 +6,10 @@ import com.redis.testcontainers.RedisContainer;
 import jakarta.annotation.PreDestroy;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.kafka.ConfluentKafkaContainer;
+import org.testcontainers.postgresql.PostgreSQLContainer;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -18,8 +18,8 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.resttestclient.TestRestTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -34,7 +34,7 @@ import org.springframework.test.context.jdbc.Sql;
 @Sql(scripts = "/test-cleanup.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 public abstract class BaseIntegrationTest {
 
-    private static final PostgreSQLContainer<?> DB = new PostgreSQLContainer<>("postgres:17.0-alpine")
+    private static final PostgreSQLContainer DB = new PostgreSQLContainer("postgres:17.0-alpine")
             .withDatabaseName("to-do-database")
             .withUsername("postgres")
             .withPassword("password2")
@@ -86,9 +86,9 @@ public abstract class BaseIntegrationTest {
         jdbcTemplate.execute(Files.readString(Paths.get("src/integration/resources/test-init.sql")));
         defaultAccessToken = login(IntegrationTestDataBuilder.buildDefaultLoginRequest());
 
-        defaultTenantId = jdbcTemplate.queryForObject("select id from tenant where name = 'TestTenant' limit 1", UUID.class);
-        defaultUserId = jdbcTemplate.queryForObject("select id from app_user where tenant_id = ? limit 1", UUID.class, defaultTenantId);
-        systemTenantId = jdbcTemplate.queryForObject("select id from tenant where name = 'system' limit 1", UUID.class);
+        defaultTenantId = jdbcTemplate.queryForObject("SELECT id FROM tenant WHERE name = 'TestTenant' LIMIT 1", UUID.class);
+        defaultUserId = jdbcTemplate.queryForObject("SELECT id FROM app_user WHERE tenant_id = ? LIMIT 1", UUID.class, defaultTenantId);
+        systemTenantId = jdbcTemplate.queryForObject("SELECT id FROM tenant WHERE name = 'system' LIMIT 1", UUID.class);
     }
 
     protected String login(LoginRequestDto loginRequestDto) {

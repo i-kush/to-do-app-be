@@ -50,7 +50,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    UserLoggingFilter userLoggingFilter,
-                                                   UserStateVerificationFilter userStateVerificationFilter) throws Exception {
+                                                   UserStateVerificationFilter userStateVerificationFilter) {
         http.csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers(ALLOWED_ENDPOINTS.toArray(new String[]{})).permitAll()
