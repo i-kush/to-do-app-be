@@ -30,8 +30,6 @@ spring:
       resourceserver:
         jwt:
           expiration-seconds: 300
-  jpa:
-    open-in-view: false
   liquibase:
     change-log: classpath:/db/changelog/changelog-master.xml
 
@@ -69,3 +67,8 @@ todo:
       core-size: 20
       max-size: 40
       queue-capacity: 200
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
