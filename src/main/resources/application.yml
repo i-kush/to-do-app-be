@@ -49,6 +49,9 @@ management:
   metrics:
     tags:
       app: ${spring.application.name}
+  tracing:
+    export:
+      enabled: false
 
 logging:
   level:
