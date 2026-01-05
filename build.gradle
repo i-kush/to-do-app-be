@@ -46,7 +46,6 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-micrometer-tracing-brave"
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springDocVersion}"
     implementation "io.micrometer:micrometer-tracing-bridge-brave"
-    implementation "io.opentelemetry:opentelemetry-context"
     implementation "org.postgresql:postgresql"
     implementation "org.mapstruct:mapstruct:${mapStructVersion}"
     implementation "net.logstash.logback:logstash-logback-encoder:${logstashVersion}"

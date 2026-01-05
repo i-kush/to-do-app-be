@@ -1,5 +1,6 @@
 package com.kush.todo.filter;
 
+import com.kush.todo.constant.MdcConstants;
 import com.kush.todo.dto.common.CurrentUser;
 import com.kush.todo.service.RequestUtilsService;
 import jakarta.servlet.FilterChain;
@@ -41,7 +42,7 @@ public class UserLoggingFilter extends OncePerRequestFilter {
     private void trySetUserId(HttpServletRequest request) {
         try {
             if (!requestUtilsService.isAllowedEndpoint(request.getRequestURI())) {
-                MDC.put("userId", currentUser.getId().toString());
+                MDC.put(MdcConstants.USER_ID, currentUser.getId().toString());
             }
         } catch (IllegalStateException e) {
             //ignore

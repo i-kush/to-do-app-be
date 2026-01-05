@@ -51,7 +51,13 @@ management:
       app: ${spring.application.name}
   tracing:
     export:
-      enabled: false
+      enabled: true
+    baggage:
+      remote-fields: userId
+      correlation:
+        fields: userId
+    sampling:
+      probability: 1.0
 
 logging:
   level:
