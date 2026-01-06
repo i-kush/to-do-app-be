@@ -14,6 +14,9 @@ spring:
       observation-enabled: true
     listener:
       observation-enabled: true
+    producer:
+      properties:
+        interceptor.classes: com.kush.todo.config.kafka.MdcKafkaProducerInterceptor
     consumer:
       group-id: group-id-${spring.application.name}
     topics:
@@ -52,12 +55,6 @@ management:
   tracing:
     export:
       enabled: true
-    baggage:
-      remote-fields: userId
-      correlation:
-        fields: userId
-    sampling:
-      probability: 1.0
 
 logging:
   level:
