@@ -1,10 +1,10 @@
 package com.kush.todo.entity;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.kush.todo.dto.common.AuditActionResult;
 import com.kush.todo.dto.common.AuditActionType;
 import com.kush.todo.dto.common.AuditTargetType;
 import lombok.Builder;
+import tools.jackson.databind.JsonNode;
 
 import java.time.Instant;
 import java.util.UUID;

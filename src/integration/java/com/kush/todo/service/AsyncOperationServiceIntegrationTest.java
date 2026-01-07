@@ -61,6 +61,8 @@ class AsyncOperationServiceIntegrationTest extends BaseIntegrationTest {
         TestAsync response = new TestAsync(UUID.randomUUID().toString());
         asyncOperationService.executeOperation(eventDto, () -> response);
 
+        pause(2);
+
         AsyncOperationDto<TestAsync> operation = asyncOperationService.getOperation(queuedResponse.id(), defaultTenantId);
         Assertions.assertNotNull(operation);
         Assertions.assertNotNull(operation.id());
@@ -81,6 +83,8 @@ class AsyncOperationServiceIntegrationTest extends BaseIntegrationTest {
                                                                         .tenantId(defaultTenantId)
                                                                         .build();
         asyncOperationService.executeOperation(eventDto, () -> new TestAsync(UUID.randomUUID().toString()).get());
+
+        pause(2);
 
         AsyncOperationDto<TestAsync> operation = asyncOperationService.getOperation(queuedResponse.id(), defaultTenantId);
         Assertions.assertNotNull(operation);

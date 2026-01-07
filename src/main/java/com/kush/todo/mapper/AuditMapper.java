@@ -1,20 +1,25 @@
 package com.kush.todo.mapper;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.kush.todo.annotation.Auditable;
 import com.kush.todo.dto.common.AuditActionResult;
 import com.kush.todo.dto.response.AuditResponseDto;
 import com.kush.todo.entity.Audit;
 import org.mapstruct.Mapper;
 import org.slf4j.MDC;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 import java.time.Instant;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 @Mapper
 public abstract class AuditMapper extends PageMapper {
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     public Audit toAudit(UUID tenantId,
                          UUID initiatorId,
@@ -40,7 +45,7 @@ public abstract class AuditMapper extends PageMapper {
         if (e == null) {
             return null;
         }
-        ObjectNode objectNode = new ObjectMapper().createObjectNode();
+        ObjectNode objectNode = objectMapper.createObjectNode();
 
         objectNode.put("message", e.getMessage());
         objectNode.put("type", e.getClass().getName());

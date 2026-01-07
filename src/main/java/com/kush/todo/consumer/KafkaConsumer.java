@@ -1,14 +1,13 @@
 package com.kush.todo.consumer;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kush.todo.dto.async.AsyncOperationEventDto;
 import com.kush.todo.dto.request.CreateTenantRequestDto;
 import com.kush.todo.facade.TenantFacade;
 import com.kush.todo.service.AsyncOperationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.UUID;
 
@@ -26,14 +25,14 @@ public class KafkaConsumer {
     private final ObjectMapper objectMapper;
 
     @KafkaListener(topics = "${spring.kafka.topics.onboard-tenant}")
-    public void onboardTenant(Message<String> message) throws JsonProcessingException {
+    public void onboardTenant(Message<String> message) {
         AsyncOperationEventDto<CreateTenantRequestDto> operation = objectMapper.readValue(message.getPayload(), new TypeReference<>() {
         });
         asyncOperationService.executeOperation(operation, () -> tenantFacade.create(operation.request()));
     }
 
     @KafkaListener(topics = "${spring.kafka.topics.offboard-tenant}")
-    public void offboardTenant(Message<String> message) throws JsonProcessingException {
+    public void offboardTenant(Message<String> message) {
         AsyncOperationEventDto<UUID> operation = objectMapper.readValue(message.getPayload(), new TypeReference<>() {
         });
         asyncOperationService.executeOperation(operation, () -> tenantFacade.delete(operation.request()));

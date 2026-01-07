@@ -14,6 +14,9 @@ spring:
       observation-enabled: true
     listener:
       observation-enabled: true
+    producer:
+      properties:
+        interceptor.classes: com.kush.todo.config.kafka.MdcKafkaProducerInterceptor
     consumer:
       group-id: group-id-${spring.application.name}
     topics:
@@ -30,8 +33,6 @@ spring:
       resourceserver:
         jwt:
           expiration-seconds: 300
-  jpa:
-    open-in-view: false
   liquibase:
     change-log: classpath:/db/changelog/changelog-master.xml
 
@@ -51,6 +52,9 @@ management:
   metrics:
     tags:
       app: ${spring.application.name}
+  tracing:
+    export:
+      enabled: true
 
 logging:
   level:
@@ -69,3 +73,8 @@ todo:
       core-size: 20
       max-size: 40
       queue-capacity: 200
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false

@@ -1,11 +1,11 @@
 package com.kush.todo;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kush.todo.converter.JsonNodeWriteConverter;
 import com.kush.todo.dto.common.CurrentUser;
 import com.kush.todo.dto.common.Role;
 import com.kush.todo.entity.Tenant;
 import org.postgresql.util.PGobject;
+import tools.jackson.databind.ObjectMapper;
 
 import java.sql.SQLException;
 import java.time.Instant;

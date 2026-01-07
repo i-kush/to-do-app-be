@@ -1,10 +1,9 @@
 package com.kush.todo.converter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.postgresql.util.PGobject;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 import java.sql.SQLException;
 
@@ -28,7 +27,7 @@ public class JsonNodeWriteConverter implements Converter<JsonNode, PGobject> {
             result.setValue(source == null ? null : objectMapper.writeValueAsString(source));
 
             return result;
-        } catch (JsonProcessingException | SQLException e) {
+        } catch (SQLException e) {
             throw new IllegalArgumentException(String.format(ERROR_MESSAGE_PATTERN_JSON, source), e);
         }
     }

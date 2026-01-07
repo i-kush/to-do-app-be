@@ -1,6 +1,5 @@
 package com.kush.todo.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.kush.todo.BaseIntegrationTest;
 import com.kush.todo.IntegrationTestDataBuilder;
 import com.kush.todo.dto.common.AuditActionResult;
@@ -15,6 +14,7 @@ import com.kush.todo.dto.response.TenantDetailsResponseDto;
 import com.kush.todo.dto.response.TenantResponseDto;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.JsonNode;
 
 import java.util.Comparator;
 import java.util.List;
