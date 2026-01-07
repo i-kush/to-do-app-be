@@ -27,8 +27,8 @@ repositories {
 ext {
     mapStructVersion = "1.6.3"
     nettyDnsResolverVersion = "4.1.110.Final:osx-aarch_64"
-    springDocVersion = "3.0.0"
-    logstashVersion = "8.1"
+    springDocVersion = "3.0.1"
+    logstashVersion = "9.0"
     archUnitVersion = "1.4.1"
 }
 

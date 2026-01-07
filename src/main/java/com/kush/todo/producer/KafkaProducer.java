@@ -1,9 +1,8 @@
 package com.kush.todo.producer;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kush.todo.validator.KafkaEventValidator;
 import lombok.RequiredArgsConstructor;
+import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
@@ -18,11 +17,6 @@ public class KafkaProducer {
 
     public void send(Object event, String topic) {
         kafkaEventValidator.validate(event, topic);
-
-        try {
-            kafkaTemplate.send(topic, objectMapper.writeValueAsString(event));
-        } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException("Cannot serialise event", e);
-        }
+        kafkaTemplate.send(topic, objectMapper.writeValueAsString(event));
     }
 }

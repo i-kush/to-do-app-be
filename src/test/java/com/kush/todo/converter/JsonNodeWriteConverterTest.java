@@ -1,8 +1,5 @@
 package com.kush.todo.converter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kush.todo.BaseTest;
 import com.kush.todo.TestDataBuilder;
 import org.junit.jupiter.api.Assertions;
@@ -12,7 +9,10 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.postgresql.util.PGobject;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
+import java.sql.SQLException;
 import java.util.stream.Stream;
 
 class JsonNodeWriteConverterTest extends BaseTest {
@@ -20,9 +20,9 @@ class JsonNodeWriteConverterTest extends BaseTest {
     private final JsonNodeWriteConverter jsonNodeWriteConverter = new JsonNodeWriteConverter(TestDataBuilder.OBJECT_MAPPER);
 
     @Test
-    void convertJsonError() throws JsonProcessingException {
+    void convertJsonError() {
         ObjectMapper objectMapper = Mockito.mock(ObjectMapper.class);
-        JsonProcessingException exception = Mockito.mock(JsonProcessingException.class);
+        SQLException exception = Mockito.mock(SQLException.class);
 
         JsonNode invalidSource = TestDataBuilder.OBJECT_MAPPER.createObjectNode();
         JsonNodeWriteConverter subject = new JsonNodeWriteConverter(objectMapper);

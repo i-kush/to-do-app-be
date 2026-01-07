@@ -1,6 +1,5 @@
 package com.kush.todo.filter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kush.todo.constant.CommonErrorMessages;
 import com.kush.todo.dto.response.ErrorDto;
 import com.kush.todo.dto.response.ErrorsDto;
@@ -11,6 +10,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 

@@ -1,8 +1,8 @@
 package com.kush.todo.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kush.todo.converter.JsonNodeReadConverter;
 import com.kush.todo.converter.JsonNodeWriteConverter;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 

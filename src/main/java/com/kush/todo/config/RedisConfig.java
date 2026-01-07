@@ -1,8 +1,5 @@
 package com.kush.todo.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Duration;
@@ -27,13 +24,6 @@ public class RedisConfig {
     public static final String CACHE_NAME_ASYNC_OPERATIONS = "asyncOperations";
     public static final String CACHE_NAME_USERS = "users";
     public static final Set<String> DEFAULT_CACHE_NAMES = Set.of(CACHE_NAME_ASYNC_OPERATIONS);
-
-    @Bean
-    public ObjectMapper objectMapper() {
-        return new ObjectMapper()
-                .registerModule(new JavaTimeModule())
-                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-    }
 
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory connectionFactory,
