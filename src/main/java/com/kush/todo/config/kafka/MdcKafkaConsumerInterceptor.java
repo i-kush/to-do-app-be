@@ -31,6 +31,7 @@ class MdcKafkaConsumerInterceptor implements RecordInterceptor<Object, Object> {
         }
     }
 
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     private void populateMdc(ConsumerRecord<Object, Object> record, String... headerKeys) {
         for (String headerKey : headerKeys) {
             Header headerValue = record.headers().lastHeader(headerKey);
